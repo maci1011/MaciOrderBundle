@@ -1,0 +1,68 @@
+
+
+{% if order %}
+
+
+{% if order.items|length %}
+
+{% for item in order.items %}
+
+<div class="row">
+
+	<div class="col-xs-4">
+
+	<a href="{{ path('maci_product_show', { 'id': item.product.id }) }}">
+		{{ item.product }}
+	</a>
+
+	</div>
+
+	<div class="col-xs-4">
+		<p>
+			{{ item.quantity }}
+		</p>
+	</div>
+
+	<div class="col-xs-4">
+		<p>
+			{{ item.product.price }} &euro;
+		</p>
+	</div>
+
+</div>
+
+{% endfor %} {# items #}
+
+<h4>Pay:</h4>
+
+<div class="row">
+
+	{{ render(controller('MaciOrderBundle:Default:paypalForm', {'order': order})) }}
+
+</div>
+
+{% else %} {# items length #}
+
+
+<div class="row">
+
+	<p>Nothing in the list.</p>
+
+</div>
+
+
+{% endif %} {# items length #}
+
+
+{% else %} {# order #}
+
+
+<div class="row">
+
+	<p>Nothing here.</p>
+
+</div>
+
+
+{% endif %} {# order #}
+

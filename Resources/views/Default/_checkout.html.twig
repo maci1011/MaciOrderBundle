@@ -1,0 +1,92 @@
+
+<h3>Checkout</h3>
+
+
+<section>
+
+<h4>Your Order</h4>
+<h5>Name: {{ order.name }}</h5>
+<h5>Name: {{ order.items|length }}</h5>
+
+</section>
+
+
+{% if order.items|length %} {# --- Valid Checkout (^^) ---  #}
+
+
+<section>
+
+{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order } %}
+
+</section>
+
+
+<section>
+
+{% if checkout is defined %}
+
+
+	{% if checkout == 'shipping' %}
+
+		<h4>Shipping</h4>
+
+		<h5>Select or Add an Address:</h5>
+
+		{% include "MaciAddressBundle:Default:_list.html.twig" with { 'list': addresses, 'select': 'form[map][shipping]' } %}
+
+		<br/><br/>
+
+		{% include "MaciAddressBundle:Default:_form.html.twig" with { 'form': address_form, 'order': order } %}
+
+	{% elseif order.shipping %}
+
+		<h4>Shipping To:</h4>
+
+		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shipping } %}
+
+	{% endif %}
+
+
+	{% if checkout == 'billing' %}
+
+		<h4>Billing</h4>
+
+		<h5>Select or Add an Address:</h5>
+
+		{% include "MaciAddressBundle:Default:_list.html.twig" with { 'list': addresses, 'select': 'form[map][billing]' } %}
+
+		<br/><br/>
+
+		{% include "MaciAddressBundle:Default:_form.html.twig" with { 'form': address_form, 'order': order } %}
+
+	{% elseif order.billing %}
+
+		<h4>Billing To:</h4>
+
+		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
+
+	{% endif %}
+
+
+	{% if checkout == 'checkout' %}
+
+		{% include "MaciOrderBundle:Default:_form.html.twig" with {'order': order, 'form': form, 'confirm': 'confirm'} %}
+
+	{% endif %}
+
+
+{% endif %}
+
+</section>
+
+
+{% else %} {# --- InValid Checkout ---  #}
+
+<div class="row">
+
+	<p>No content.</p>
+
+</div>
+
+{% endif %} {# --- EndIf Checkout ---  #}
+

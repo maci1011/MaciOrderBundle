@@ -1,0 +1,14 @@
+
+{% extends "MaciCartBundle::layout.html.twig" %}
+
+
+{% block content %}
+
+<h3>{{ category.name }}</h3>
+
+{% include "MaciCartBundle:Default:_list.html.twig" with { 'list': category.products } %}
+
+{% endblock %}
+
+
+

@@ -1,0 +1,55 @@
+
+{% for item in list %}
+
+<div class="row">
+
+	<div class="col-xs-4">
+
+	<h5>
+		{{ item.code }}
+	</h5>
+
+	</div>
+
+	<div class="col-xs-2">
+		<p>
+			{{ item.created | date('d/m/Y') }}
+		</p>
+	</div>
+
+	<div class="col-xs-2">
+		<p>
+			{{ item.status }}
+		</p>
+	</div>
+
+	<div class="col-xs-4">
+
+		{% if item.status == 'confirmed' %}
+
+		<a href="{{ path('maci_order_invoice', {'id': item.id}) }}">
+			Show Invoice
+		</a>
+
+		{% else %}
+
+		<a href="{{ path('maci_order_checkout', {'id': item.id}) }}">
+			Checkout
+		</a>
+
+		{% endif %}
+
+	</div>
+
+</div>
+
+{% else %}
+
+<div class="row">
+
+	<p>No orders.</p>
+
+</div>
+
+{% endfor %}
+

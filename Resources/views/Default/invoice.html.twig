@@ -1,0 +1,15 @@
+
+{% extends "MaciOrderBundle::layout.html.twig" %}
+
+
+
+{% block content %}
+
+
+{% include "MaciOrderBundle:Default:_invoice.html.twig" with { 'order': order } %}
+
+
+{% endblock %}
+
+
+

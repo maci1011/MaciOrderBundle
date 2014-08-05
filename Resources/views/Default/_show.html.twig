@@ -1,0 +1,48 @@
+
+
+{% if order %}
+
+
+{% for item in order.items %}
+
+<div class="row">
+
+	<div class="col-xs-4">
+
+	<a href="{{ path('maci_product_show', { 'id': item.product.id }) }}">
+		{{ item.product }}
+	</a>
+
+	</div>
+
+	<div class="col-xs-4">
+		<p>
+			{{ item.quantity }}
+		</p>
+	</div>
+
+	<div class="col-xs-4">
+		<p>
+			{{ item.product.price }} &euro;
+		</p>
+	</div>
+
+</div>
+
+{% else %}
+
+<div class="row">
+
+	<p>Nothing in the list.</p>
+
+</div>
+
+{% endfor %}
+
+
+{% else %}
+
+<p>Nothing here.</p>
+
+{% endif %}
+

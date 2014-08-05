@@ -1,0 +1,27 @@
+{
+    "name": "maci/order-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony MaciOrderBundle",
+    "keywords": ["Order Generator", "order", "maci", "bootstrap"],
+    "homepage": "https://github.com/maci1011/OrderBundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maci",
+            "email": "info@macister.com",
+            "homepage": "http://macister.com"
+        }
+    ],
+    "require": {
+    },
+    "require-dev": {
+    },
+    "suggest": {
+    },
+    "autoload": {
+        "psr-0": { "Maci\\OrderBundle": "" }
+    },
+    "target-dir": "Maci/OrderBundle",
+    "extra": {
+    }
+}

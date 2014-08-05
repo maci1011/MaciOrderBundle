@@ -1,0 +1,54 @@
+
+Maci\OrderBundle\Entity\Item:
+    type:  entity
+    table: maci_order_item
+    repositoryClass: Maci\OrderBundle\Repository\ItemRepository
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    fields:
+        info:
+            type: text
+            nullable: true
+        details:
+            type: text
+            nullable: true
+        quantity:
+            type: decimal
+            nullable: true
+        price:
+            type: decimal
+            nullable: true
+        created:
+            type: datetime
+        updated:
+            type: datetime
+    manyToMany:
+        variants:
+            targetEntity: Maci\ProductBundle\Entity\Variant
+            joinTable:
+                name: maci_order_items_and_variants
+                joinColumns:
+                    variant_id:
+                        referencedColumnName: id
+                inverseJoinColumns:
+                    item_id:
+                        referencedColumnName: id
+    manyToOne:
+        order:
+            targetEntity: Order
+            inversedBy: items
+            joinColumn:
+                name: order_id
+                referencedColumnName: id
+        product:
+            targetEntity: Maci\ProductBundle\Entity\Product
+            joinColumn:
+                name: product_id
+                referencedColumnName: id
+    lifecycleCallbacks:
+        prePersist: [ setUpdatedValue, setCreatedValue ]
+        preUpdate: [ setUpdatedValue ]
+

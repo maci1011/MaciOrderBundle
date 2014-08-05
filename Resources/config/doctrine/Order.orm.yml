@@ -1,0 +1,65 @@
+
+Maci\OrderBundle\Entity\Order:
+    type:  entity
+    table: maci_order
+    repositoryClass: Maci\OrderBundle\Repository\OrderRepository
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 63
+            nullable: true
+        description:
+            type: text
+            nullable: true
+        type:
+            type: string
+            length: 31
+            nullable: true
+        code:
+            type: string
+            length: 31
+            nullable: true
+        status:
+            type: string
+            length: 31
+            nullable: true
+        amount:
+            type: decimal
+        token:
+            type: string
+            length: 63
+            nullable: true
+        created:
+            type: datetime
+        updated:
+            type: datetime
+    manyToOne:
+        user:
+            targetEntity: Maci\UserBundle\Entity\User
+            joinColumn:
+                name: user_id
+                referencedColumnName: id
+        billing:
+            targetEntity: Maci\AddressBundle\Entity\Address
+            joinColumn:
+                name: billing_id
+                referencedColumnName: id
+        shipping:
+            targetEntity: Maci\AddressBundle\Entity\Address
+            joinColumn:
+                name: shipping_id
+                referencedColumnName: id
+    oneToMany:
+        items:
+            targetEntity: Item
+            mappedBy: order
+            orderBy: { 'created': ASC }
+    lifecycleCallbacks:
+        prePersist: [ setUpdatedValue, setCreatedValue ]
+        preUpdate: [ setUpdatedValue ]
+
