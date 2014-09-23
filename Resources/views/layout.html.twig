@@ -3,24 +3,8 @@
 {% extends "MaciHelloBundle::layout.html.twig" %}
 
 
-{% block container %}
+{% block leftMenu %}
 
-<div id="row">
-	<div class="col-md-2">
-
-		{% block leftMenu %}
-
-			{% include "MaciOrderBundle:Default:_nav.html.twig" %}
-
-		{% endblock %}
-
-	</div>
-	<div class="col-md-10">
-
-		{% block content %}{% endblock %}
-
-	</div>
-</div>
+	{% include "MaciOrderBundle:Default:_nav.html.twig" %}
 
 {% endblock %}
-
