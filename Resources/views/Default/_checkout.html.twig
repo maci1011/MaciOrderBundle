@@ -7,6 +7,7 @@
 <h4>Your Order</h4>
 <h5>Name: {{ order.name }}</h5>
 <h5>Name: {{ order.items|length }}</h5>
+<h5>Checkout Status: {{ checkout }}</h5>
 
 </section>
 
@@ -32,11 +33,11 @@
 
 		<h5>Select or Add an Address:</h5>
 
-		{% include "MaciAddressBundle:Default:_list.html.twig" with { 'list': addresses, 'select': 'form[map][shipping]' } %}
+		{% render(controller('MaciAddressBundle:Default:list', { 'select': path('maci_order_checkout', {'id': order.id, 'set': 'shipping'}) } )) %}
 
 		<br/><br/>
 
-		{% include "MaciAddressBundle:Default:_form.html.twig" with { 'form': address_form, 'order': order } %}
+		{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': 'maci_order_checkout'})) %}
 
 	{% elseif order.shipping %}
 
@@ -53,11 +54,11 @@
 
 		<h5>Select or Add an Address:</h5>
 
-		{% include "MaciAddressBundle:Default:_list.html.twig" with { 'list': addresses, 'select': 'form[map][billing]' } %}
+		{% render(controller('MaciAddressBundle:Default:list', { 'select': path('maci_order_checkout', {'id': order.id, 'set': 'billing'}) } )) %}
 
 		<br/><br/>
 
-		{% include "MaciAddressBundle:Default:_form.html.twig" with { 'form': address_form, 'order': order } %}
+		{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': 'maci_order_checkout'})) %}
 
 	{% elseif order.billing %}
 
@@ -68,9 +69,11 @@
 	{% endif %}
 
 
-	{% if checkout == 'checkout' %}
+	{% if checkout == 'confirm' %}
 
-		{% include "MaciOrderBundle:Default:_form.html.twig" with {'order': order, 'form': form, 'confirm': 'confirm'} %}
+		<h4>Confirm Order:</h4>
+
+		{% render(controller('MaciOrderBundle:Default:paypalForm', {'order': order})) %}
 
 	{% endif %}
 

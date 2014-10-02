@@ -1,13 +1,13 @@
 
 
-{% if order %}
+{% if order and order.items|length %}
 
 
 {% for item in order.items %}
 
 <div class="row">
 
-	<div class="col-xs-4">
+	<div class="col-xs-3">
 
 	<a href="{{ path('maci_product_show', { 'id': item.product.id }) }}">
 		{{ item.product }}
@@ -15,13 +15,23 @@
 
 	</div>
 
-	<div class="col-xs-4">
+	<div class="col-xs-3">
 		<p>
 			{{ item.quantity }}
 		</p>
 	</div>
 
-	<div class="col-xs-4">
+	<div class="col-xs-3">
+
+		{% for variant in item.variants %}
+
+		<span>{{ variant }}</span>
+
+		{% endfor %}
+
+	</div>
+
+	<div class="col-xs-3">
 		<p>
 			{{ item.product.price }} &euro;
 		</p>
@@ -29,20 +39,28 @@
 
 </div>
 
+{% endfor %}
+
+<div class="row">
+
+	<div class="col-xs-8">
+
+	</div>
+
+	<div class="col-xs-4">
+		<span>Amount: {{ order.amount }} &euro;</span>
+	</div>
+
+</div>
+
+
 {% else %}
 
 <div class="row">
 
-	<p>Nothing in the list.</p>
+	<h3 class="noitems">No Items.</h3>
 
 </div>
-
-{% endfor %}
-
-
-{% else %}
-
-<p>Nothing here.</p>
 
 {% endif %}
 

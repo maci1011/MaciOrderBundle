@@ -1,43 +1,35 @@
 
-maci_order_cart:
-    pattern:  /{_locale}/order/cart
-    defaults: { _controller: MaciOrderBundle:Default:cart }
-
-maci_order_cart_form:
-    pattern:  /{_locale}/order/cart/form
-    defaults: { _controller: MaciOrderBundle:Default:cartForm }
-
-maci_order_cart_checkout:
-    pattern:  /{_locale}/order/cart/checkout
-    defaults: { _controller: MaciOrderBundle:Default:cartCheckout }
-
-maci_order_preview:
-    pattern:  /{_locale}/order/preview
-    defaults: { _controller: MaciOrderBundle:Default:preview }
-
-maci_order_save_and_pay:
-    pattern:  /{_locale}/order/saveAndPay
-    defaults: { _controller: MaciOrderBundle:Default:saveAndPay }
 
 maci_order_checkout:
-    pattern:  /{_locale}/order/checkout/{id}
+    pattern:  /order/checkout/{id}
     defaults: { _controller: MaciOrderBundle:Default:checkout }
 
 maci_order_invoice:
-    pattern:  /{_locale}/order/invoice/{id}
+    pattern:  /order/invoice/{id}
     defaults: { _controller: MaciOrderBundle:Default:invoice }
 
-maci_order_show:
-    pattern:  /{_locale}/order/show/{id}
-    defaults: { _controller: MaciOrderBundle:Default:show }
-
-maci_order_homepage:
-    pattern:  /{_locale}/order
-    defaults: { _controller: MaciOrderBundle:Default:index }
-
+maci_order_cart_form:
+    pattern:  /order/cart/form
+    defaults: { _controller: MaciOrderBundle:Default:cartForm }
 
 # PayPal Ipn Order Notification
 maci_order_paypal_notification:
     pattern:  /order/paypal/ipn
     defaults: { _controller: MaciOrderBundle:Notification:ipn }
+
+maci_order_cart_add:
+    pattern:  /order/cart/add
+    defaults: { _controller: MaciOrderBundle:Default:addToCart }
+
+maci_order_cart:
+    pattern:  /order/cart
+    defaults: { _controller: MaciOrderBundle:Default:cart }
+
+maci_order_notfound:
+    pattern:  /order/notfound
+    defaults: { _controller: MaciOrderBundle:Default:notfound }
+
+maci_order_homepage:
+    pattern:  /order
+    defaults: { _controller: MaciOrderBundle:Default:index }
 

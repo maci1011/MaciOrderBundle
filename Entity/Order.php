@@ -65,6 +65,11 @@ class Order
     private $items;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $transactions;
+
+    /**
      * @var \Maci\UserBundle\Entity\User
      */
     private $user;
@@ -85,6 +90,7 @@ class Order
     public function __construct()
     {
         $this->items = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->transactions = new \Doctrine\Common\Collections\ArrayCollection();
         $this->token = md5(
             'MaciOrderBundle_Entity_Order-' . rand(10000, 99999) . '-' . 
             date('h') . date('i') . date('s') . date('m') . date('d') . date('Y')
@@ -344,6 +350,39 @@ class Order
     }
 
     /**
+     * Add transactions
+     *
+     * @param \Maci\OrderBundle\Entity\Transaction $transactions
+     * @return Order
+     */
+    public function addTransaction(\Maci\OrderBundle\Entity\Transaction $transactions)
+    {
+        $this->transactions[] = $transactions;
+
+        return $this;
+    }
+
+    /**
+     * Remove transactions
+     *
+     * @param \Maci\OrderBundle\Entity\Transaction $transactions
+     */
+    public function removeTransaction(\Maci\OrderBundle\Entity\Transaction $transactions)
+    {
+        $this->transactions->removeElement($transactions);
+    }
+
+    /**
+     * Get transactions
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getTransactions()
+    {
+        return $this->transactions;
+    }
+
+    /**
      * Set user
      *
      * @param \Maci\UserBundle\Entity\User $user
@@ -434,5 +473,27 @@ class Order
     public function setCreatedValue()
     {
         $this->created = new \DateTime();
+    }
+
+    public function refreshAmount()
+    {
+        $amounts = $this->getItems()->map(function($e){
+            $e->refreshAmount();
+            return $e->getAmount();
+        });
+        $tot = 0;
+        foreach ($amounts as $amount) {
+            $tot += $amount;
+        }
+        $this->amount = $tot;
+    }
+
+    public function completeOrder()
+    {
+        if ($this->status === 'complete') {
+            return;
+        }
+        $this->status = 'complete';
+        
     }
 }

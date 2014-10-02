@@ -59,6 +59,10 @@ Maci\OrderBundle\Entity\Order:
             targetEntity: Item
             mappedBy: order
             orderBy: { 'created': ASC }
+        transactions:
+            targetEntity: Transaction
+            mappedBy: order
+            orderBy: { 'created': ASC }
     lifecycleCallbacks:
         prePersist: [ setUpdatedValue, setCreatedValue ]
         preUpdate: [ setUpdatedValue ]

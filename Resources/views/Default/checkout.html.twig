@@ -2,20 +2,12 @@
 {% extends "MaciOrderBundle::layout.html.twig" %}
 
 
-
 {% block content %}
-
 
 {% include "MaciOrderBundle:Default:_checkout.html.twig" with {
 	'checkout': checkout,
-	'address_form': address_form,
-	'addresses': addresses,
-	'order': order,
-	'form': form
+	'order': order
 } %}
 
-
 {% endblock %}
-
-
 

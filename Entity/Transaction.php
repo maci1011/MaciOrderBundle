@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Item
  */
-class Item
+class Transaction
 {
     /**
      * @var integer
@@ -17,17 +17,12 @@ class Item
     /**
      * @var string
      */
-    private $info;
+    private $tx;
 
     /**
      * @var string
      */
     private $details;
-
-    /**
-     * @var string
-     */
-    private $quantity;
 
     /**
      * @var string
@@ -49,25 +44,6 @@ class Item
      */
     private $order;
 
-    /**
-     * @var \Maci\ProductBundle\Entity\Product
-     */
-    private $product;
-
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    private $variants;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->quantity = 1;
-        $this->variants = new \Doctrine\Common\Collections\ArrayCollection();
-    }
-
 
     /**
      * Get id
@@ -80,26 +56,26 @@ class Item
     }
 
     /**
-     * Set info
+     * Set tx
      *
-     * @param string $info
+     * @param string $tx
      * @return Item
      */
-    public function setInfo($info)
+    public function setTx($tx)
     {
-        $this->info = $info;
+        $this->tx = $tx;
 
         return $this;
     }
 
     /**
-     * Get info
+     * Get tx
      *
      * @return string 
      */
-    public function getInfo()
+    public function getTx()
     {
-        return $this->info;
+        return $this->tx;
     }
 
     /**
@@ -126,29 +102,6 @@ class Item
     }
 
     /**
-     * Set quantity
-     *
-     * @param string $quantity
-     * @return Item
-     */
-    public function setQuantity($quantity)
-    {
-        $this->quantity = $quantity;
-
-        return $this;
-    }
-
-    /**
-     * Get quantity
-     *
-     * @return string 
-     */
-    public function getQuantity()
-    {
-        return $this->quantity;
-    }
-
-    /**
      * Set amount
      *
      * @param string $amount
@@ -169,15 +122,6 @@ class Item
     public function getAmount()
     {
         return $this->amount;
-    }
-
-    public function refreshAmount()
-    {
-        $tot = 0;
-        if ($this->getProduct()) {
-            $tot += $this->getProduct()->getPrice();
-        }
-        $this->amount = $tot;
     }
 
     /**
@@ -250,67 +194,11 @@ class Item
     }
 
     /**
-     * Set product
-     *
-     * @param \Maci\ProductBundle\Entity\Product $product
-     * @return Item
-     */
-    public function setProduct(\Maci\ProductBundle\Entity\Product $product = null)
-    {
-        $this->product = $product;
-
-        return $this;
-    }
-
-    /**
-     * Get product
-     *
-     * @return \Maci\ProductBundle\Entity\Product 
-     */
-    public function getProduct()
-    {
-        return $this->product;
-    }
-
-    /**
-     * Add variants
-     *
-     * @param \Maci\ProductBundle\Entity\Variant $variants
-     * @return Item
-     */
-    public function addVariant(\Maci\ProductBundle\Entity\Variant $variants)
-    {
-        $this->variants[] = $variants;
-
-        return $this;
-    }
-
-    /**
-     * Remove variants
-     *
-     * @param \Maci\ProductBundle\Entity\Variant $variants
-     */
-    public function removeVariant(\Maci\ProductBundle\Entity\Variant $variants)
-    {
-        $this->variants->removeElement($variants);
-    }
-
-    /**
-     * Get variants
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getVariants()
-    {
-        return $this->variants;
-    }
-
-    /**
      * __toString()
      */
     public function __toString()
     {
-        return 'MaciOrderItem_' . $this->getId();
+        return $this->getTx();
     }
 
     public function setUpdatedValue()

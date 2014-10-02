@@ -18,7 +18,7 @@ Maci\OrderBundle\Entity\Item:
         quantity:
             type: decimal
             nullable: true
-        price:
+        amount:
             type: decimal
             nullable: true
         created:
@@ -31,10 +31,10 @@ Maci\OrderBundle\Entity\Item:
             joinTable:
                 name: maci_order_items_and_variants
                 joinColumns:
-                    variant_id:
+                    item_id:
                         referencedColumnName: id
                 inverseJoinColumns:
-                    item_id:
+                    variant_id:
                         referencedColumnName: id
     manyToOne:
         order:

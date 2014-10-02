@@ -3,28 +3,6 @@ parameters:
 
 services:
 
-  sonata.admin.maci_order:
-      class: Maci\OrderBundle\Admin\OrderAdmin
-      tags:
-          - { name: sonata.admin, manager_type: orm, group: "Order", label: "Order" }
-      arguments:
-          - ~
-          - Maci\OrderBundle\Entity\Order
-          - ~
-      calls:
-          - [ setTranslationDomain, [MaciOrderBundle]]
-
-  sonata.admin.maci_order_item:
-      class: Maci\OrderBundle\Admin\ItemAdmin
-      tags:
-          - { name: sonata.admin, manager_type: orm, group: "Order", label: "Item" }
-      arguments:
-          - ~
-          - Maci\OrderBundle\Entity\Item
-          - ~
-      calls:
-          - [ setTranslationDomain, [MaciOrderBundle]]
-
   maci.order.paypal_im_received:
       class: Maci\OrderBundle\Event\OrderPayPalListener
       arguments: ["@doctrine.orm.entity_manager"]

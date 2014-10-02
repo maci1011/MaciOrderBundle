@@ -1,6 +1,6 @@
 <?php
 
-namespace Orderly\PayPalIpnBundle\Controller;
+namespace Maci\OrderBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;

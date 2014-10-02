@@ -1,0 +1,35 @@
+
+Maci\OrderBundle\Entity\Transaction:
+    type:  entity
+    table: maci_order_transaction
+    repositoryClass: Maci\OrderBundle\Repository\TransactionRepository
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    fields:
+        tx:
+            type: string
+            length: 63
+        details:
+            type: text
+            nullable: true
+        amount:
+            type: decimal
+            nullable: true
+        created:
+            type: datetime
+        updated:
+            type: datetime
+    manyToOne:
+        order:
+            targetEntity: Order
+            inversedBy: transactions
+            joinColumn:
+                name: order_id
+                referencedColumnName: id
+    lifecycleCallbacks:
+        prePersist: [ setUpdatedValue, setCreatedValue ]
+        preUpdate: [ setUpdatedValue ]
+
