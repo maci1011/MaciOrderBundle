@@ -12,12 +12,11 @@
 
 {% if cart and cart.items|length %}
 
-<br/><br/><br/>
-
-<a href="{{ path('maci_order_checkout', {'id': cart.id}) }}" class="btn btn-default">Checkout</a>
+<div class="row">
+	<a href="{{ path('maci_order_checkout', {'id': cart.id}) }}" class="btn btn-default">Checkout</a>
+</div>
 
 {% endif %}
-
 
 {% endblock %}
 

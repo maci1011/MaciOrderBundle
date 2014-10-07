@@ -37,7 +37,7 @@
 
 		<br/><br/>
 
-		{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': 'maci_order_checkout'})) %}
+		{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout', {'id': order.id, 'set': 'shipping'}) } )) %}
 
 	{% elseif order.shipping %}
 
@@ -58,7 +58,7 @@
 
 		<br/><br/>
 
-		{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': 'maci_order_checkout'})) %}
+		{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout', {'id': order.id, 'set': 'billing'})})) %}
 
 	{% elseif order.billing %}
 

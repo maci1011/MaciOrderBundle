@@ -322,4 +322,34 @@ class Item
     {
         $this->created = new \DateTime();
     }
+
+    public function checkProductQuantity($quantity = false)
+    {
+        $quantity = $quantity ? $quantity : $this->getQuantity();
+
+        if ($product = $this->getProduct()) {
+            if ( !$product->checkQuantity($quantity) ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function checkVariantsQuantity($quantity = false)
+    {
+        $quantity = $quantity ? $quantity : $this->getQuantity();
+        $errors = false;
+
+        if (count($this->getVariants())) {
+            foreach ($this->getVariants() as $variant) {
+                if ( !$variant->checkQuantity($quantity) ) {
+                    $errors = true;
+                }
+            }
+        }
+
+        if ($errors) { return false; }
+        return true;
+    }
 }

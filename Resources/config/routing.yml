@@ -1,5 +1,9 @@
 
 
+maci_order_paypal_complete:
+    pattern:  /order/complete/paypal/{id}
+    defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
+
 maci_order_checkout:
     pattern:  /order/checkout/{id}
     defaults: { _controller: MaciOrderBundle:Default:checkout }
@@ -8,14 +12,13 @@ maci_order_invoice:
     pattern:  /order/invoice/{id}
     defaults: { _controller: MaciOrderBundle:Default:invoice }
 
+maci_order_dev:
+    pattern:  /order/dev/{id}
+    defaults: { _controller: MaciOrderBundle:Default:dev, id: 0 }
+
 maci_order_cart_form:
     pattern:  /order/cart/form
     defaults: { _controller: MaciOrderBundle:Default:cartForm }
-
-# PayPal Ipn Order Notification
-maci_order_paypal_notification:
-    pattern:  /order/paypal/ipn
-    defaults: { _controller: MaciOrderBundle:Notification:ipn }
 
 maci_order_cart_add:
     pattern:  /order/cart/add
@@ -29,7 +32,7 @@ maci_order_notfound:
     pattern:  /order/notfound
     defaults: { _controller: MaciOrderBundle:Default:notfound }
 
-maci_order_homepage:
+maci_order:
     pattern:  /order
     defaults: { _controller: MaciOrderBundle:Default:index }
 

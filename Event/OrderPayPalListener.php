@@ -6,6 +6,7 @@ use Orderly\PayPalIpnBundle\Event\PayPalEvent;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Maci\OrderBundle\Entity\Transaction;
+use Maci\MediaBundle\Entity\Permission;
 
 
 class OrderPayPalListener {
@@ -40,7 +41,32 @@ class OrderPayPalListener {
 
             $order->addTransaction($tx);
 
+            $this->om->persist($tx);
+
             $order->completeOrder();
+
+            $docs = $order->getOrderDocuments();
+
+            if (count($docs)) {
+                foreach ($docs as $id => $document) {
+                    $permission = $this->om->getRepository('MaciMediaBundle:Permission')->findBy(array(
+                        'user' => $this->getUser(),
+                        'media' => $document
+                    ));
+
+                    if ($permission) {
+                        $permission->setStatus('active');
+                    } else {
+                        $permission = new Permission;
+                        $permission->setUser($this->getUser());
+                        $permission->setMedia($document);
+                        $permission->setStatus('active');
+                        $permission->setNote('Created by Order ['.$this->getId().'], Item: ['.$item->getId().'].');
+                        $this->om->persist($permission);
+                    }
+
+                }
+            }
 
         }
 

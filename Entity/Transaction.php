@@ -5,7 +5,7 @@ namespace Maci\OrderBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Item
+ * Transaction
  */
 class Transaction
 {

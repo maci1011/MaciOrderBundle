@@ -488,12 +488,62 @@ class Order
         $this->amount = $tot;
     }
 
+    public function checkOrder()
+    {
+        $errors = false;
+
+        foreach ($this->items as $item) {
+            if ( !$item->checkProductQuantity() || !$item->checkVariantsQuantity() ) {
+                $errors = true;
+            }
+        }
+
+        if ($errors) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function subItemsQuantity()
+    {
+        foreach ($this->items as $item) {
+            if ($product = $item->getProduct()) {
+                $product->subQuantity($item->getQuantity());
+            }
+            if (count($item->getVariants())) {
+                foreach ($item->getVariants() as $variant) {
+                    $variant->subQuantity($item->getQuantity());
+                }
+            }
+        }
+    }
+
     public function completeOrder()
     {
         if ($this->status === 'complete') {
             return;
         }
+
+        $this->subItemsQuantity();
+
         $this->status = 'complete';
-        
+    }
+
+    public function getOrderDocuments()
+    {
+        $documents = array();
+        foreach ($this->items as $item) {
+            if ($product = $item->getProduct()) {
+                if (count($product->getPrivateDocuments())) {
+                    foreach ($product->getPrivateDocuments() as $item) {
+                        $document = $item->getMedia();
+                        $documents[$document->getId()] = $document;
+                    }
+                }
+            }
+        }
+
+        return $documents;
     }
 }

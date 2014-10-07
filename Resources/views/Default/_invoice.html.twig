@@ -1,9 +1,6 @@
 
+{% if order and order.items|length %}
 
-{% if order %}
-
-
-{% if order.items|length %}
 
 {% for item in order.items %}
 
@@ -33,36 +30,11 @@
 
 {% endfor %} {# items #}
 
-<h4>Pay:</h4>
+
+{% else %}
 
 <div class="row">
-
-	{{ render(controller('MaciOrderBundle:Default:paypalForm', {'order': order})) }}
-
+	<h3 class="noitems">No Items.</h3>
 </div>
-
-{% else %} {# items length #}
-
-
-<div class="row">
-
-	<p>Nothing in the list.</p>
-
-</div>
-
-
-{% endif %} {# items length #}
-
-
-{% else %} {# order #}
-
-
-<div class="row">
-
-	<p>Nothing here.</p>
-
-</div>
-
 
 {% endif %} {# order #}
-
