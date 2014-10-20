@@ -2,6 +2,19 @@
 {% extends "MaciCartBundle::layout.html.twig" %}
 
 
+{% block title %}
+
+<title>{{ 'order.notfound.meta_title' | matra }}</title>
+
+{% endblock %}
+
+{% block description %}
+
+<meta name="description" content="{{ 'order.notfound.meta_description' | matra }}" />
+
+{% endblock %}
+
+
 {% block content %}
 
 <h3>Not Found.</h3>

@@ -2,6 +2,19 @@
 {% extends "MaciOrderBundle::layout.html.twig" %}
 
 
+{% block title %}
+
+<title>{{ 'order.checkout.meta_title' | matra }}</title>
+
+{% endblock %}
+
+{% block description %}
+
+<meta name="description" content="{{ 'order.checkout.meta_description' | matra }}" />
+
+{% endblock %}
+
+
 {% block content %}
 
 {% include "MaciOrderBundle:Default:_checkout.html.twig" with {
