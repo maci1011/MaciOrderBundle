@@ -60,7 +60,7 @@ class OrderPayPalListener {
                         $permission = new Permission;
                         $permission->setUser($this->getUser());
                         $permission->setMedia($document);
-                        $permission->setStatus('active');
+                        $permission->setStatus('end');
                         $permission->setNote('Created by Order ['.$this->getId().'], Item: ['.$item->getId().'].');
                         $this->om->persist($permission);
                     }
