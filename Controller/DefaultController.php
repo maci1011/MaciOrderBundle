@@ -138,10 +138,15 @@ class DefaultController extends Controller
             $status = $pdtArray['payment_status'];
         }
 
-        return $this->render('MaciOrderBundle:Default:invoice.html.twig', array(
-            'order' => $order,
-            'status' => $status
-        ));
+        $page = $this->getDoctrine()->getManager()
+            ->getRepository('MaciPageBundle:Page')
+            ->findOneByPath('order-complete');
+
+        if ($page) {
+            return $this->render('MaciPageBundle:Default:page.html.twig', array('page' => $page));
+        }
+
+        return $this->render('MaciOrderBundle:Default:complete.html.twig');
     }
 
     public function invoiceAction($id)

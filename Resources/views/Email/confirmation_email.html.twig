@@ -1,0 +1,78 @@
+<html>
+<body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor='#e6e6e6' font-family='verdana'>
+
+
+<table width="100%" cellpadding="10" cellspacing="0" class="backgroundTable" bgcolor='#e6e6e6' >
+
+<tr>
+<td valign="top" align="center">
+<h1>Thank you for your Order!</h1>
+<h2>Your order has been confirmed.</h2>
+<span>Order Id: {{ order.name }}</span>
+</td>
+</tr>
+
+<td valign="top" align="center">
+<h3>Payment Address:</h3>
+{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
+</td>
+</tr>
+
+{% if order.shipping %}
+<td valign="top" align="center">
+<h3>Shipping Address:</h3>
+{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shipping } %}
+</td>
+</tr>
+{% endif %}
+
+<td valign="top" align="center">
+<h3>Order Details:</h3>
+<table>
+	{% for item in order.items %}
+	<tr>
+		<td>{{ item }}</td>
+		<td>
+			{% for variant in item.variants %}
+			{{ variant }}<br/>
+			{% endfor %}
+		</td>
+		<td>{{ item.quantity }}</td>
+		<td>{{ item.amount }} &euro;</td>
+	</tr>
+	{% endfor %}
+	<tr>
+		<td>Amount:</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>{{ order.amount }} &euro;</td>
+	</tr>
+</table>
+</td>
+</tr>
+
+{% if order.orderDocuents|length %}
+<td valign="top" align="center">
+<h3>E-Book:</h3>
+<table>
+	{% for item in order.orderDocuents %}
+	<tr>
+		<td>{{ item }}</td>
+		<td><a href="{{ path('maci_media_get', {'path': item.path}) }}">Get E-Book</a></td>
+	</tr>
+	{% endfor %}
+</table>
+</td>
+</tr>
+{% endif %}
+
+<tr>
+<td valign="top" align="center">
+<p>Contact <a href="mailto:mah@mah.com">mah@mah.com</a> if you need more informations.</p>
+</td>
+</tr>
+
+</table>
+
+</body>
+</html>

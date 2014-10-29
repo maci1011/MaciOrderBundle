@@ -1,0 +1,25 @@
+
+{% extends "MaciOrderBundle::layout.html.twig" %}
+
+
+{% block title %}
+
+<title>{{ 'order.complete.meta_title' | matra }}</title>
+
+{% endblock %}
+
+{% block description %}
+
+<meta name="description" content="{{ 'order.complete.meta_description' | matra }}" />
+
+{% endblock %}
+
+
+{% block content %}
+
+{% include "MaciOrderBundle:Default:_complete.html.twig" with { 'order': order } %}
+
+{% endblock %}
+
+
+
