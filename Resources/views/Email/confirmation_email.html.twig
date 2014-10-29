@@ -54,6 +54,7 @@
 {% if order.orderDocuents|length %}
 <td valign="top" align="center">
 <h3>E-Book:</h3>
+<p>You can ee all your ebooks in <a href="{{ path('maci_user_library') }}">Your Library</a>.</p>
 <table>
 	{% for item in order.orderDocuents %}
 	<tr>
