@@ -4,6 +4,7 @@ namespace Maci\OrderBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Maci\OrderBundle\Entity\Order;
@@ -59,7 +60,7 @@ class DefaultController extends Controller
         $checkout = ( $request->get('checkout') ? $request->get('checkout') : 'checkout' );
 
         if ( $checkout === 'checkout' ) {
-            if ( !$order->getShipping() ) {
+            if ( $order->checkShipment() && !$order->getShipping() ) {
                 $checkout = 'shipping';
             } else if (!$order->getBilling() ) {
                 $checkout = 'billing';
@@ -236,6 +237,40 @@ class DefaultController extends Controller
         $om->flush();
 
         return $this->redirect($this->generateUrl('maci_order_cart'));
+    }
+
+    public function removeCartItemAction(Request $request, $id)
+    {
+        if ($this->removeItem($request, $id)) {
+            return $this->redirect($this->generateUrl('maci_order_cart', array('removed' => true)));
+        } else {
+            return $this->redirect($this->generateUrl('maci_order_cart', array('error' => true)));
+        }
+    }
+
+    public function removeItem(Request $request, $id)
+    {
+        $item = $this->getDoctrine()->getEntityManager()->getRepository('MaciOrderBundle:Item')
+            ->findOneBy(array(
+                'id' => $id
+            ))
+        ;
+
+        if (
+            !$item ||
+            ( $item->getOrder()->getUser() && $item->getOrder()->getUser()->getId() !== $this->getUser()->getId() ) &&
+            false === $this->get('security.context')->isGranted('ROLE_SUPER_ADMIN')
+        ) {
+            return false;
+        }
+
+        $em = $this->getDoctrine()->getEntityManager();
+
+        $em->remove($item);
+
+        $em->flush();
+
+        return true;
     }
 
     public function set($order, $request)

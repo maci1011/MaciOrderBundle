@@ -96,8 +96,7 @@ class Order
             date('h') . date('i') . date('s') . date('m') . date('d') . date('Y')
         );
         $this->amount = 0;
-        $this->ask_billing = true;
-        $this->ask_shipping = false;
+        $this->shipment = false;
     }
 
     /**
@@ -473,6 +472,22 @@ class Order
     public function setCreatedValue()
     {
         $this->created = new \DateTime();
+    }
+
+
+    public function checkShipment()
+    {
+        $shipment = false;
+
+        foreach ($this->items as $item) {
+            $product = $item->getProduct();
+            if ( $product && $product->getShipment() ) {
+                $shipment = true;
+                break;
+            }
+        }
+
+        return $shipment;
     }
 
     public function refreshAmount()

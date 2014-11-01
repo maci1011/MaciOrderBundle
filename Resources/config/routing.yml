@@ -4,6 +4,10 @@ maci_order_paypal_complete:
     pattern:  /order/complete/paypal/{id}
     defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
 
+maci_order_remove_cart_item:
+    pattern:  /order/cart-item/{id}/remove
+    defaults: { _controller: MaciOrderBundle:Default:removeCartItem }
+
 maci_order_checkout:
     pattern:  /order/checkout/{id}
     defaults: { _controller: MaciOrderBundle:Default:checkout }
@@ -12,9 +16,9 @@ maci_order_invoice:
     pattern:  /order/invoice/{id}
     defaults: { _controller: MaciOrderBundle:Default:invoice }
 
-maci_order_dev:
-    pattern:  /order/dev/{id}
-    defaults: { _controller: MaciOrderBundle:Default:dev, id: 0 }
+# maci_order_dev:
+#     pattern:  /order/dev/{id}
+#     defaults: { _controller: MaciOrderBundle:Default:dev, id: 0 }
 
 maci_order_cart_form:
     pattern:  /order/cart/form
