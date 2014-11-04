@@ -239,6 +239,32 @@ class DefaultController extends Controller
         return $this->redirect($this->generateUrl('maci_order_cart'));
     }
 
+    public function editCartItemAction(Request $request, $id)
+    {
+        $om = $this->getDoctrine()->getManager();
+
+        $item = $om->getRepository('MaciOrderBundle:Item')
+            ->findOneById($id);
+
+        if (!$item) {
+            return $this->redirect($this->generateUrl('maci_order_notfound'));
+        }
+
+        $quantity = $request->get('quantity', 1);
+
+        $item->setQuantity($quantity);
+
+        if (!$item->checkProductQuantity($quantity) || !$item->checkVariantsQuantity($quantity)) {
+            return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.noquantity')));
+        }
+
+        $item->getOrder()->refreshAmount();
+
+        $om->flush();
+
+        return $this->redirect($this->generateUrl('maci_order_cart'));
+    }
+
     public function removeCartItemAction(Request $request, $id)
     {
         if ($this->removeItem($request, $id)) {

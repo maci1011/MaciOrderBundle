@@ -474,6 +474,40 @@ class Order
         $this->created = new \DateTime();
     }
 
+    public function getOrderDocuments()
+    {
+        $documents = array();
+        foreach ($this->items as $item) {
+            if ($product = $item->getProduct()) {
+                if (count($product->getPrivateDocuments())) {
+                    foreach ($product->getPrivateDocuments() as $item) {
+                        $document = $item->getMedia();
+                        $documents[$document->getId()] = $document;
+                    }
+                }
+            }
+        }
+
+        return $documents;
+    }
+
+    public function checkOrder()
+    {
+        $errors = false;
+
+        foreach ($this->items as $item) {
+            if ( !$item->checkProductQuantity() || !$item->checkVariantsQuantity() ) {
+                $errors = true;
+            }
+        }
+
+        if ($errors) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     public function checkShipment()
     {
@@ -503,23 +537,6 @@ class Order
         $this->amount = $tot;
     }
 
-    public function checkOrder()
-    {
-        $errors = false;
-
-        foreach ($this->items as $item) {
-            if ( !$item->checkProductQuantity() || !$item->checkVariantsQuantity() ) {
-                $errors = true;
-            }
-        }
-
-        if ($errors) {
-            return false;
-        }
-
-        return true;
-    }
-
     public function subItemsQuantity()
     {
         foreach ($this->items as $item) {
@@ -543,22 +560,5 @@ class Order
         $this->subItemsQuantity();
 
         $this->status = 'complete';
-    }
-
-    public function getOrderDocuments()
-    {
-        $documents = array();
-        foreach ($this->items as $item) {
-            if ($product = $item->getProduct()) {
-                if (count($product->getPrivateDocuments())) {
-                    foreach ($product->getPrivateDocuments() as $item) {
-                        $document = $item->getMedia();
-                        $documents[$document->getId()] = $document;
-                    }
-                }
-            }
-        }
-
-        return $documents;
     }
 }

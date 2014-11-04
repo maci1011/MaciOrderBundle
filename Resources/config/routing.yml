@@ -4,6 +4,10 @@ maci_order_paypal_complete:
     pattern:  /order/complete/paypal/{id}
     defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
 
+maci_order_edit_cart_item:
+    pattern:  /order/cart-item/{id}/edit
+    defaults: { _controller: MaciOrderBundle:Default:editCartItem }
+
 maci_order_remove_cart_item:
     pattern:  /order/cart-item/{id}/remove
     defaults: { _controller: MaciOrderBundle:Default:removeCartItem }

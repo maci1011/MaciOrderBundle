@@ -19,7 +19,7 @@
 
 <h3>Cart:</h3>
 
-{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': cart } %}
+{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': cart, 'edit': true } %}
 
 {% if cart and cart.items|length %}
 
