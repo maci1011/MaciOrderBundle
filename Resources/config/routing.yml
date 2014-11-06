@@ -1,9 +1,5 @@
 
 
-maci_order_paypal_complete:
-    pattern:  /order/complete/paypal/{id}
-    defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
-
 maci_order_edit_cart_item:
     pattern:  /order/cart-item/{id}/edit
     defaults: { _controller: MaciOrderBundle:Default:editCartItem }
@@ -23,6 +19,14 @@ maci_order_invoice:
 # maci_order_test:
 #     pattern:  /order/test/{id}
 #     defaults: { _controller: MaciOrderBundle:Default:test, id: 0 }
+
+maci_order_paypal_complete:
+    pattern:  /order/paypal/complete
+    defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
+
+maci_order_paypal_ipn:
+    pattern:  /order/paypal/ipn
+    defaults: { _controller: MaciOrderBundle:Ipn:index }
 
 maci_order_cart_form:
     pattern:  /order/cart/form

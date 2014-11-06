@@ -44,39 +44,21 @@ class OrderPayPalListener {
 
             $this->om->persist($tx);
 
-            $order->completeOrder();
+            if ( 0 <= $order->getBalance() ) {
 
-            $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
-                $order->getOrderDocuments(),
-                $order->getUser(),
-                'Created by Order: '.$order->getCode()
-            );
+                $order->completeOrder();
 
-            $message = \Swift_Message::newInstance()
-                ->setSubject('Order Confirmation')
-                ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                ->setTo($this->paypal_ipn->getOrder()->getPayerEmail(), $this->paypal_ipn->getOrder()->getFirstName() .' '. $this->paypal_ipn->getOrder()->getLastName())
-                ->setBody($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig',
-                        array('order' => $order)
-                        ), 'text/html')
-            ;
-            //send message
-            $this->get('mailer')->send($message);
+                $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
+                    $order->getOrderDocuments(),
+                    $order->getUser(),
+                    'Created by Order: '.$order->getCode()
+                );
+                
+            }
 
-            $notify = \Swift_Message::newInstance()
-                ->setSubject('Order Notify')
-                ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                ->setTo($this->get('service_container')->getParameter('order_email'))
-                ->setBody($this->renderView('MaciOrderBundle:Email:notify_email.html.twig',
-                        array('order' => $order())
-                        ), 'text/html')
-            ;
-            //send notify
-            $this->get('mailer')->send($notify);
+            $this->om->flush();
 
         }
-
-        $this->om->flush();
 
     }
 }
