@@ -20,9 +20,9 @@ maci_order_invoice:
     pattern:  /order/invoice/{id}
     defaults: { _controller: MaciOrderBundle:Default:invoice }
 
-# maci_order_dev:
-#     pattern:  /order/dev/{id}
-#     defaults: { _controller: MaciOrderBundle:Default:dev, id: 0 }
+# maci_order_test:
+#     pattern:  /order/test/{id}
+#     defaults: { _controller: MaciOrderBundle:Default:test, id: 0 }
 
 maci_order_cart_form:
     pattern:  /order/cart/form

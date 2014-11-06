@@ -34,6 +34,12 @@ Maci\OrderBundle\Entity\Order:
             type: string
             length: 63
             nullable: true
+        invoice:
+            type: datetime
+        paid:
+            type: datetime
+        due:
+            type: datetime
         created:
             type: datetime
         updated:

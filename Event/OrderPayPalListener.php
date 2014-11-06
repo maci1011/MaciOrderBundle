@@ -6,7 +6,6 @@ use Orderly\PayPalIpnBundle\Event\PayPalEvent;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Maci\OrderBundle\Entity\Transaction;
-use Maci\MediaBundle\Entity\Permission;
 
 
 class OrderPayPalListener {
@@ -37,6 +36,8 @@ class OrderPayPalListener {
 
             $tx->setAmount($ipnOrder->getMcGross());
 
+            $tx->setGateway('PayPal');
+
             $tx->setOrder($order);
 
             $order->addTransaction($tx);
@@ -45,28 +46,11 @@ class OrderPayPalListener {
 
             $order->completeOrder();
 
-            $docs = $order->getOrderDocuments();
-
-            if (count($docs)) {
-                foreach ($docs as $id => $document) {
-                    $permission = $this->om->getRepository('MaciMediaBundle:Permission')->findBy(array(
-                        'user' => $this->getUser(),
-                        'media' => $document
-                    ));
-
-                    if ($permission) {
-                        $permission->setStatus('active');
-                    } else {
-                        $permission = new Permission;
-                        $permission->setUser($this->getUser());
-                        $permission->setMedia($document);
-                        $permission->setStatus('end');
-                        $permission->setNote('Created by Order ['.$this->getId().'], Item: ['.$item->getId().'].');
-                        $this->om->persist($permission);
-                    }
-
-                }
-            }
+            $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
+                $order->getOrderDocuments(),
+                $order->getUser(),
+                'Created by Order: '.$order->getCode()
+            );
 
             $message = \Swift_Message::newInstance()
                 ->setSubject('Order Confirmation')

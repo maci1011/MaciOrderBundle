@@ -2,39 +2,199 @@
 {% if order and order.items|length %}
 
 
-{% for item in order.items %}
+<div class="invoice">
 
-<div class="row">
 
-	<div class="col-xs-4">
+<header id="header" class="row">
+<table>
+	<tr>
 
-	<a href="{{ path('maci_product_show', { 'id': item.product.id }) }}">
-		{{ item.product }}
-	</a>
+		<td width="50%">
 
-	</div>
+			{% include "MaciOrderBundle:Default:_invoice_header.html.twig" %}
 
-	<div class="col-xs-4">
-		<p>
-			{{ item.quantity }}
-		</p>
-	</div>
+		</td>
 
-	<div class="col-xs-4">
-		<p>
-			{{ item.product.price }} &euro;
-		</p>
-	</div>
+		<td width="50%">
+
+			{% if order.status == 'complete' %}
+
+			<span class="paid">PAID</span>
+			<p>Paid: {{ order.due|date('d/m/Y') }}</p>
+
+			{% elseif order.status == 'refounded' %}
+
+			<span class="refounded">REFOUNDED</span>
+
+			{% elseif order.status == 'canceled' %}
+
+			<span class="canceled">CANCELED</span>
+
+			{% else %}
+
+			<span class="unpaid">UNPAID</span>
+
+			{% endif %}
+		</td>
+
+	</tr>
+</table>
+</header>
+
+
+<div id="addresses" class="row">
+<table>
+	<tr>
+		<td width="50%">
+
+			<h4>Invoiced To:</h4>
+
+			{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
+
+		</td>
+		<td width="50%">
+
+			<h4>Pay To:</h4>
+
+			<address>
+				<strong>Mah! S.r.l.</strong><br>
+				Via Delle Vie 88<br>
+				Lido di Jesolo, VE 30016<br>
+				<abbr title="Phone">Tel.</abbr> 0123456789
+			</address>
+
+		</td>
+	</tr>
+</table>
+</div>
+
+
+<div id="dates" class="row">
+
+	<h4>Invoice {{ order.code }}</h4>
+
+	<p>
+		Invoice Date: {{ order.invoice|date('d/m/Y') }}<br/>
+		Due Date: {{ order.due|date('d/m/Y') }}
+	</p>
 
 </div>
 
-{% endfor %} {# items #}
+
+<div id="details" class="row">
+
+	<h4>Details</h4>
+
+<table>
+
+	<thead>
+	    <tr>
+	        <td class="description" width="60%">Description</td>
+	        <td class="quantity" width="20%">Quantity</td>
+	        <td class="amount" width="20%">Amount</td>
+	    </tr>
+	</thead>
+
+	<tbody>
+
+	{% for item in order.items %}
+
+	    <tr>
+	        <td class="description">
+	        	<p>{{ item.product }}</p>
+	        </td>
+	        <td class="quantity">
+	        	<span>{{ item.quantity }}</span>
+	        </td>
+	        <td class="amount">
+	        	<span>{{ item.amount }} &euro;</span>
+	        </td>
+	    </tr>
+
+	{% endfor %}
+
+	</tbody>
+
+	<tfoot>
+	    <tr class="subtotal">
+	        <td class="label" colspan="2">Sub Total:</td>
+	        <td>{{ order.amount }} &euro;</td>
+	    </tr>
+	    <tr class="total">
+	        <td class="label" colspan="2">Total:</td>
+	        <td>{{ order.amount }} &euro;</td>
+	    </tr>
+	</tfoot>
+
+</table>
+</div>
+
+
+<div id="transactions" class="row">
+
+	<h4>Transactions</h4>
+
+<table>
+
+	<thead>
+
+	    <tr>
+
+	        <td class="tx-date" width="30%">Transaction Date</td>
+
+	        <td class="gateway" width="25%">Gateway</td>
+
+	        <td class="tx-id" width="25%">Transaction ID</td>
+
+	        <td class="amount" width="20%">Amount</td>
+
+	    </tr>
+
+	</thead>
+
+	<tbody>
+
+	{% for item in order.transactions %}
+
+	    <tr>
+
+	        <td class="tx-date">{{ item.product }}</td>
+
+	        <td class="gateway">{{ item.gateway }}</td>
+
+	        <td class="tx-id">{{ item.tx }}</td>
+
+	        <td class="amount">{{ item.amount }} &euro;</td>
+
+	    </tr>
+
+	{% endfor %}
+
+	</tbody>
+
+	<tfoot>
+
+	    <tr>
+
+	        <td class="label" colspan="3">Balance:</td>
+
+	        <td>{{ order.balance }} &euro;</td>
+
+	    </tr>
+
+	</tfoot>
+
+</table>
+</div>
+
+
+</div>
 
 
 {% else %}
 
 <div class="row">
-	<h3 class="noitems">No Items.</h3>
+	<h3 class="noitems">Nothing here.</h3>
 </div>
 
-{% endif %} {# order #}
+{% endif %}

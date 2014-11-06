@@ -53,6 +53,10 @@ class DefaultController extends Controller
             return $this->redirect($this->generateUrl('maci_order_notfound'));
         }
 
+        if ($order->getStatus() === 'complete') {
+            return $this->redirect($this->generateUrl('maci_order_invoice', array('id'=>$order->getId())));
+        }
+
         if ($request->get('set')) {
             return $this->set($order, $request);
         }
@@ -75,46 +79,6 @@ class DefaultController extends Controller
 
         return $this->render('MaciOrderBundle:Default:checkout.html.twig', array(
             'checkout' => $checkout,
-            'order' => $order
-        ));
-    }
-
-    public function devAction(Request $request, $id)
-    {
-        $om = $this->getDoctrine()->getManager();
-        $order = $om->getRepository('MaciOrderBundle:Order')
-            ->findOneById($id);
-
-        $order->completeOrder();
-
-        $docs = $order->getOrderDocuments();
-
-        if (count($docs)) {
-            foreach ($docs as $id => $document) {
-                $permission = $om->getRepository('MaciMediaBundle:Permission')->findOneBy(array(
-                    'user' => $this->getUser(),
-                    'media' => $document
-                ));
-
-                if ($permission) {
-                    $permission->setStatus('active');
-                } else {
-                    $permission = new Permission;
-                    $permission->setUser($this->getUser());
-                    $permission->setMedia($document);
-                    $permission->setStatus('active');
-                    $permission->setNote('Created by Order ['.$order->getId().'].');
-                    $om->persist($permission);
-                }
-
-            }
-        }
-
-        $om->flush();
-
-        // return $this->redirect($this->generateUrl('maci_order'));
-
-        return $this->render('MaciOrderBundle:Default:invoice.html.twig', array(
             'order' => $order
         ));
     }
@@ -327,13 +291,22 @@ class DefaultController extends Controller
 
     public function paypalFormAction($order)
     {
-        $form = $this->createFormBuilder($order)
-            // ->setAction('https://www.paypal.com/cgi-bin/webscr')
-            ->setAction('https://sandbox.paypal.com/cgi-bin/webscr')
-            ->add('cmd', 'hidden', array('mapped' => false, 'data' => '_xclick'))
+        $form = $this->createFormBuilder($order);
+
+        if ($this->get('service_container')->getParameter('paypal_islive')) {
+
+            $form = $form->setAction('https://www.paypal.com/cgi-bin/webscr')
+                ->add('business', 'hidden', array('mapped' => false, 'data' => $this->get('service_container')->getParameter('maciorder_paypalform_business')));
+
+        } else {
+
+            $form = $form->setAction('https://sandbox.paypal.com/cgi-bin/webscr')
+                ->add('business', 'hidden', array('mapped' => false, 'data' => $this->get('service_container')->getParameter('maciorder_paypalform_business_fac')));
+
+        }
+
+        $form = $form->add('cmd', 'hidden', array('mapped' => false, 'data' => '_xclick'))
             ->add('lc', 'hidden', array('mapped' => false, 'data' => 'IT'))
-            // ->add('business', 'hidden', array('mapped' => false, 'data' => $this->get('service_container')->getParameter('maciorder_paypalform_business')))
-            ->add('business', 'hidden', array('mapped' => false, 'data' => $this->get('service_container')->getParameter('maciorder_paypalform_business_fac')))
             ->add('item_name', 'hidden', array('mapped' => false, 'data' => $order->getName()))
             ->add('item_number', 'hidden', array('mapped' => false, 'data' => 1))
             ->add('custom', 'hidden', array('mapped' => false, 'data' => $order->getId()))
@@ -350,6 +323,28 @@ class DefaultController extends Controller
 
         return $this->render('MaciOrderBundle:Default:_paypal.html.twig', array(
             'form' => $form->createView(),
+        ));
+    }
+
+    public function testAction(Request $request, $id)
+    {
+        $om = $this->getDoctrine()->getManager();
+
+        $order = $om->getRepository('MaciOrderBundle:Order')
+            ->findOneById($id);
+
+        $order->completeOrder();
+
+        $om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
+            $order->getOrderDocuments(),
+            $order->getUser(),
+            'Created by Order: '.$order->getCode()
+        );
+
+        $om->flush();
+
+        return $this->render('MaciOrderBundle:Default:invoice.html.twig', array(
+            'order' => $order
         ));
     }
 }

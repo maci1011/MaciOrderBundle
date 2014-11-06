@@ -12,6 +12,9 @@ Maci\OrderBundle\Entity\Transaction:
         tx:
             type: string
             length: 63
+        gateway:
+            type: string
+            length: 31
         details:
             type: text
             nullable: true

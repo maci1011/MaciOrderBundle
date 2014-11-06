@@ -52,6 +52,21 @@ class Order
     /**
      * @var \DateTime
      */
+    private $invoice;
+
+    /**
+     * @var \DateTime
+     */
+    private $paid;
+
+    /**
+     * @var \DateTime
+     */
+    private $due;
+
+    /**
+     * @var \DateTime
+     */
     private $created;
 
     /**
@@ -270,6 +285,75 @@ class Order
     }
 
     /**
+     * Set invoice
+     *
+     * @param \DateTime $invoice
+     * @return Order
+     */
+    public function setInvoice($invoice)
+    {
+        $this->invoice = $invoice;
+
+        return $this;
+    }
+
+    /**
+     * Get invoice
+     *
+     * @return \DateTime 
+     */
+    public function getInvoice()
+    {
+        return $this->invoice;
+    }
+
+    /**
+     * Set paid
+     *
+     * @param \DateTime $paid
+     * @return Order
+     */
+    public function setPaid($paid)
+    {
+        $this->paid = $paid;
+
+        return $this;
+    }
+
+    /**
+     * Get paid
+     *
+     * @return \DateTime 
+     */
+    public function getPaid()
+    {
+        return $this->paid;
+    }
+
+    /**
+     * Set due
+     *
+     * @param \DateTime $due
+     * @return Order
+     */
+    public function setDue($due)
+    {
+        $this->due = $due;
+
+        return $this;
+    }
+
+    /**
+     * Get due
+     *
+     * @return \DateTime 
+     */
+    public function getDue()
+    {
+        return $this->due;
+    }
+
+    /**
      * Set created
      *
      * @param \DateTime $created
@@ -474,6 +558,22 @@ class Order
         $this->created = new \DateTime();
     }
 
+    public function getTransactionsAmount()
+    {
+        $amount = 0;
+
+        foreach ($this->transactions as $item) {
+            $amount += $item->getAmount();
+        }
+
+        return $amount;
+    }
+
+    public function getBalance()
+    {
+        return ( $this->getTransactionsAmount() - $this->getAmount() );
+    }
+
     public function getOrderDocuments()
     {
         $documents = array();
@@ -560,5 +660,12 @@ class Order
         $this->subItemsQuantity();
 
         $this->status = 'complete';
+
+        $this->invoice = new \DateTime();
+
+        $this->due = new \DateTime();
+
+        $this->due->modify('+1 month');
+
     }
 }

@@ -22,6 +22,11 @@ class Transaction
     /**
      * @var string
      */
+    private $gateway;
+
+    /**
+     * @var string
+     */
     private $details;
 
     /**
@@ -76,6 +81,29 @@ class Transaction
     public function getTx()
     {
         return $this->tx;
+    }
+
+    /**
+     * Set gateway
+     *
+     * @param string $gateway
+     * @return Item
+     */
+    public function setGateway($gateway)
+    {
+        $this->gateway = $gateway;
+
+        return $this;
+    }
+
+    /**
+     * Get gateway
+     *
+     * @return string 
+     */
+    public function getGateway()
+    {
+        return $this->gateway;
     }
 
     /**
