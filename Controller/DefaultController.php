@@ -85,8 +85,9 @@ class DefaultController extends Controller
 
     public function paypalCompleteAction($id)
     {
-        $order = $this->getDoctrine()->getManager()
-            ->getRepository('MaciOrderBundle:Order')
+        $om = $this->getDoctrine()->getManager();
+
+        $order = $om->getRepository('MaciOrderBundle:Order')
             ->findOneById($id);
 
         $tx = $this->getRequest()->get('tx');
@@ -99,8 +100,16 @@ class DefaultController extends Controller
         $pdtArray = $pdt->getPdt($tx);
 
         $status = 'unknown';
+
         if (isset($pdtArray['payment_status'])) {
             $status = $pdtArray['payment_status'];
+        } else if ($this->getRequest()->get('st')) {
+            $status = $this->getRequest()->get('st');
+        }
+
+        if ($status === 'Completed' && $order->getStatus() === 'current') {
+            $order->setStatus('confirmed');
+            $om->flush();
         }
 
         $page = $this->getDoctrine()->getManager()
@@ -284,7 +293,7 @@ class DefaultController extends Controller
         return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'checkout.nothingsetted')));
     }
 
-    public function notfoundAction($order)
+    public function notfoundAction()
     {
         return $this->render('MaciOrderBundle:Default:notfound.html.twig');
     }

@@ -31,6 +31,10 @@
 			Show Invoice
 		</a>
 
+		{% elseif item.status == 'confirmed' %}
+
+		&nbsp;
+
 		{% else %}
 
 		<a href="{{ path('maci_order_checkout', {'id': item.id}) }}">
