@@ -83,9 +83,11 @@ class DefaultController extends Controller
         ));
     }
 
-    public function paypalCompleteAction($id)
+    public function paypalCompleteAction()
     {
         $om = $this->getDoctrine()->getManager();
+
+        $id = $tx = $this->getRequest()->get('cm');
 
         $order = $om->getRepository('MaciOrderBundle:Order')
             ->findOneById($id);
@@ -325,9 +327,9 @@ class DefaultController extends Controller
             ->add('no_note', 'hidden', array('mapped' => false, 'data' => '1'))
             ->add('no_shipping', 'hidden', array('mapped' => false, 'data' => '1'))
             ->add('rm', 'hidden', array('mapped' => false, 'data' => '1'))
-            ->add('return', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_order_paypal_complete', array('id' => $order->getId()), true)))
+            ->add('return', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_order_paypal_complete', array(), true)))
             ->add('cancel_return', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_order', array(), true)))
-            ->add('notify_url', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('orderly_paypalipn_nonotification_index', array(), true)))
+            ->add('notify_url', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_order_paypal_ipn', array(), true)))
             ->getForm();
 
         return $this->render('MaciOrderBundle:Default:_paypal.html.twig', array(

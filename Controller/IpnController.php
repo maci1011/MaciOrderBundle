@@ -65,6 +65,7 @@ class IpnController extends Controller
 		{
 			return $this->redirect('/');
 		}
+
 		$this->triggerEvent(Events\PayPalEvents::RECEIVED);
 
 		$response = new Response();
