@@ -36,10 +36,13 @@ Maci\OrderBundle\Entity\Order:
             nullable: true
         invoice:
             type: datetime
+            nullable: true
         paid:
             type: datetime
+            nullable: true
         due:
             type: datetime
+            nullable: true
         created:
             type: datetime
         updated:

@@ -24,10 +24,6 @@ maci_order_paypal_complete:
     pattern:  /order/paypal/complete
     defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
 
-maci_order_paypal_ipn:
-    pattern:  /order/paypal/ipn
-    defaults: { _controller: MaciOrderBundle:Ipn:index }
-
 maci_order_cart_form:
     pattern:  /order/cart/form
     defaults: { _controller: MaciOrderBundle:Default:cartForm }

@@ -32,17 +32,17 @@ class OrderPayPalListener {
 
             $tx = new Transaction;
 
-            $tx->setTx($ipnOrder->getTxnId());
+            $tx->setTx( $ipnOrder->getTxnId() );
 
-            $tx->setAmount($ipnOrder->getMcGross());
+            $tx->setAmount( $ipnOrder->getMcGross() );
 
-            $tx->setGateway('PayPal');
+            $tx->setGateway( 'PayPal' );
 
-            $tx->setOrder($order);
+            $tx->setOrder( $order );
 
-            $order->addTransaction($tx);
+            $this->om->persist( $tx );
 
-            $this->om->persist($tx);
+            $order->addTransaction( $tx );
 
             if ( 0 <= $order->getBalance() ) {
 
@@ -54,7 +54,7 @@ class OrderPayPalListener {
                     'Created by Order: '.$order->getCode()
                 );
                 
-            }
+            } 
 
             $this->om->flush();
 

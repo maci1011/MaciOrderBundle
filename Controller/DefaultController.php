@@ -344,16 +344,6 @@ class DefaultController extends Controller
         $order = $om->getRepository('MaciOrderBundle:Order')
             ->findOneById($id);
 
-        $order->completeOrder();
-
-        $om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
-            $order->getOrderDocuments(),
-            $order->getUser(),
-            'Created by Order: '.$order->getCode()
-        );
-
-        $om->flush();
-
         return $this->render('MaciOrderBundle:Default:invoice.html.twig', array(
             'order' => $order
         ));

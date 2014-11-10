@@ -18,7 +18,7 @@
 </td>
 </tr>
 
-{% if order.shipping %}
+{% if order.shipping is not null %}
 <td valign="top" align="center">
 <h3>Shipping Address:</h3>
 {% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shipping } %}
@@ -51,18 +51,18 @@
 </td>
 </tr>
 
-{% if order.orderDocuents|length %}
+{% if order.orderDocuments|length %}
 <td valign="top" align="center">
-<h3>E-Book:</h3>
-<p>You can ee all your ebooks in <a href="{{ path('maci_user_library') }}">Your Library</a>.</p>
+<h3>E-Books:</h3>
 <table>
-	{% for item in order.orderDocuents %}
+	{% for item in order.orderDocuments %}
 	<tr>
-		<td>{{ item }}</td>
+		<td>- {{ item }}</td>
 		<td><a href="{{ path('maci_media_get', {'path': item.path}) }}">Get E-Book</a></td>
 	</tr>
 	{% endfor %}
 </table>
+<p>You can see all your ebooks in <a href="{{ path('maci_user_library') }}">Your Library</a>.</p>
 </td>
 </tr>
 {% endif %}
