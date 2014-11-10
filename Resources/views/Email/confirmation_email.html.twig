@@ -12,6 +12,7 @@
 </td>
 </tr>
 
+<tr>
 <td valign="top" align="center">
 <h3>Payment Address:</h3>
 {% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
@@ -19,6 +20,7 @@
 </tr>
 
 {% if order.shipping is not null %}
+<tr>
 <td valign="top" align="center">
 <h3>Shipping Address:</h3>
 {% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shipping } %}
@@ -26,6 +28,7 @@
 </tr>
 {% endif %}
 
+<tr>
 <td valign="top" align="center">
 <h3>Order Details:</h3>
 <table>
@@ -52,6 +55,7 @@
 </tr>
 
 {% if order.orderDocuments|length %}
+<tr>
 <td valign="top" align="center">
 <h3>E-Books:</h3>
 <table>
@@ -69,7 +73,8 @@
 
 <tr>
 <td valign="top" align="center">
-<p>Contact <a href="mailto:mah@mah.com">mah@mah.com</a> if you need more informations.</p>
+<h5>Contact us for more informations:</h5>
+{% include "MaciPageBundle:Default:_contacts.html.twig" } %}
 </td>
 </tr>
 
