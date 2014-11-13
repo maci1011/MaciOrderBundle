@@ -4,13 +4,7 @@
 
 {% block title %}
 
-<title>{{ 'order.notfound.meta_title' | matra }}</title>
-
-{% endblock %}
-
-{% block description %}
-
-<meta name="description" content="{{ 'order.notfound.meta_description' | matra }}" />
+<title>{{ 'order.notfound.meta_title' | matra('Order Not Found!') }}</title>
 
 {% endblock %}
 
