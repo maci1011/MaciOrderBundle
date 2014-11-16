@@ -325,31 +325,52 @@ class Item
 
     public function checkProductQuantity($quantity = false)
     {
-        $quantity = $quantity ? $quantity : $this->getQuantity();
-
-        if ($product = $this->getProduct()) {
-            if ( !$product->checkQuantity($quantity) ) {
+        if ($this->product) {
+            $quantity = $quantity ? $quantity : $this->getQuantity();
+            if ( !$this->product->checkQuantity($quantity) ) {
                 return false;
             }
         }
-
         return true;
     }
 
     public function checkVariantsQuantity($quantity = false)
     {
         $quantity = $quantity ? $quantity : $this->getQuantity();
-        $errors = false;
+        foreach ($this->variants as $variant) {
+            if ( !$variant->checkQuantity($quantity) ) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-        if (count($this->getVariants())) {
-            foreach ($this->getVariants() as $variant) {
-                if ( !$variant->checkQuantity($quantity) ) {
-                    $errors = true;
-                }
+    public function checkAvailability()
+    {
+        if ( !$this->checkProductQuantity() || !$this->checkVariantsQuantity() ) {
+            return false;
+        }
+        if ( $this->product && !$this->product->isOnSale() ) {
+            return false;
+        }
+        return true;
+    }
+
+    public function getPrivateDocuments($quantity = false)
+    {
+        $documents = array();
+
+        if ($this->product) {
+            foreach ($this->product->getPrivateDocuments() as $item) {
+                $document = $item->getMedia();
+                $documents[$document->getId()] = $document;
             }
         }
 
-        if ($errors) { return false; }
-        return true;
+        if (count($documents)) {
+            return $documents;
+        }
+
+        return false;
     }
 }

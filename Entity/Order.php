@@ -578,12 +578,9 @@ class Order
     {
         $documents = array();
         foreach ($this->items as $item) {
-            if ($product = $item->getProduct()) {
-                if (count($product->getPrivateDocuments())) {
-                    foreach ($product->getPrivateDocuments() as $item) {
-                        $document = $item->getMedia();
-                        $documents[$document->getId()] = $document;
-                    }
+            if (count($docs = $item->getPrivateDocuments())) {
+                foreach ($docs as $id => $doc) {
+                    $documents[$id] = $doc;
                 }
             }
         }
@@ -593,16 +590,10 @@ class Order
 
     public function checkOrder()
     {
-        $errors = false;
-
         foreach ($this->items as $item) {
-            if ( !$item->checkProductQuantity() || !$item->checkVariantsQuantity() ) {
-                $errors = true;
+            if ( !$item->checkAvailability() ) {
+                return false;
             }
-        }
-
-        if ($errors) {
-            return false;
         }
 
         return true;
@@ -634,7 +625,7 @@ class Order
         foreach ($amounts as $amount) {
             $tot += $amount;
         }
-        $this->amount = $tot;
+        return $this->amount = $tot;
     }
 
     public function subItemsQuantity()
