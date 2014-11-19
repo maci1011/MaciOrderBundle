@@ -112,6 +112,9 @@ class Order
         );
         $this->amount = 0;
         $this->shipment = false;
+        $this->invoice = null;
+        $this->paid = null;
+        $this->due = null;
     }
 
     /**
