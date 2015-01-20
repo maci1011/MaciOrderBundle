@@ -1,13 +1,9 @@
 
+<div class="page">
+
+<section class="page_header page_container row">
+
 <h3>Checkout</h3>
-
-
-<section>
-
-<h4>Your Order</h4>
-<h5>Name: {{ order.name }}</h5>
-<h5>Name: {{ order.items|length }}</h5>
-<h5>Checkout Status: {{ checkout }}</h5>
 
 </section>
 
@@ -15,72 +11,211 @@
 {% if order.items|length %} {# --- Valid Checkout (^^) ---  #}
 
 
-<section>
+<section class="page_content page_container row">
 
-{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order } %}
+	{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order } %}
+
+</section>
+
+
+{% if checkout is defined and checkout %}
+
+
+{% if checkout.billing == 'set' %} {# --- Billing ---  #}
+
+<section class="page_content page_container row active">
+
+	<h4>Billing</h4>
+
+	{% render(controller('MaciAddressBundle:Default:list', { 'select': path('maci_order_checkout_set_address', {'option': 'billing'}) } )) %}
+
+	<br/><br/>
+
+	{#%
+		render(controller('MaciAddressBundle:Default:form', {
+			'id': false,
+			'method': {
+				'The Billing Address is the same as that of Shipment.': path('maci_order_checkout_set_address', {'option': 'both'}),
+				'The Billing Address is different from that of Shipment.': path('maci_order_checkout_set_address', {'option': 'billing'})
+			}
+		} ))
+	%#}
+
+	{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout_set_address', {'option': 'billing'})})) %}
 
 </section>
 
+{% elseif checkout.billing == 'setted' %}
 
-<section>
+<section class="page_content page_container row setted">
 
-{% if checkout is defined %}
+	<h4>Billing To:</h4>
 
+	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
 
-	{% if checkout == 'shipping' %}
-
-		<h4>Shipping</h4>
-
-		<h5>Select or Add an Address:</h5>
-
-		{% render(controller('MaciAddressBundle:Default:list', { 'select': path('maci_order_checkout', {'id': order.id, 'set': 'shipping'}) } )) %}
-
-		<br/><br/>
-
-		{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout', {'id': order.id, 'set': 'shipping'}) } )) %}
-
-	{% elseif order.shipping %}
-
-		<h4>Shipping To:</h4>
-
-		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shipping } %}
-
-	{% endif %}
-
-
-	{% if checkout == 'billing' %}
-
-		<h4>Billing</h4>
-
-		<h5>Select or Add an Address:</h5>
-
-		{% render(controller('MaciAddressBundle:Default:list', { 'select': path('maci_order_checkout', {'id': order.id, 'set': 'billing'}) } )) %}
-
-		<br/><br/>
-
-		{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout', {'id': order.id, 'set': 'billing'})})) %}
-
-	{% elseif order.billing %}
-
-		<h4>Billing To:</h4>
-
-		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
-
-	{% endif %}
-
-
-	{% if checkout == 'confirm' %}
-
-		<h4>Confirm Order:</h4>
-
-		{% render(controller('MaciOrderBundle:Default:paypalForm', {'order': order})) %}
-
-	{% endif %}
-
-
-{% endif %}
+	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'billing'}) }}" class="btn btn-success">Edit</a>
 
 </section>
+
+{% elseif checkout.billing == 'toset' %}
+
+<section class="page_content page_container row">
+
+	<h4>Set Billing</h4>
+
+</section>
+
+{% endif %} {# --- End Billing ---  #}
+
+
+{% if checkout.shipping == 'set' %} {# --- Shipping ---  #}
+
+<section class="page_content page_container row">
+
+	<h4>Shipping</h4>
+
+	{% render(controller('MaciAddressBundle:Default:list', { 'select': path('maci_order_checkout_set_address', {'option': 'shipping'}) } )) %}
+
+	<br/><br/>
+
+	{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout_set_address', {'option': 'shipping'})})) %}
+
+</section>
+
+{% elseif checkout.shipping == 'setted' %}
+
+<section class="page_content page_container row setted">
+
+	<h4>Shipping To:</h4>
+
+	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shipping } %}
+
+	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'shipping'}) }}" class="btn btn-success">Edit</a>
+
+</section>
+
+{% elseif checkout.shipping == 'toset' %}
+
+<section class="page_content page_container row">
+
+	<h4>Set Shipping</h4>
+
+</section>
+
+{% endif %} {# --- End Shipping ---  #}
+
+
+{% if checkout.spedition == 'set' %} {# --- Spedition ---  #}
+
+<section class="page_content page_container row active">
+
+	<h4>Select Spedition</h4>
+
+	{% render(controller('MaciOrderBundle:Default:cartSetSpedition')) %}
+
+</section>
+
+{% elseif checkout.spedition == 'setted' %}
+
+<section class="page_content page_container row setted">
+
+	<h4>Spedition:</h4>
+
+	{% if order.spedition == 'standard' %}
+	<span>Standard</span>
+	{% elseif order.spedition == 'express' %}
+	<span>Express</span>
+	{% elseif order.spedition == 'pickup' %}
+	<span>Pickup in Store</span>
+	{% else %}
+	<span>{{ order.spedition }}</span>
+	{% endif %}
+
+	<br/><br/>
+
+	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'spedition'}) }}" class="btn btn-success">Edit</a>
+
+</section>
+
+{% elseif checkout.spedition == 'toset' %}
+
+<section class="page_content page_container row">
+
+	<h4>Set Spedition</h4>
+
+</section>
+
+{% endif %} {# --- End Spedition ---  #}
+
+
+{% if checkout.payment == 'set' %} {# --- Payment ---  #}
+
+<section class="page_content page_container row active">
+
+	<h4>Select Payment</h4>
+
+	{% render(controller('MaciOrderBundle:Default:cartSetPayment')) %}
+
+</section>
+
+{% elseif checkout.payment == 'setted' %}
+
+<section class="page_content page_container row setted">
+
+	<h4>Payment:</h4>
+
+
+	{% if order.payment == 'paypal' %}
+	<span>PayPal</span>
+	{% elseif order.payment == 'delivery' %}
+	<span>Cash On Delivery</span>
+	{% elseif order.payment == 'cash' %}
+	<span>Cash</span>
+	{% else %}
+	<span>{{ order.payment }}</span>
+	{% endif %}
+
+	<br/><br/>
+
+	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'payment'}) }}" class="btn btn-success">Edit</a>
+
+</section>
+
+{% elseif checkout.payment == 'toset' %}
+
+<section class="page_content page_container row">
+
+	<h4>Set Payment</h4>
+
+</section>
+
+{% endif %} {# --- End Payment ---  #}
+
+
+{% if checkout.confirm == 'set' %} {# --- Confirm ---  #}
+
+<section class="page_content page_container row active">
+
+	<h4>Confirm Order</h4>
+
+	<a href="{{ path('maci_order_checkout_confirm') }}" class="btn btn-primary">Confirm Order</a>
+
+</section>
+
+{% elseif checkout.confirm == 'toset' %}
+
+<section class="page_content page_container row">
+
+	<h4>Confirm Order</h4>
+
+</section>
+
+{% endif %} {# --- End Confirm ---  #}
+
+
+
+{% endif %} {# --- Checkout Defined ---  #}
+
 
 
 {% else %} {# --- InValid Checkout ---  #}
@@ -93,3 +228,4 @@
 
 {% endif %} {# --- EndIf Checkout ---  #}
 
+</div>

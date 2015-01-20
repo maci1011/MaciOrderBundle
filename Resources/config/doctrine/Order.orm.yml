@@ -20,11 +20,23 @@ Maci\OrderBundle\Entity\Order:
             type: string
             length: 31
             nullable: true
+        payment:
+            type: string
+            length: 31
+            nullable: true
+        spedition:
+            type: string
+            length: 31
+            nullable: true
         code:
             type: string
             length: 31
             nullable: true
         status:
+            type: string
+            length: 31
+            nullable: true
+        checkout:
             type: string
             length: 31
             nullable: true

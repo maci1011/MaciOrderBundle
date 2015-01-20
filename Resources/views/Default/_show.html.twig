@@ -5,6 +5,12 @@
 
 {% for item in order.items %}
 
+{% if item.id %}
+{% set id = item.id %}
+{% else %}
+{% set id = loop.index0 %}
+{% endif %}
+
 <div class="row">
 
 	<div class="col-xs-6">
@@ -14,17 +20,14 @@
 		</a>
 
 		{% for variant in item.variants %}
-
-		<br/>
-		<span class="order-item-variant">- {{ variant }}</span>
-
+		<br/><span class="order-item-variant">- {{ variant }}</span>
 		{% endfor %}
 
 	</div>
 
 	<div class="col-xs-3">
 		{% if edit is defined and edit %}
-		<form class="form-inline order-item-form" action="{{ path('maci_order_edit_cart_item', {'id': item.id}) }}" method="post">
+		<form class="form-inline order-item-form" action="{{ path('maci_order_edit_cart_item', {'id': id}) }}" method="post">
 			<div class="form-group">
 				<input type="text" class="form-control edit-quantity-field" name="quantity"  value="{{ item.quantity }}" />
 				<input type="submit" class="btn btn-success" value="Edit" />
@@ -42,7 +45,9 @@
 	</div>
 
 	<div class="col-xs-1">
-		<a class="btn btn-danger" href="{{ path('maci_order_remove_cart_item', {'id': item.id}) }}">Remove</a>
+		{% if edit is defined and edit %}
+		<a class="btn btn-danger" href="{{ path('maci_order_remove_cart_item', {'id': id}) }}">Remove</a>
+		{% endif %}
 	</div>
 
 </div>

@@ -8,9 +8,13 @@ maci_order_remove_cart_item:
     pattern:  /order/cart-item/{id}/remove
     defaults: { _controller: MaciOrderBundle:Default:removeCartItem }
 
-maci_order_checkout:
-    pattern:  /order/checkout/{id}
-    defaults: { _controller: MaciOrderBundle:Default:checkout }
+maci_order_checkout_set_address:
+    pattern:  /cart/checkout/set-address/{option}
+    defaults: { _controller: MaciOrderBundle:Default:cartSetAddress }
+
+maci_order_gocheckout:
+    pattern:  /cart/gocheckout/{option}
+    defaults: { _controller: MaciOrderBundle:Default:cartGoCheckout, option: checkout }
 
 maci_order_invoice:
     pattern:  /order/invoice/{id}
@@ -20,27 +24,43 @@ maci_order_invoice:
 #     pattern:  /order/test/{id}
 #     defaults: { _controller: MaciOrderBundle:Default:test, id: 0 }
 
+maci_order_checkout_set_payment:
+    pattern:  /cart/checkout/set-payment
+    defaults: { _controller: MaciOrderBundle:Default:cartSetPayment }
+
+maci_order_checkout_set_spedition:
+    pattern:  /cart/checkout/set-spedition
+    defaults: { _controller: MaciOrderBundle:Default:cartSetSpedition }
+
 maci_order_paypal_complete:
     pattern:  /order/paypal/complete
     defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
 
-maci_order_cart_form:
-    pattern:  /order/cart/form
-    defaults: { _controller: MaciOrderBundle:Default:cartForm }
-
 maci_order_cart_add:
-    pattern:  /order/cart/add
+    pattern:  /cart/add
     defaults: { _controller: MaciOrderBundle:Default:addToCart }
 
-maci_order_cart:
-    pattern:  /order/cart
-    defaults: { _controller: MaciOrderBundle:Default:cart }
+maci_order_checkout_confirm:
+    pattern:  /cart/checkout/confirm
+    defaults: { _controller: MaciOrderBundle:Default:cartConfirm }
+
+maci_order_checkout:
+    pattern:  /cart/checkout
+    defaults: { _controller: MaciOrderBundle:Default:cartCheckout }
+
+maci_order_cart_form:
+    pattern:  /cart/form
+    defaults: { _controller: MaciOrderBundle:Default:cartForm }
 
 maci_order_notfound:
     pattern:  /order/notfound
     defaults: { _controller: MaciOrderBundle:Default:notfound }
 
 maci_order:
-    pattern:  /order
+    pattern:  /user/orders
     defaults: { _controller: MaciOrderBundle:Default:index }
+
+maci_order_cart:
+    pattern:  /cart
+    defaults: { _controller: MaciOrderBundle:Default:cart }
 

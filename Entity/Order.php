@@ -32,7 +32,22 @@ class Order
     /**
      * @var string
      */
+    private $checkout;
+
+    /**
+     * @var string
+     */
     private $type;
+
+    /**
+     * @var string
+     */
+    private $spedition;
+
+    /**
+     * @var string
+     */
+    private $payment;
 
     /**
      * @var string
@@ -110,6 +125,11 @@ class Order
             'MaciOrderBundle_Entity_Order-' . rand(10000, 99999) . '-' . 
             date('h') . date('i') . date('s') . date('m') . date('d') . date('Y')
         );
+        $this->type = 'order';
+        $this->status = 'new';
+        $this->checkout = 'checkout';
+        $this->spedition = null;
+        $this->payment = null;
         $this->amount = 0;
         $this->shipment = false;
         $this->invoice = null;
@@ -195,6 +215,30 @@ class Order
         return $this->type;
     }
 
+    public function setPayment($payment)
+    {
+        $this->payment = $payment;
+
+        return $this;
+    }
+
+    public function getPayment()
+    {
+        return $this->payment;
+    }
+
+    public function setSpedition($spedition)
+    {
+        $this->spedition = $spedition;
+
+        return $this;
+    }
+
+    public function getSpedition()
+    {
+        return $this->spedition;
+    }
+
     /**
      * Set status
      *
@@ -216,6 +260,18 @@ class Order
     public function getStatus()
     {
         return $this->status;
+    }
+
+    public function setCheckout($checkout)
+    {
+        $this->checkout = $checkout;
+
+        return $this;
+    }
+
+    public function getCheckout()
+    {
+        return $this->checkout;
     }
 
     /**
@@ -645,15 +701,15 @@ class Order
         }
     }
 
-    public function completeOrder()
+    public function confirmOrder()
     {
-        if ($this->status === 'complete') {
-            return;
+        if ($this->status === 'confirm') {
+            return false;
         }
 
-        $this->subItemsQuantity();
+        $this->status = 'confirm';
 
-        $this->status = 'complete';
+        $this->subItemsQuantity();
 
         $this->invoice = new \DateTime();
 
@@ -661,5 +717,17 @@ class Order
 
         $this->due->modify('+1 month');
 
+        return true;
+    }
+
+    public function completeOrder()
+    {
+        if ($this->status === 'complete') {
+            return false;
+        }
+
+        $this->status = 'complete';
+
+        return true;
     }
 }

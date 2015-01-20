@@ -1,0 +1,10 @@
+
+{% extends "MaciOrderBundle::sendform.html.twig" %}
+
+
+{% block content %}
+
+{% render(controller('MaciOrderBundle:Default:paypalForm', {'order': order})) %}
+
+{% endblock %}
+

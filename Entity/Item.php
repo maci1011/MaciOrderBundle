@@ -296,6 +296,16 @@ class Item
         return $this->variants;
     }
 
+    public function getVariantsId()
+    {
+        $list = $this->getVariants();
+        $res = array();
+        foreach ($list as $el) {
+            array_push($res, $el->getId());
+        }
+        return $res;
+    }
+
     /**
      * __toString()
      */
@@ -332,10 +342,13 @@ class Item
         return false;
     }
 
-    public function checkProductQuantity($quantity = false)
+    public function checkProduct($quantity = false)
     {
         if ($this->product) {
-            $quantity = $quantity ? $quantity : $this->getQuantity();
+            if ( !$this->product->isAvailable() ) {
+                return false;
+            }
+            $quantity = $quantity ? $quantity : $this->quantity;
             if ( !$this->product->checkQuantity($quantity) ) {
                 return false;
             }
@@ -343,11 +356,11 @@ class Item
         return true;
     }
 
-    public function checkVariantsQuantity($quantity = false)
+    public function checkVariants($quantity = false)
     {
-        $quantity = $quantity ? $quantity : $this->getQuantity();
+        $quantity = $quantity ? $quantity : $this->quantity;
         foreach ($this->variants as $variant) {
-            if ( !$variant->checkQuantity($quantity) ) {
+            if ( !$variant->checkQuantity($quantity) && $this->product->isAvalaible() ) {
                 return false;
             }
         }
@@ -356,11 +369,10 @@ class Item
 
     public function checkAvailability()
     {
-        if ( !$this->checkProductQuantity() || !$this->checkVariantsQuantity() ) {
-            return false;
-        }
-        if ( $this->product && !$this->product->isOnSale() ) {
-            return false;
+        if ( $this->product ) {
+            if ( !$this->product->isAvailable() || !$this->checkProduct() || !$this->checkVariants() ) {
+                return false;
+            }
         }
         return true;
     }
@@ -368,8 +380,8 @@ class Item
     public function refreshAmount()
     {
         $tot = 0;
-        if ($this->getProduct()) {
-            $tot += $this->getProduct()->getPrice();
+        if ($this->product) {
+            $tot += ( $this->product->getPrice() * $this->quantity );
         }
         $this->amount = $tot;
     }

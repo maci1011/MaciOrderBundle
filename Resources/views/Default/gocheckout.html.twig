@@ -1,0 +1,17 @@
+
+{% extends "MaciOrderBundle::layout.html.twig" %}
+
+
+{% block title %}
+
+{{ 'order.gocheckout.meta_title' | matra('Go To Checkout') }}
+
+{% endblock %}
+
+
+{% block container %}
+
+{% include "MaciOrderBundle:Default:_gocheckout.html.twig" with {} %}
+
+{% endblock %}
+

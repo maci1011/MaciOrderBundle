@@ -3,9 +3,25 @@ parameters:
 
 services:
 
-  maci.order.paypal_im_received:
-      class: Maci\OrderBundle\Event\OrderPayPalListener
-      arguments: ["@doctrine.orm.entity_manager"]
-      tags:
-          - { name: kernel.event_listener, event: paypal.ipn.receive, method: onIPNReceive }
+services:
+
+    maci.orders:
+        class: Maci\OrderBundle\Controller\OrderController
+        arguments: ["@doctrine.orm.entity_manager","@security.context","@session"]
+
+    maci.order.paypal_im_received:
+        class: Maci\OrderBundle\Event\OrderPayPalListener
+        arguments: ["@doctrine.orm.entity_manager"]
+        tags:
+            - { name: kernel.event_listener, event: paypal.ipn.receive, method: onIPNReceive }
+
+    maci.order.form.type.spedition:
+        class: Maci\OrderBundle\Form\Type\SpeditionType
+        tags:
+            - { name: form.type, alias: order_spedition }
+
+    maci.order.form.type.payment:
+        class: Maci\OrderBundle\Form\Type\PaymentType
+        tags:
+            - { name: form.type, alias: order_payment }
 
