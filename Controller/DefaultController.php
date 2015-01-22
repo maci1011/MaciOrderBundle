@@ -212,7 +212,21 @@ class DefaultController extends Controller
     public function cartConfirmAction(Request $request)
     {
         if ( $cart = $this->get('maci.orders')->confirmCart() ) {
+
+            if ($cart->getPayment() === 'paypal') {
+                return $this->paypalForm($cart);
+            }
+
+            $page = $this->getDoctrine()->getManager()
+                ->getRepository('MaciPageBundle:Page')
+                ->findOneByPath('order-complete');
+
+            if ($page) {
+                return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete')));
+            }
+
             return $this->render('MaciOrderBundle:Default:confirm.html.twig', array('order' => $cart));
+
         } else {
             return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => true)));
         }
@@ -324,17 +338,6 @@ class DefaultController extends Controller
         ));
     }
 
-    public function paypalPayAction()
-    {
-        $cart = $this->get('maci.orders')->getCurrentCart();
-
-        if (!$cart || $cart->getStatus() !== 'confirmed') {
-            return $this->redirect($this->generateUrl('maci_order_cart'));
-        }
-
-
-    }
-
     public function paypalCompleteAction()
     {
         $om = $this->getDoctrine()->getManager();
@@ -368,16 +371,16 @@ class DefaultController extends Controller
 
         $page = $this->getDoctrine()->getManager()
             ->getRepository('MaciPageBundle:Page')
-            ->findOneByPath('order-complete');
+            ->findOneByPath('order-complete-paypal');
 
         if ($page) {
-            return $this->render('MaciPageBundle:Default:page.html.twig', array('page' => $page));
+            return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete-paypal')));
         }
 
         return $this->render('MaciOrderBundle:Default:complete.html.twig');
     }
 
-    public function paypalFormAction($order)
+    public function paypalForm($order)
     {
         $form = $this->createFormBuilder($order);
 
