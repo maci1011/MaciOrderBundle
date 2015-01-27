@@ -36,13 +36,17 @@ maci_order_paypal_complete:
     pattern:  /order/paypal/complete
     defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
 
-maci_order_cart_add:
-    pattern:  /cart/add
-    defaults: { _controller: MaciOrderBundle:Default:addToCart }
+maci_order_checkout_complete:
+    pattern:  /cart/checkout/complete
+    defaults: { _controller: MaciOrderBundle:Default:cartComplete }
 
 maci_order_checkout_confirm:
     pattern:  /cart/checkout/confirm
     defaults: { _controller: MaciOrderBundle:Default:cartConfirm }
+
+maci_order_cart_add:
+    pattern:  /cart/add
+    defaults: { _controller: MaciOrderBundle:Default:addToCart }
 
 maci_order_checkout:
     pattern:  /cart/checkout

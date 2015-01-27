@@ -75,7 +75,7 @@ class TwigNotificationEmailController extends Controller
                 ;
 
                 $notify = \Swift_Message::newInstance()
-                    ->setSubject('Order Notify')
+                    ->setSubject('Payment Notify')
                     ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
                     ->setTo($this->get('service_container')->getParameter('order_email'))
                     ->setBody($this->renderView('MaciOrderBundle:Email:notify_email.html.twig',array('order' => $order)), 'text/html')
@@ -83,6 +83,7 @@ class TwigNotificationEmailController extends Controller
 
                 //send message
                 $this->get('mailer')->send($message);
+
                 //send notify
                 $this->get('mailer')->send($notify);
 

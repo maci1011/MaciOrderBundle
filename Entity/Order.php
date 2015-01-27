@@ -703,7 +703,7 @@ class Order
 
     public function confirmOrder()
     {
-        if ($this->status === 'confirm') {
+        if ( $this->status === 'confirm' || ( $this->status !== 'new' && $this->status !== 'current' ) ) {
             return false;
         }
 
@@ -722,7 +722,7 @@ class Order
 
     public function completeOrder()
     {
-        if ($this->status === 'complete') {
+        if ($this->status === 'complete' || $this->status !== 'confirm') {
             return false;
         }
 

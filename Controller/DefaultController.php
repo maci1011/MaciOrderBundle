@@ -217,6 +217,34 @@ class DefaultController extends Controller
                 return $this->paypalForm($cart);
             }
 
+            if ($cart->getUser()) {
+                $to = $cart->getUser()->getEmail();
+                $toint = $cart->getUser()->getUsername();
+            } else {
+                $to = $cart->getBilling()->getMail();
+                $toint = $cart->getBilling()->getName() .' '. $cart->getBilling()->getSurname();
+            }
+
+            $message = \Swift_Message::newInstance()
+                ->setSubject('Order Confirmation')
+                ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
+                ->setTo($to, $toint)
+                ->setBody($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('order' => $cart)), 'text/html')
+            ;
+
+            $notify = \Swift_Message::newInstance()
+                ->setSubject('Payment Notify')
+                ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
+                ->setTo($this->get('service_container')->getParameter('order_email'))
+                ->setBody($this->renderView('MaciOrderBundle:Email:notify_email.html.twig',array('order' => $cart)), 'text/html')
+            ;
+
+            //send message
+            $this->get('mailer')->send($message);
+
+            //send notify
+            $this->get('mailer')->send($notify);
+
             $page = $this->getDoctrine()->getManager()
                 ->getRepository('MaciPageBundle:Page')
                 ->findOneByPath('order-complete');
@@ -225,11 +253,93 @@ class DefaultController extends Controller
                 return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete')));
             }
 
-            return $this->render('MaciOrderBundle:Default:confirm.html.twig', array('order' => $cart));
+            return $this->redirect($this->generateUrl('maci_order_checkout_complete'));
 
         } else {
             return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => true)));
         }
+    }
+
+    public function paypalCompleteAction()
+    {
+        $om = $this->getDoctrine()->getManager();
+
+        $id = $tx = $this->getRequest()->get('cm');
+
+        $order = $om->getRepository('MaciOrderBundle:Order')
+            ->findOneById($id);
+
+        $tx = $this->getRequest()->get('tx');
+
+        if (!$order || !$tx) {
+            return $this->redirect($this->generateUrl('maci_order_notfound'));
+        }
+
+        $pdt = $this->get('orderly_pay_pal_pdt');
+        $pdtArray = $pdt->getPdt($tx);
+
+        $status = 'unknown';
+
+        if (isset($pdtArray['payment_status'])) {
+            $status = $pdtArray['payment_status'];
+        } else if ($this->getRequest()->get('st')) {
+            $status = $this->getRequest()->get('st');
+        }
+
+        if ($status === 'Completed') {
+            $order->setStatus('paid');
+            $om->flush();
+        }
+
+        $page = $this->getDoctrine()->getManager()
+            ->getRepository('MaciPageBundle:Page')
+            ->findOneByPath('order-complete-paypal');
+
+        if ($page) {
+            return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete-paypal')));
+        }
+
+        $page = $this->getDoctrine()->getManager()
+            ->getRepository('MaciPageBundle:Page')
+            ->findOneByPath('order-complete');
+
+        if ($page) {
+            return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete')));
+        }
+
+        return $this->redirect($this->generateUrl('maci_order_checkout_complete'));
+    }
+
+    public function cartCompleteAction(Request $request)
+    {
+        return $this->render('MaciOrderBundle:Default:complete.html.twig');
+    }
+
+    public function invoiceAction($id)
+    {
+        $order = $this->getDoctrine()->getManager()
+            ->getRepository('MaciOrderBundle:Order')
+            ->findOneById($id);
+
+        if (!$order) {
+            return $this->redirect($this->generateUrl('maci_order_notfound'));
+        }
+
+        if (
+            ( $order->getUser() && $order->getUser()->getId() !== $this->getUser()->getId() ) &&
+            false === $this->get('security.context')->isGranted('ROLE_SUPER_ADMIN')
+        ) {
+            return $this->redirect($this->generateUrl('maci_order_homepage', array('error' => 'order.nomap')));
+        }
+
+        return $this->render('MaciOrderBundle:Default:invoice.html.twig', array(
+            'order' => $order
+        ));
+    }
+
+    public function notfoundAction()
+    {
+        return $this->render('MaciOrderBundle:Default:notfound.html.twig');
     }
 
     public function cartSetAddressAction(Request $request, $option)
@@ -311,75 +421,6 @@ class DefaultController extends Controller
         return false;
     }
 
-    public function notfoundAction()
-    {
-        return $this->render('MaciOrderBundle:Default:notfound.html.twig');
-    }
-
-    public function invoiceAction($id)
-    {
-        $order = $this->getDoctrine()->getManager()
-            ->getRepository('MaciOrderBundle:Order')
-            ->findOneById($id);
-
-        if (!$order) {
-            return $this->redirect($this->generateUrl('maci_order_notfound'));
-        }
-
-        if (
-            ( $order->getUser() && $order->getUser()->getId() !== $this->getUser()->getId() ) &&
-            false === $this->get('security.context')->isGranted('ROLE_SUPER_ADMIN')
-        ) {
-            return $this->redirect($this->generateUrl('maci_order_homepage', array('error' => 'order.nomap')));
-        }
-
-        return $this->render('MaciOrderBundle:Default:invoice.html.twig', array(
-            'order' => $order
-        ));
-    }
-
-    public function paypalCompleteAction()
-    {
-        $om = $this->getDoctrine()->getManager();
-
-        $id = $tx = $this->getRequest()->get('cm');
-
-        $order = $om->getRepository('MaciOrderBundle:Order')
-            ->findOneById($id);
-
-        $tx = $this->getRequest()->get('tx');
-
-        if (!$order || !$tx) {
-            return $this->redirect($this->generateUrl('maci_order_notfound'));
-        }
-
-        $pdt = $this->get('orderly_pay_pal_pdt');
-        $pdtArray = $pdt->getPdt($tx);
-
-        $status = 'unknown';
-
-        if (isset($pdtArray['payment_status'])) {
-            $status = $pdtArray['payment_status'];
-        } else if ($this->getRequest()->get('st')) {
-            $status = $this->getRequest()->get('st');
-        }
-
-        if ($status === 'Completed') {
-            $order->setStatus('paid');
-            $om->flush();
-        }
-
-        $page = $this->getDoctrine()->getManager()
-            ->getRepository('MaciPageBundle:Page')
-            ->findOneByPath('order-complete-paypal');
-
-        if ($page) {
-            return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete-paypal')));
-        }
-
-        return $this->render('MaciOrderBundle:Default:complete.html.twig');
-    }
-
     public function paypalForm($order)
     {
         $form = $this->createFormBuilder($order);
@@ -414,18 +455,6 @@ class DefaultController extends Controller
 
         return $this->render('MaciOrderBundle:Default:_paypal.html.twig', array(
             'form' => $form->createView(),
-        ));
-    }
-
-    public function testAction(Request $request, $id)
-    {
-        $om = $this->getDoctrine()->getManager();
-
-        $order = $om->getRepository('MaciOrderBundle:Order')
-            ->findOneById($id);
-
-        return $this->render('MaciOrderBundle:Default:invoice.html.twig', array(
-            'order' => $order
         ));
     }
 }

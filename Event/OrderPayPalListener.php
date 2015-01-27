@@ -44,17 +44,13 @@ class OrderPayPalListener {
 
             $order->addTransaction( $tx );
 
-            if ( 0 <= $order->getBalance() ) {
+            $order->completeOrder();
 
-                $order->completeOrder();
-
-                $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
-                    $order->getOrderDocuments(),
-                    $order->getUser(),
-                    'Created by Order: '.$order->getCode()
-                );
-                
-            } 
+            $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
+                $order->getOrderDocuments(),
+                $order->getUser(),
+                'Created by Order: '.$order->getCode()
+            );
 
             $this->om->flush();
 

@@ -403,6 +403,10 @@ class OrderController extends Controller
     {
         $cart = $this->getCurrentCart();
         if ($cart->confirmOrder()) {
+            if (!$cart->getId()) {
+                $this->em->persist($cart);
+            }
+            $this->em->flush();
             return $cart;
         }
         return false;
