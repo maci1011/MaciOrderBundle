@@ -23,10 +23,7 @@ class PaymentType extends AbstractType
 	{
 		$builder
 			->add('payment', 'choice', array(
-                'choices' => array(
-                	'standard' => 'PayPal',
-                	'delivery' => 'Cash On Delivery'
-                ),
+                'choices' => $builder->getData()->getPaymentArray(),
                 'expanded' => true
             ))
 			->add('cancel', 'reset')

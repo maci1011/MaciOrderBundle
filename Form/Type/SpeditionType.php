@@ -23,11 +23,7 @@ class SpeditionType extends AbstractType
 	{
 		$builder
 			->add('spedition', 'choice', array(
-                'choices' => array(
-                	'standard' => 'Standard',
-                	'express' => 'Express',
-                	'pickup' => 'Pickup in Store'
-                ),
+                'choices' => $builder->getData()->getSpeditionArray(),
                 'expanded' => true
             ))
 			->add('cancel', 'reset')

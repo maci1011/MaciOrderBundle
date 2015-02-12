@@ -11,24 +11,6 @@
 
 {% block content %}
 
-
-<h3>Cart:</h3>
-
-{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': cart, 'edit': true } %}
-
-
-{% if cart and cart.items|length %}
-
-<div class="row">
-	<a href="{{ path('maci_order_gocheckout', {'option': 'fast_checkout'}) }}" class="btn btn-default">Checkout</a>
-	or
-	<a href="{{ path('maci_order_gocheckout', {'option': 'booking'}) }}" class="btn btn-default">Pickup In Store</a>
-</div>
-
-{% endif %}
-
+{% include "MaciOrderBundle:Default:_cart.html.twig" with { 'cart': cart } %}
 
 {% endblock %}
-
-
-

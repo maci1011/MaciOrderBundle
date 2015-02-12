@@ -215,6 +215,25 @@ class Order
         return $this->type;
     }
 
+    public function getTypeArray()
+    {
+        return array(
+            'cart' => 'Cart',
+            'order' => 'Order',
+            'booking' => 'Booking'
+        );
+    }
+
+    public function getTypeLabel()
+    {
+        $array = $this->getTypeArray();
+        if (array_key_exists($this->type, $array)) {
+            return $array[$this->type];
+        }
+        $str = str_replace('_', ' ', $this->type);
+        return ucwords($str);
+    }
+
     public function setPayment($payment)
     {
         $this->payment = $payment;
@@ -227,6 +246,25 @@ class Order
         return $this->payment;
     }
 
+    public function getPaymentArray()
+    {
+        return array(
+            'paypal' => 'PayPal',
+            'delivery' => 'Cash On Delivery',
+            'cash' => 'Cash'
+        );
+    }
+
+    public function getPaymentLabel()
+    {
+        $array = $this->getPaymentArray();
+        if (array_key_exists($this->payment, $array)) {
+            return $array[$this->payment];
+        }
+        $str = str_replace('_', ' ', $this->payment);
+        return ucwords($str);
+    }
+
     public function setSpedition($spedition)
     {
         $this->spedition = $spedition;
@@ -237,6 +275,25 @@ class Order
     public function getSpedition()
     {
         return $this->spedition;
+    }
+
+    public function getSpeditionArray()
+    {
+        return array(
+            'standard' => 'Standard',
+            'express' => 'Express',
+            'pickup' => 'Pickup in Store'
+        );
+    }
+
+    public function getSpeditionLabel()
+    {
+        $array = $this->getSpeditionArray();
+        if (array_key_exists($this->spedition, $array)) {
+            return $array[$this->spedition];
+        }
+        $str = str_replace('_', ' ', $this->spedition);
+        return ucwords($str);
     }
 
     /**
@@ -262,6 +319,29 @@ class Order
         return $this->status;
     }
 
+    public function getStatusArray()
+    {
+        return array(
+            'new' => 'New',
+            'current' => 'Current',
+            'complete' => 'Complete',
+            'confirm' => 'Confirm',
+            'paid' => 'Paid',
+            'refuse' => 'Refuse',
+            'foo' => 'Foo'
+        );
+    }
+
+    public function getStatusLabel()
+    {
+        $array = $this->getStatusArray();
+        if (array_key_exists($this->status, $array)) {
+            return $array[$this->status];
+        }
+        $str = str_replace('_', ' ', $this->status);
+        return ucwords($str);
+    }
+
     public function setCheckout($checkout)
     {
         $this->checkout = $checkout;
@@ -272,6 +352,26 @@ class Order
     public function getCheckout()
     {
         return $this->checkout;
+    }
+
+    public function getCheckoutArray()
+    {
+        return array(
+            'checkout' => 'Checkout',
+            'fast_checkout' => 'Fast Checkout',
+            'pickup' => 'Pickup In Store',
+            'foo' => 'Foo'
+        );
+    }
+
+    public function getCheckoutLabel()
+    {
+        $array = $this->getCheckoutArray();
+        if (array_key_exists($this->checkout, $array)) {
+            return $array[$this->checkout];
+        }
+        $str = str_replace('_', ' ', $this->checkout);
+        return ucwords($str);
     }
 
     /**

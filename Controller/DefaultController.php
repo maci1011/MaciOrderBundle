@@ -93,10 +93,10 @@ class DefaultController extends Controller
             $this->get('maci.orders')->setCartSpedition('standard');
             $this->get('maci.orders')->setCartPayment('paypal');
             $this->get('maci.orders')->setCartCheckout('fast_checkout');
-        } else if ($option === 'booking') {
-            $this->get('maci.orders')->setCartSpedition('pickup');
+        } else if ($option === 'pickup') {
+            $this->get('maci.orders')->setCartSpedition('none');
             $this->get('maci.orders')->setCartPayment('cash');
-            $this->get('maci.orders')->setCartCheckout('booking');
+            $this->get('maci.orders')->setCartCheckout('pickup');
         } else {
             $this->get('maci.orders')->setCartCheckout('checkout');
         }
@@ -154,7 +154,7 @@ class DefaultController extends Controller
                     }
                 }
             } else {
-                $checkout['shipping'] = 'disabled';
+                $checkout['shipping'] = false;
             }
 
             if ($type === 'checkout') {
@@ -169,7 +169,7 @@ class DefaultController extends Controller
                     }
                 }
             } else {
-                $checkout['spedition'] = 'disabled';
+                $checkout['spedition'] = false;
             }
 
             if ($type === 'checkout') {
@@ -184,7 +184,7 @@ class DefaultController extends Controller
                     }
                 }
             } else {
-                $checkout['payment'] = 'disabled';
+                $checkout['payment'] = false;
             }
 
             if ($set) {
