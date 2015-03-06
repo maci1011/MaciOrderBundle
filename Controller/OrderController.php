@@ -87,13 +87,16 @@ class OrderController extends Controller
                     $this->session->set('order_items', array());
                 }
                 $cart = $this->setCart(new Order);
+                $cart->setUser($this->user);
                 $this->em->persist($cart);
             }
 
             if ($order_arr['status'] === 'session') {
                 $cart = $this->loadCartFromSession($cart);
                 $cart->setStatus('current');
-                $cart->setUser($this->user);
+                foreach ($cart->getItems() as $item) {
+                    $this->em->persist($item);
+                }
                 $this->refreshSession($cart);
             }
 
@@ -222,10 +225,10 @@ class OrderController extends Controller
         $cart->refreshAmount();
 
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
-            $this->em->flush();
+            $this->em->persist($item);
         }
 
-        $this->refreshSession($cart);
+        $this->saveCart();
 
         return true;
     }
@@ -267,11 +270,6 @@ class OrderController extends Controller
 
         if (!$item->checkAvailability()) {
             return false;
-        }
-
-        if ( $order->getId() ) {
-            $this->em->persist($item);
-            $this->em->flush();
         }
 
         return $item;

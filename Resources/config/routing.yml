@@ -1,11 +1,11 @@
 
 
 maci_order_edit_cart_item:
-    pattern:  /order/cart-item/{id}/edit
+    pattern:  /cart/item/{id}/edit
     defaults: { _controller: MaciOrderBundle:Default:editCartItem }
 
 maci_order_remove_cart_item:
-    pattern:  /order/cart-item/{id}/remove
+    pattern:  /cart/item/{id}/remove
     defaults: { _controller: MaciOrderBundle:Default:removeCartItem }
 
 maci_order_checkout_set_address:

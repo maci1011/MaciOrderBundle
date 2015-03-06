@@ -12,12 +12,14 @@
 </td>
 </tr>
 
+{% if order.billing is not null %}
 <tr>
 <td valign="top" align="center">
 <h3>Payment Address:</h3>
 {% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
 </td>
 </tr>
+{% endif %}
 
 {% if order.shipping is not null %}
 <tr>
@@ -74,7 +76,7 @@
 <tr>
 <td valign="top" align="center">
 <h5>Contact us for more informations:</h5>
-{% include "MaciPageBundle:Default:_contacts.html.twig" } %}
+{% include "MaciPageBundle:Default:_contacts.html.twig" %}
 </td>
 </tr>
 
