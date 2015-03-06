@@ -314,44 +314,34 @@ class OrderController extends Controller
     public function removeItem($id)
     {
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
-
             $cart = $this->getCurrentCart();
             $item = false;
-
             foreach ($cart->getItems() as $_item) {
-                if ($_item->getId() === $id) {
+                if ( $_item->getId() === intval($id) ) {
                     $item = $_item;
                     break;
                 }
             }
-
-            if (!$item) {
-                return false;
-            }
-
             if (
                 !$item ||
-                ( $item->getOrder()->getUser() && $item->getOrder()->getUser()->getId() !== $this->user->getId() ) &&
-                false === $this->securityContext->isGranted('ROLE_SUPER_ADMIN')
+                (
+                    $item->getOrder()->getUser() &&
+                    $item->getOrder()->getUser()->getId() !== $this->user->getId() &&
+                    false === $this->securityContext->isGranted('ROLE_SUPER_ADMIN')
+                )
             ) {
                 return false;
             }
-
             $this->em->remove($item);
-
-            $this->em->flush();
+            $this->saveCart();
         } else {
             $items = $this->session->get('order_items');
-
             if (!is_array($items) || !count($items) || count($items) <= $id) {
                 return false;
             }
-
             array_splice($items, $id);
-
             $this->session->set('order_items', $items);
         }
-
         return true;
     }
 
@@ -394,9 +384,8 @@ class OrderController extends Controller
     {
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
             $this->em->flush();
-        } else {
-            $this->refreshSession($this->getCurrentCart());
         }
+        $this->refreshSession($this->getCurrentCart());
     }
 
     public function confirmCart()
