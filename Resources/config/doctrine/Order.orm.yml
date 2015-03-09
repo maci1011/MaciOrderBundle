@@ -16,6 +16,10 @@ Maci\OrderBundle\Entity\Order:
         description:
             type: text
             nullable: true
+        mail:
+            type: string
+            length: 63
+            nullable: true
         type:
             type: string
             length: 31

@@ -16,6 +16,16 @@
 
 {% endif %}
 
+{% if is_granted('ROLE_USER') %}
+
+<h4>You are ordering as {{ app.user.username }}</h4>
+
+{% else %}
+
+<h4>You are ordering with this e-mail address: {{ order.mail }}</h4>
+
+{% endif %}
+
 </section>
 
 

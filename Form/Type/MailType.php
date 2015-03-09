@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class PaymentType extends AbstractType
+class MailType extends AbstractType
 {
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{
@@ -19,17 +19,13 @@ class PaymentType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('payment', 'choice', array(
-                'choices' => $builder->getData()->getPaymentArray(),
-                'expanded' => true
-            ))
-			->add('cancel', 'reset')
+			->add('mail', 'email')
 			->add('send', 'submit')
 		;
 	}
 
 	public function getName()
 	{
-		return 'order_payment';
+		return 'order_mail';
 	}
 }

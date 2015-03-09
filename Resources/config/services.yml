@@ -15,13 +15,18 @@ services:
         tags:
             - { name: kernel.event_listener, event: paypal.ipn.receive, method: onIPNReceive }
 
-    maci.order.form.type.spedition:
-        class: Maci\OrderBundle\Form\Type\SpeditionType
+    maci.order.form.type.mail:
+        class: Maci\OrderBundle\Form\Type\MailType
         tags:
-            - { name: form.type, alias: order_spedition }
+            - { name: form.type, alias: order_mail }
 
     maci.order.form.type.payment:
         class: Maci\OrderBundle\Form\Type\PaymentType
         tags:
             - { name: form.type, alias: order_payment }
+
+    maci.order.form.type.spedition:
+        class: Maci\OrderBundle\Form\Type\SpeditionType
+        tags:
+            - { name: form.type, alias: order_spedition }
 

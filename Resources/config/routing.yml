@@ -1,5 +1,4 @@
 
-
 maci_order_edit_cart_item:
     pattern:  /cart/item/{id}/edit
     defaults: { _controller: MaciOrderBundle:Default:editCartItem }
@@ -23,6 +22,10 @@ maci_order_invoice:
 # maci_order_test:
 #     pattern:  /order/test/{id}
 #     defaults: { _controller: MaciOrderBundle:Default:test, id: 0 }
+
+maci_order_checkout_set_mail:
+    pattern:  /cart/checkout/set-mail
+    defaults: { _controller: MaciOrderBundle:Default:cartSetMail }
 
 maci_order_checkout_set_payment:
     pattern:  /cart/checkout/set-payment

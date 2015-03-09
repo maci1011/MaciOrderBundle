@@ -49,8 +49,11 @@ class OrderController extends Controller
                     date('h') . date('i') . date('s') . date('m') . date('d') . date('Y'),
                 'status' => $status,
                 'type' => 'cart',
+                'mail' => null,
                 'shipping' => null,
                 'billing' => null,
+                'spedition' => null,
+                'payment' => null,
                 'amount' => 0
             ));
             $this->session->set('order_items', array());
@@ -65,6 +68,11 @@ class OrderController extends Controller
         $cart->setCode( $order_arr['code'] );
         $cart->setStatus( $order_arr['status'] );
         $cart->setType( $order_arr['type'] );
+        $cart->setMail( $order_arr['mail'] );
+        $cart->setShipping( $order_arr['shipping'] );
+        $cart->setBilling( $order_arr['billing'] );
+        $cart->setSpedition( $order_arr['spedition'] );
+        $cart->setPayment( $order_arr['payment'] );
         return $cart;
     }
 
@@ -174,7 +182,12 @@ class OrderController extends Controller
             'code' => $order->getCode(),
             'status' => $order->getStatus(),
             'type' => $order->getType(),
-            'amount' => $order->getAmount()
+            'mail' => $order->getMail(),
+            'amount' => $order->getAmount(),
+            'spedition' => $order->getSpedition(),
+            'payment' => $order->getPayment(),
+            'shipping' => null,
+            'billing' => null
         );
 
         if ($order->getShipping()) {
@@ -341,6 +354,13 @@ class OrderController extends Controller
             $this->session->set('order_items', $items);
         }
         return true;
+    }
+
+    public function setCartMail($mail)
+    {
+        $cart = $this->getCurrentCart();
+        $cart->setMail($mail);
+        $this->saveCart();
     }
 
     public function setCartPayment($payment)

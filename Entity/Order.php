@@ -27,6 +27,11 @@ class Order
     /**
      * @var string
      */
+    private $mail;
+
+    /**
+     * @var string
+     */
     private $status;
 
     /**
@@ -190,6 +195,29 @@ class Order
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Set mail
+     *
+     * @param string $mail
+     * @return Address
+     */
+    public function setMail($mail)
+    {
+        $this->mail = $mail;
+
+        return $this;
+    }
+
+    /**
+     * Get mail
+     *
+     * @return string 
+     */
+    public function getMail()
+    {
+        return $this->mail;
     }
 
     /**
@@ -357,9 +385,11 @@ class Order
     public function getCheckoutArray()
     {
         return array(
+            'full_checkout' => 'Full Checkout',
             'checkout' => 'Checkout',
             'fast_checkout' => 'Fast Checkout',
             'pickup' => 'Pickup In Store',
+            'booking' => 'Booking',
             'foo' => 'Foo'
         );
     }
