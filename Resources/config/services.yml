@@ -9,11 +9,20 @@ services:
         class: Maci\OrderBundle\Controller\OrderController
         arguments: ["@doctrine.orm.entity_manager","@security.context","@session"]
 
-    maci.order.paypal_im_received:
-        class: Maci\OrderBundle\Event\OrderPayPalListener
-        arguments: ["@doctrine.orm.entity_manager"]
+    maci.order.form.type.booking:
+        class: Maci\OrderBundle\Form\Type\CartBookingType
         tags:
-            - { name: kernel.event_listener, event: paypal.ipn.receive, method: onIPNReceive }
+            - { name: form.type, alias: cart_booking }
+
+    maci.order.form.type.pickup:
+        class: Maci\OrderBundle\Form\Type\CartPickupType
+        tags:
+            - { name: form.type, alias: cart_pickup }
+
+    maci.order.form.type.checkout:
+        class: Maci\OrderBundle\Form\Type\CartCheckoutType
+        tags:
+            - { name: form.type, alias: cart_checkout }
 
     maci.order.form.type.mail:
         class: Maci\OrderBundle\Form\Type\MailType
@@ -29,4 +38,10 @@ services:
         class: Maci\OrderBundle\Form\Type\SpeditionType
         tags:
             - { name: form.type, alias: order_spedition }
+
+    maci.order.paypal_im_received:
+        class: Maci\OrderBundle\Event\OrderPayPalListener
+        arguments: ["@doctrine.orm.entity_manager"]
+        tags:
+            - { name: kernel.event_listener, event: paypal.ipn.receive, method: onIPNReceive }
 

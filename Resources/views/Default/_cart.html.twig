@@ -5,18 +5,26 @@
 
 {% if cart and cart.items|length %}
 
-<div class="row checkout-options">
+<div class="checkout-options">
 
-	<div class="col-md-4">
+	{% if cart.items|length < 4 %}
+	<div class="row">
+
+		<h3>{{ 'page.cart.pickup' | matra('Pickup In Store') }}</h3>
+		<p>{{ 'page.cart.pickup.description' | matra('Reserve the order and then get it in our store.') }}</p>
+
+		{{ render(controller('MaciOrderBundle:Default:cartSetCheckout', {'checkout': 'pickup'})) }}
+
+	</div>
+	{% endif %}
+
+	<div class="row">
+
 		<h3>{{ 'page.cart.checkout' | matra('Checkout') }}</h3>
 		<p>{{ 'page.cart.checkout.description' | matra('Pay the order and get it at home.') }}</p>
-		<a href="{{ path('maci_order_gocheckout', {'option': 'fast_checkout'}) }}" class="btn btn-default">{{ 'page.cart.checkout' | matra('Checkout') }}</a>
-	</div>
 
-	<div class="col-md-4">
-		<h3>{{ 'page.cart.pickup' | matra('Pickup In Store') }}</h3>
-		<p>{{ 'page.cart.pickup.description' | matra('Reserve the order the get it our store.') }}</p>
-		<a href="{{ path('maci_order_gocheckout', {'option': 'pickup'}) }}" class="btn btn-default">{{ 'page.cart.pickup' | matra('Pickup In Store') }}</a>
+		{{ render(controller('MaciOrderBundle:Default:cartSetCheckout')) }}
+
 	</div>
 
 </div>

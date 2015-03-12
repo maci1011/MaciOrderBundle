@@ -248,7 +248,8 @@ class Order
         return array(
             'cart' => 'Cart',
             'order' => 'Order',
-            'booking' => 'Booking'
+            'booking' => 'Booking',
+            'none' => 'None'
         );
     }
 

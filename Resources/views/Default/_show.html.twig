@@ -1,19 +1,15 @@
 
 <section class="cart-list">
 
-	<h3>{{ 'menu.user.cart' | matra('My Cart') }}:</h3>
+<div class="row">
+
+	<h3>{{ 'menu.user.cart' | matra('My Cart') }}</h3>
+
+</div>
 
 
 {% if order and order.items|length %}
 
-
-{% for item in order.items %}
-
-{% if item.id %}
-{% set id = item.id %}
-{% else %}
-{% set id = loop.index0 %}
-{% endif %}
 
 <div class="row">
 
@@ -38,6 +34,15 @@
 	</div>
 
 </div>
+
+
+{% for item in order.items %}
+
+{% if item.id %}
+{% set id = item.id %}
+{% else %}
+{% set id = loop.index0 %}
+{% endif %}
 
 <div class="row">
 

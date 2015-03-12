@@ -22,7 +22,7 @@
 
 {% else %}
 
-<h4>You are ordering with this e-mail address: {{ order.mail }}</h4>
+<h4>You are ordering with this e-mail address: {{ order.mail }} ( <a href="{{ path('maci_order_gocheckout', {'edit': true}) }}">Change Email</a> )</h4>
 
 {% endif %}
 
@@ -54,7 +54,13 @@
 
 	<br/><br/>
 
-	{#%
+	{% if order.checkout == 'pickup' or order.checkout == 'booking' or order.shipping is not null %}
+
+	{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout_set_address', {'option': 'billing'})})) %}
+
+	{% else %}
+
+	{%
 		render(controller('MaciAddressBundle:Default:form', {
 			'id': false,
 			'method': {
@@ -62,9 +68,9 @@
 				'The Billing Address is different from that of Shipment.': path('maci_order_checkout_set_address', {'option': 'billing'})
 			}
 		} ))
-	%#}
+	%}
 
-	{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout_set_address', {'option': 'billing'})})) %}
+	{% endif %}
 
 </section>
 
