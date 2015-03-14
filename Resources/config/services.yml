@@ -7,7 +7,7 @@ services:
 
     maci.orders:
         class: Maci\OrderBundle\Controller\OrderController
-        arguments: ["@doctrine.orm.entity_manager","@security.context","@session"]
+        arguments: ["@doctrine.orm.entity_manager","@security.context","@session","@maci.addresses"]
 
     maci.order.form.type.booking:
         class: Maci\OrderBundle\Form\Type\CartBookingType

@@ -412,19 +412,27 @@ class DefaultController extends Controller
 
     public function cartSetAddressAction(Request $request, $option)
     {
-        $address = $this->getDoctrine()->getManager()->getRepository('MaciAddressBundle:Address')
-                ->findOneBy(array('user' => $this->getUser(), 'id' => $request->get('address')));
-        if (!$address) {
+        if ($request->get('address') === false) {
+            return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'address.notid')));
+        }
+
+        $id = intval($request->get('address'));
+        $address = false;
+
+        if (true === $this->get('security.context')->isGranted('ROLE_USER')) {
+            $address = $this->getDoctrine()->getManager()->getRepository('MaciAddressBundle:Address')
+                ->findOneBy(array('user' => $this->getUser(), 'id' => $id));
+        } else {
+            $addresses = $this->get('session')->get('addresses', array());
+            if (array_key_exists($id, $addresses)) {
+                $address = $id;
+            }
+        }
+
+        if ($address === false) {
             return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'address.notfound')));
         }
-        if ( $this->setAddress($option, $address) ) {
-            return $this->redirect($this->generateUrl('maci_order_checkout', array('setted' => $option)));
-        }
-        return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'checkout.nothingsetted')));
-    }
 
-    public function setAddress($option, $address)
-    {
         if ($option === 'both') {
             $this->get('maci.orders')->setCartShipping($address);
             $this->get('maci.orders')->setCartBilling($address);
@@ -436,7 +444,8 @@ class DefaultController extends Controller
             $this->get('maci.orders')->setCartBilling($address);
             return $this->redirect($this->generateUrl('maci_order_checkout', array('setted' => 'billing')));
         }
-        return false;
+
+        return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'checkout.nothingsetted')));
     }
 
     public function paypalForm($order)

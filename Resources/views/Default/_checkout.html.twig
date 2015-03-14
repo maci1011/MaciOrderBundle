@@ -56,13 +56,13 @@
 
 	{% if order.checkout == 'pickup' or order.checkout == 'booking' or order.shipping is not null %}
 
-	{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout_set_address', {'option': 'billing'})})) %}
+	{% render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': path('maci_order_checkout_set_address', {'option': 'billing'})})) %}
 
 	{% else %}
 
 	{%
 		render(controller('MaciAddressBundle:Default:form', {
-			'id': false,
+			'id': null,
 			'method': {
 				'The Billing Address is the same as that of Shipment.': path('maci_order_checkout_set_address', {'option': 'both'}),
 				'The Billing Address is different from that of Shipment.': path('maci_order_checkout_set_address', {'option': 'billing'})
@@ -112,7 +112,7 @@
 
 	<br/><br/>
 
-	{% render(controller('MaciAddressBundle:Default:form', {'id': false, 'method': path('maci_order_checkout_set_address', {'option': 'shipping'})})) %}
+	{% render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': path('maci_order_checkout_set_address', {'option': 'shipping'})})) %}
 
 </section>
 

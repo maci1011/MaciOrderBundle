@@ -10,6 +10,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\SecurityContext;
 
+use Maci\AddressBundle\Controller\AddressController;
+use Maci\AddressBundle\Entity\Address;
 use Maci\OrderBundle\Entity\Order;
 use Maci\OrderBundle\Entity\Item;
 
@@ -25,12 +27,15 @@ class OrderController extends Controller
 
     private $cart;
 
-	public function __construct(EntityManager $doctrine, SecurityContext $securityContext, Session $session)
+    private $ac;
+
+	public function __construct(EntityManager $doctrine, SecurityContext $securityContext, Session $session, AddressController $ac)
 	{
     	$this->em = $doctrine;
 	    $this->securityContext = $securityContext;
 	    $this->user = $securityContext->getToken()->getUser();
 		$this->session = $session;
+        $this->ac = $ac;
         $this->cart = false;
     }
 
@@ -186,25 +191,37 @@ class OrderController extends Controller
         $this->saveCart();
     }
 
-    public function setCartShipping($address)
-    {
-        $this->getCurrentCart();
-        $this->cart->setShipping($address);
-        $this->saveCart();
-    }
-
-    public function setCartBilling($address)
-    {
-        $this->getCurrentCart();
-        $this->cart->setBilling($address);
-        $this->saveCart();
-    }
-
     public function setCartCheckout($checkout)
     {
         $this->getCurrentCart();
         $this->cart->setCheckout($checkout);
         $this->saveCart();
+    }
+
+    public function setCartShipping($address)
+    {
+        if (true === $this->securityContext->isGranted('ROLE_USER')) {
+            $this->getCurrentCart();
+            $this->cart->setShipping($address);
+            $this->em->flush();
+        } else {
+            $info = $this->getDefaultSession();
+            $info['shipping'] = $address;
+            $this->session->set('order', $info);
+        }
+    }
+
+    public function setCartBilling($address)
+    {
+        if (true === $this->securityContext->isGranted('ROLE_USER')) {
+            $this->getCurrentCart();
+            $this->cart->setBilling($address);
+            $this->em->flush();
+        } else {
+            $info = $this->getDefaultSession();
+            $info['billing'] = $address;
+            $this->session->set('order', $info);
+        }
     }
 
     public function confirmCart()
@@ -282,8 +299,6 @@ class OrderController extends Controller
         $cart->setType( $order_arr['type'] );
         $cart->setMail( $order_arr['mail'] );
         $cart->setCheckout( $order_arr['checkout'] );
-        $cart->setShipping( $order_arr['shipping'] );
-        $cart->setBilling( $order_arr['billing'] );
         $cart->setSpedition( $order_arr['spedition'] );
         $cart->setPayment( $order_arr['payment'] );
         return $cart;
@@ -319,7 +334,9 @@ class OrderController extends Controller
 
     public function refreshSession($order)
     {
-        $info =array(
+        $info = $this->getDefaultSession();
+
+        $info = array(
             'name' => $order->getName(),
             'code' => $order->getCode(),
             'status' => $order->getStatus(),
@@ -329,17 +346,9 @@ class OrderController extends Controller
             'spedition' => $order->getSpedition(),
             'payment' => $order->getPayment(),
             'checkout' => $order->getCheckout(),
-            'shipping' => null,
-            'billing' => null
+            'shipping' => $info['shipping'],
+            'billing' => $info['billing']
         );
-
-        if ($order->getShipping()) {
-            $info['shipping'] = $order->getShipping()->getId();
-        }
-
-        if ($order->getBilling()) {
-            $info['billing'] = $order->getBilling()->getId();
-        }
 
         $this->session->set('order', $info);
 
@@ -401,18 +410,15 @@ class OrderController extends Controller
             }
         }
 
-        if (array_key_exists('shipping', $order_arr) && $id = intval($order_arr['shipping'])) {
-            $address = $this->em->getRepository('MaciAddressBundle:Address')
-                ->findOneById($id);
-            if ($address && !$address->getUser()) {
+        if ($order_arr['shipping'] !== null) {
+            $address = $this->ac->getAddress($order_arr['shipping']);
+            if ($address) {
                 $cart->setShipping($address);
             }
         }
-
-        if (array_key_exists('billing', $order_arr) && $id = intval($order_arr['billing'])) {
-            $address = $this->em->getRepository('MaciAddressBundle:Address')
-                ->findOneById($id);
-            if ($address && !$address->getUser()) {
+        if ($order_arr['billing'] !== null) {
+            $address = $this->ac->getAddress($order_arr['billing']);
+            if ($address) {
                 $cart->setBilling($address);
             }
         }
