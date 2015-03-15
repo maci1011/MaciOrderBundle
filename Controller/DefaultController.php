@@ -190,9 +190,9 @@ class DefaultController extends Controller
 
             return $this->redirect($this->generateUrl('maci_order_checkout_complete'));
 
-        } else {
-            return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => true)));
         }
+
+        return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => true)));
     }
 
     public function cartCompleteAction(Request $request)
