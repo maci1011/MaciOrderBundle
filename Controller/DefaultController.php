@@ -156,7 +156,7 @@ class DefaultController extends Controller
                 $to = $cart->getUser()->getEmail();
                 $toint = $cart->getUser()->getUsername();
             } else {
-                $to = $cart->getBilling()->getMail();
+                $to = $cart->getMail();
                 $toint = $cart->getBilling()->getName() .' '. $cart->getBilling()->getSurname();
             }
 
