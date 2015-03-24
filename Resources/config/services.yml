@@ -9,6 +9,21 @@ services:
         class: Maci\OrderBundle\Controller\OrderController
         arguments: ["@doctrine.orm.entity_manager","@security.context","@session","@maci.addresses"]
 
+    maci.order.form.type.cart_add_product_item:
+        class: Maci\OrderBundle\Form\Type\CartAddProductItemType
+        tags:
+            - { name: form.type, alias: cart_add_product_item }
+
+    maci.order.form.type.cart_edit_item:
+        class: Maci\OrderBundle\Form\Type\CartEditItemType
+        tags:
+            - { name: form.type, alias: cart_edit_item }
+
+    maci.order.form.type.cart_remove_item:
+        class: Maci\OrderBundle\Form\Type\CartRemoveItemType
+        tags:
+            - { name: form.type, alias: cart_remove_item }
+
     maci.order.form.type.booking:
         class: Maci\OrderBundle\Form\Type\CartBookingType
         tags:

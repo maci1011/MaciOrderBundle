@@ -1,0 +1,10 @@
+
+<form class="form-inline order-item-quantity-form" action="{{ path('maci_order_edit_cart_item', {'id': id}) }}" method="post">
+
+	<div class="form-group">
+    	{{ form_errors(form) }}
+	</div>
+
+    {{ form_rest(form) }}
+
+</form>

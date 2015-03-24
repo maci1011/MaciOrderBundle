@@ -1,0 +1,10 @@
+
+<form class="maci_cart_add_product" action="{{ path('maci_order_cart_add', {'product': product.id}) }}" method="post">
+
+	<div class="form-group">
+    	{{ form_errors(form) }}
+	</div>
+
+    {{ form_rest(form) }}
+
+</form>

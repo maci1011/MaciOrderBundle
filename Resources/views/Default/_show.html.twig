@@ -3,7 +3,11 @@
 
 <div class="row">
 
-	<h3>{{ 'menu.user.cart' | matra('My Cart') }}</h3>
+	<div class="col-xs-12">
+
+		<h3>{{ 'menu.user.cart' | matra('My Cart') }}</h3>
+
+	</div>
 
 </div>
 
@@ -68,13 +72,8 @@
 
 	<div class="col-xs-4">
 		{% if edit is defined and edit %}
-		<form class="form-inline order-item-quantity-form" action="{{ path('maci_order_edit_cart_item', {'id': id}) }}" method="post">
-			<div class="form-group">
-				<input type="text" class="form-control edit-quantity-field" name="quantity"  value="{{ item.quantity }}" />
-				<input type="submit" class="btn btn-success" value="{{ 'form.edit' | matra('Edit') }}" />
-			</div>
-		</form>
-		<a class="btn btn-danger" href="{{ path('maci_order_remove_cart_item', {'id': id}) }}">{{ 'form.remove' | matra('Remove') }}</a>
+		{% render(controller('MaciOrderBundle:Default:editCartItem', { 'id': id, 'quantity': item.quantity } )) %}
+		{% render(controller('MaciOrderBundle:Default:removeCartItem', { 'id': id } )) %}
 		{% else %}
 		<span class="order-item-quantity">{{ item.quantity }}</span>
 		{% endif %}

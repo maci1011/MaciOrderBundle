@@ -1,4 +1,8 @@
 
+maci_order_cart_add:
+    pattern:  /cart/item/add/{product}
+    defaults: { _controller: MaciOrderBundle:Default:addToCart }
+
 maci_order_edit_cart_item:
     pattern:  /cart/item/edit/{id}
     defaults: { _controller: MaciOrderBundle:Default:editCartItem }
@@ -46,10 +50,6 @@ maci_order_checkout_complete:
 maci_order_checkout_confirm:
     pattern:  /cart/checkout/confirm
     defaults: { _controller: MaciOrderBundle:Default:cartConfirm }
-
-maci_order_cart_add:
-    pattern:  /cart/add
-    defaults: { _controller: MaciOrderBundle:Default:addToCart }
 
 maci_order_checkout:
     pattern:  /cart/checkout
