@@ -1,0 +1,68 @@
+
+{% for variant in list %}
+
+<div class="product-variant-row">
+
+{% if is_granted("ROLE_ADMIN") %}
+
+<div class="btn-group">
+
+	{% include 'MaciAdminBundle:Modal:edit.html.twig' with {'entity': 'product_variant', 'item': variant, '_hide': '#product_variant_product,#product_variant_parent', 'label': '', 'btnxs': true} %}
+
+	{% include 'MaciAdminBundle:Modal:remove.html.twig' with {'entity': 'product_variant', 'item': variant, 'label': '', 'btnxs': true} %}
+
+	{% include 'MaciAdminBundle:Modal:new.html.twig' with {'entity': 'product_variant', '_parent': '#product_variant_parent', '_parentval': variant.id, '_hide': '#product_variant_product', 'label': '', 'btnxs': true} %}
+
+	{% include 'MaciAdminBundle:Modal:edit.html.twig' with {'entity': 'product_variant', 'item': variant, '_clone': true, 'label': '', 'btnxs': true} %}
+
+</div>
+
+{% endif %}
+
+
+{% if variant.hasAvailableChildren %}
+
+<span>{{ variant.name }}</span>
+
+{% if variant.description %}
+<p>{{ variant.description }}</p>
+{% endif %}
+
+{% include "MaciOrderBundle:Default:_order_cart_add_product_variants.html.twig" with { 'list': variant.getAvailableChildren } %}
+
+{% else %}
+
+
+{# --- RADIO ---#}
+
+{% if variant.style == 'radio' %}
+
+{% if variant.parent %}
+<input id="variant_{{ variant.id }}" type="radio" name="cart_add_product_item[variants][{{ variant.parent.value }}]" value="{{ variant.id }}" {% if loop.first %}checked{% endif %} />
+{% else %}
+<input id="variant_{{ variant.id }}" type="radio" name="cart_add_product_item[variants][{{ list.first.value }}]" value="{{ variant.id }}" {% if loop.first %}checked{% endif %} />
+{% endif %}
+<label for="variant_{{ variant.id }}">{{ variant.name }}</label>
+
+{# --- CHECKBOX ---#}
+
+{% elseif variant.style == 'checkbox' %}
+
+<input id="variant_{{ variant.id }}" type="checkbox" name="variants[{{ variant.value }}]" value="{{ variant.id }}" />
+<label for="variant_{{ variant.id }}">{{ variant.name }}</label>
+
+{% endif %}
+
+
+{% if variant.description %}
+<p>{{ variant.description }}</p>
+{% endif %}
+
+
+{% endif %}
+
+
+</div>
+
+{% endfor %}
+

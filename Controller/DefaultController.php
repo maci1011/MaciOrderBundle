@@ -296,7 +296,7 @@ class DefaultController extends Controller
 
         if ($form->isValid()) {
             $variants = array();
-            if (array_key_exists('variants', $form)) {
+            if ($form->has('variants')) {
                 $variants = $form['variants']->getData();
             }
 

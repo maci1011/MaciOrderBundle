@@ -23,7 +23,9 @@ class CartAddProductItemType extends AbstractType
 			if (count($product->getVariants())) {
 				$builder->add('variants', 'entity', array(
 					'class' => 'MaciProductBundle:Variant',
-					'choices' => $product->getVariantsChildren()
+					'choices' => $product->getVariantsChildren(),
+					'multiple' => true,
+					'group_by' => 'variant.parent'
 				));
 			}
 		}

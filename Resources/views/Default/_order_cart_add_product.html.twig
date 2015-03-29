@@ -1,10 +1,34 @@
 
 <form class="maci_cart_add_product" action="{{ path('maci_order_cart_add', {'product': product.id}) }}" method="post">
 
-	<div class="form-group">
-    	{{ form_errors(form) }}
-	</div>
+<div class="form-group">
+	{{ form_errors(form) }}
+</div>
 
-    {{ form_rest(form) }}
+
+{% if product.hasAvailableVariants %}
+
+<h5 class="cart-form-variants-title">{{ 'product.variants' | matra('Variants') }}</h5>
+
+{% if is_granted("ROLE_ADMIN") %}
+<div sortable="{{ path('maci_admin_entity_reorder', {'entity': 'product_variant_item'}) }}">
+{% endif %}
+
+<div class="cart-form-variants">
+
+{% include "MaciOrderBundle:Default:_order_cart_add_product_variants.html.twig" with { 'list': product.getAvailableVariants } %}
+
+</div>
+
+{% if is_granted("ROLE_ADMIN") %}
+</div>
+{% endif %}
+
+{% endif %}
+
+
+{{ form_row(form.quantity) }}
+{{ form_row(form._token) }}
+{{ form_row(form.add_to_cart) }}
 
 </form>
