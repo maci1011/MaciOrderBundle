@@ -231,7 +231,12 @@ class OrderController extends Controller
             if (!$cart->getId()) {
                 $this->em->persist($cart);
             }
-            $this->em->flush();
+            foreach ($cart->getItems() as $item) {
+                if (!$item->getId()) {
+                    $this->em->persist($item);
+                }
+            }
+            $this->saveCart();
             return $cart;
         }
         return false;
@@ -239,10 +244,11 @@ class OrderController extends Controller
 
     public function saveCart()
     {
-        if (true === $this->securityContext->isGranted('ROLE_USER')) {
+        $cart = $this->getCurrentCart();
+        if (true === $this->securityContext->isGranted('ROLE_USER') || $cart->getStatus() === 'confirm') {
             $this->em->flush();
         }
-        $this->refreshSession($this->getCurrentCart());
+        $this->refreshSession($cart);
     }
 
     public function getCurrentCart()
