@@ -20,7 +20,7 @@ class MailType extends AbstractType
 	{
 		$builder
 			->add('mail', 'email')
-			->add('send', 'submit')
+			->add('use_this_email', 'submit')
 		;
 	}
 
