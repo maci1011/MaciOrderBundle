@@ -7,7 +7,7 @@ services:
 
     maci.orders:
         class: Maci\OrderBundle\Controller\OrderController
-        arguments: ["@doctrine.orm.entity_manager","@security.context","@session","@maci.addresses"]
+        arguments: ["@doctrine.orm.entity_manager","@security.context","@session","%maci.order.configs%","@maci.addresses"]
 
     maci.order.form.type.cart_add_product_item:
         class: Maci\OrderBundle\Form\Type\CartAddProductItemType
@@ -36,6 +36,7 @@ services:
 
     maci.order.form.type.checkout:
         class: Maci\OrderBundle\Form\Type\CartCheckoutType
+        arguments: ["@maci.orders"]
         tags:
             - { name: form.type, alias: cart_checkout }
 
@@ -46,13 +47,15 @@ services:
 
     maci.order.form.type.payment:
         class: Maci\OrderBundle\Form\Type\PaymentType
+        arguments: ["@maci.orders"]
         tags:
             - { name: form.type, alias: order_payment }
 
-    maci.order.form.type.spedition:
-        class: Maci\OrderBundle\Form\Type\SpeditionType
+    maci.order.form.type.shipping:
+        class: Maci\OrderBundle\Form\Type\ShippingType
+        arguments: ["@maci.orders"]
         tags:
-            - { name: form.type, alias: order_spedition }
+            - { name: form.type, alias: order_shipping }
 
     maci.order.paypal_im_received:
         class: Maci\OrderBundle\Event\OrderPayPalListener

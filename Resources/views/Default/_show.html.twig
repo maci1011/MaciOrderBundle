@@ -90,6 +90,84 @@
 {% endfor %}
 
 
+{# SHIPPING COST #}
+
+{% if order.shippingCost and edit is not defined or not edit %}
+
+<div class="row">
+
+	<div class="col-xs-5">
+		&nbsp;
+	</div>
+
+	<div class="col-xs-2">
+		&nbsp;
+	</div>
+
+	<div class="col-xs-2">
+		<span class="order-amount-label">{{ 'order.shipping' | matra('Shipping') }}</span>
+	</div>
+
+	<div class="col-xs-2">
+		<span class="order-amount-label">{{ order.shipping | matra(configs.shippings[order.shipping].label) }}</span>
+	</div>
+
+	<div class="col-xs-1">
+		<span class="order-amount-value">
+			{% if 0 < order.shippingCost %}
+			{{ order.shippingCost | number_format(2, '.', ',') }} &euro;
+			{% else %}
+			&nbsp;
+			{% endif %}
+		</span>
+	</div>
+
+</div>
+
+{% endif %}
+
+
+
+{# PAYMENT COST #}
+
+{% if order.paymentCost and edit is not defined or not edit %}
+
+<div class="row">
+
+	<div class="col-xs-5">
+		&nbsp;
+	</div>
+
+	<div class="col-xs-2">
+		&nbsp;
+	</div>
+
+	<div class="col-xs-2">
+		<span class="order-amount-label">{{ 'order.payment' | matra('Payment') }}</span>
+	</div>
+
+	<div class="col-xs-2">
+		<span class="order-amount-label">{{ order.payment | matra(configs.payments[order.payment].label) }}</span>
+	</div>
+
+	<div class="col-xs-1">
+		<span class="order-amount-value">
+			{% if 0 < order.paymentCost %}
+			{{ order.paymentCost | number_format(2, '.', ',') }} &euro;
+			{% else %}
+			&nbsp;
+			{% endif %}
+		</span>
+	</div>
+
+</div>
+
+{% endif %}
+
+
+
+{# AMOUNT #}
+
 <div class="row">
 
 	<div class="col-xs-5">

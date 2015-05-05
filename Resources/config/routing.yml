@@ -35,9 +35,9 @@ maci_order_checkout_set_payment:
     pattern:  /cart/checkout/set-payment
     defaults: { _controller: MaciOrderBundle:Default:cartSetPayment }
 
-maci_order_checkout_set_spedition:
-    pattern:  /cart/checkout/set-spedition
-    defaults: { _controller: MaciOrderBundle:Default:cartSetSpedition }
+maci_order_checkout_set_shipping:
+    pattern:  /cart/checkout/set-shipping
+    defaults: { _controller: MaciOrderBundle:Default:cartSetShipping }
 
 maci_order_paypal_complete:
     pattern:  /order/paypal/complete

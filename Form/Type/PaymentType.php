@@ -8,6 +8,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class PaymentType extends AbstractType
 {
+	protected $orders;
+
+	public function __construct($orders)
+	{
+		$this->orders = $orders;
+	}
+
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{
 		$resolver->setDefaults(array(
@@ -20,12 +27,21 @@ class PaymentType extends AbstractType
 	{
 		$builder
 			->add('payment', 'choice', array(
-                'choices' => $builder->getData()->getPaymentArray(),
+                'choices' => $this->getChoices($this->orders->getPaymentsArray()),
                 'expanded' => true
             ))
 			->add('cancel', 'reset')
 			->add('send', 'submit')
 		;
+	}
+
+	public function getChoices($array)
+	{
+		$result = array();
+		foreach ($array as $key => $value) {
+			$result[$key] = ( $value['label'] . ( $value['cost'] ? ( ' ( + ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' ) : null ) );
+		}
+		return $result;
 	}
 
 	public function getName()

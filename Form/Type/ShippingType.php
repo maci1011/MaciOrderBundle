@@ -6,8 +6,15 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class SpeditionType extends AbstractType
+class ShippingType extends AbstractType
 {
+	protected $orders;
+
+	public function __construct($orders)
+	{
+		$this->orders = $orders;
+	}
+
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{
 		$resolver->setDefaults(array(
@@ -19,8 +26,8 @@ class SpeditionType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('spedition', 'choice', array(
-                'choices' => $builder->getData()->getSpeditionArray(),
+			->add('shipping', 'choice', array(
+                'choices' => $this->getChoices($this->orders->getShippingsArray()),
                 'expanded' => true
             ))
 			->add('cancel', 'reset')
@@ -28,8 +35,17 @@ class SpeditionType extends AbstractType
 		;
 	}
 
+	public function getChoices($array)
+	{
+		$result = array();
+		foreach ($array as $key => $value) {
+			$result[$key] = ( $value['label'] . ( $value['cost'] ? ( ' ( + ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' ) : null ) );
+		}
+		return $result;
+	}
+
 	public function getName()
 	{
-		return 'order_spedition';
+		return 'order_shipping';
 	}
 }

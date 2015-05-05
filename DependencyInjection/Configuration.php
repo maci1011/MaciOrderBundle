@@ -20,9 +20,36 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('maci_order');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode
+            ->children()
+                ->arrayNode('payments')
+                    ->prototype('array')
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(function($v) { return array('label' => $v, 'cost' => 0); })
+                        ->end()
+                        ->children()
+                            ->scalarNode('label')->isRequired()->end()
+                            ->scalarNode('cost')->defaultValue(0)->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('shippings')
+                    ->prototype('array')
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(function($v) { return array('label' => $v, 'cost' => 0); })
+                        ->end()
+                        ->children()
+                            ->scalarNode('label')->isRequired()->end()
+                            ->scalarNode('cost')->defaultValue(0)->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->scalarNode('default_tax')->defaultValue(22)->end()
+                ->scalarNode('free_shipping_over')->defaultValue(150)->end()
+            ->end()
+        ;
 
         return $treeBuilder;
     }

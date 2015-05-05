@@ -28,9 +28,15 @@ Maci\OrderBundle\Entity\Order:
             type: string
             length: 31
             nullable: true
-        spedition:
+        shipping:
             type: string
             length: 31
+            nullable: true
+        payment_cost:
+            type: decimal
+            nullable: true
+        shipping_cost:
+            type: decimal
             nullable: true
         code:
             type: string
@@ -69,12 +75,12 @@ Maci\OrderBundle\Entity\Order:
             joinColumn:
                 name: user_id
                 referencedColumnName: id
-        billing:
+        billing_address:
             targetEntity: Maci\AddressBundle\Entity\Address
             joinColumn:
                 name: billing_id
                 referencedColumnName: id
-        shipping:
+        shipping_address:
             targetEntity: Maci\AddressBundle\Entity\Address
             joinColumn:
                 name: shipping_id

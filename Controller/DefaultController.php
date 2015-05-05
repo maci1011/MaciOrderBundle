@@ -24,10 +24,19 @@ class DefaultController extends Controller
         ));
     }
 
-    public function cartAction(Request $request)
+    public function cartAction()
     {
         return $this->render('MaciOrderBundle:Default:cart.html.twig', array(
             'cart' => $this->get('maci.orders')->getCurrentCart()
+        ));
+    }
+
+    public function showOrderAction($order, $edit = false)
+    {
+        return $this->render('MaciOrderBundle:Default:_show.html.twig', array(
+            'configs' => $this->container->getParameter('maci.order.configs'),
+            'order' => $order,
+            'edit' => $edit
         ));
     }
 
@@ -70,7 +79,7 @@ class DefaultController extends Controller
         $edit = $request->get('checkout');
         $set = false;
 
-        if ($cart->getBilling() && $edit !== 'billing') {
+        if ($cart->getBillingAddress() && $edit !== 'billing') {
             $checkout['billing'] = 'setted';
         } else {
             if ($set) {
@@ -82,7 +91,7 @@ class DefaultController extends Controller
         }
 
         if ($type === 'full_checkout' || $type === 'checkout' || $type === 'fast_checkout') {
-            if ($cart->getShipping() && $edit !== 'shipping') {
+            if ($cart->getShippingAddress() && $edit !== 'shipping') {
                 $checkout['shipping'] = 'setted';
             } else {
                 if ($set) {
@@ -97,18 +106,18 @@ class DefaultController extends Controller
         }
 
         if ($type === 'full_checkout') {
-            if ($cart->getSpedition() && $edit !== 'spedition') {
-                $checkout['spedition'] = 'setted';
+            if ($cart->getShipping() && $edit !== 'shipping') {
+                $checkout['shipping'] = 'setted';
             } else {
                 if ($set) {
-                    $checkout['spedition'] = 'toset';
+                    $checkout['shipping'] = 'toset';
                 } else {
-                    $checkout['spedition'] = 'set';
+                    $checkout['shipping'] = 'set';
                     $set = true;
                 }
             }
         } else {
-            $checkout['spedition'] = false;
+            $checkout['shipping'] = false;
         }
 
         if ($type === 'full_checkout') {
@@ -336,9 +345,13 @@ class DefaultController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
+            $payment = $form['payment']->getData();
+            $shipping = $form['shipping']->getData();
+            $payments = $this->get('maci.orders')->getPaymentsArray();
+            $shippings = $this->get('maci.orders')->getShippingsArray();
             $this->get('maci.orders')->setCartCheckout( $checkout );
-            $this->get('maci.orders')->setCartPayment( $form['payment']->getData() );
-            $this->get('maci.orders')->setCartSpedition( $form['spedition']->getData() );
+            $this->get('maci.orders')->setCartPayment( $payment, $payments[$payment]['cost'] );
+            $this->get('maci.orders')->setCartShipping( $shipping, $shippings[$shipping]['cost'] );
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'checkout')));
         }
 
@@ -371,7 +384,9 @@ class DefaultController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->get('maci.orders')->setCartPayment( $form['payment']->getData() );
+            $payments = $this->get('maci.orders')->getPaymentsArray();
+            $payment = $form['payment']->getData();
+            $this->get('maci.orders')->setCartPayment( $payment, $payments[$payment]['cost'] );
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'payment')));
         }
 
@@ -380,18 +395,20 @@ class DefaultController extends Controller
         ));
     }
 
-    public function cartSetSpeditionAction(Request $request)
+    public function cartSetShippingAction(Request $request)
     {
         $cart = $this->get('maci.orders')->getCurrentCart();
-        $form = $this->createForm('order_spedition', $cart);
+        $form = $this->createForm('order_shipping', $cart);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->get('maci.orders')->setCartSpedition( $form['spedition']->getData() );
-            return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'spedition')));
+            $shippings = $this->get('maci.orders')->getShippingsArray();
+            $shipping = $form['shipping']->getData();
+            $this->get('maci.orders')->setCartShipping( $shipping, $shippings[$shipping]['cost'] );
+            return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'shipping')));
         }
 
-        return $this->render('MaciOrderBundle:Default:_order_spedition.html.twig', array(
+        return $this->render('MaciOrderBundle:Default:_order_shipping.html.twig', array(
             'form' => $form->createView()
         ));
     }

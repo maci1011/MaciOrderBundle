@@ -12,20 +12,20 @@
 </td>
 </tr>
 
-{% if order.billing is not null %}
+{% if order.billingAddress is not null %}
 <tr>
 <td valign="top" align="center">
 <h3>Payment Address:</h3>
-{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
+{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
 </td>
 </tr>
 {% endif %}
 
-{% if order.shipping is not null %}
+{% if order.shippingAddress is not null %}
 <tr>
 <td valign="top" align="center">
 <h3>Shipping Address:</h3>
-{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shipping } %}
+{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
 </td>
 </tr>
 {% endif %}

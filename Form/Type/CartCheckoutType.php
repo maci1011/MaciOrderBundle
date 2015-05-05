@@ -8,6 +8,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CartCheckoutType extends AbstractType
 {
+	protected $orders;
+
+	public function __construct($orders)
+	{
+		$this->orders = $orders;
+	}
+
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{
 		$resolver->setDefaults(array(
@@ -19,18 +26,13 @@ class CartCheckoutType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('spedition', 'choice', array(
-                'choices' => array(
-                	'standard' => 'Standard'
-                ),
+			->add('shipping', 'choice', array(
+                'choices' => $this->getChoices($this->orders->getShippingsArray()),
                 'expanded' => true,
 				'data' => 'standard'
             ))
 			->add('payment', 'choice', array(
-                'choices' => array(
-                	'paypal' => 'PayPal',
-                	'delivery' => 'Cash On Delivery'
-                ),
+                'choices' => $this->getChoices($this->orders->getPaymentsArray()),
                 'expanded' => true,
 				'data' => 'paypal'
             ))
@@ -39,6 +41,15 @@ class CartCheckoutType extends AbstractType
             ))
 			->add('proceed', 'submit')
 		;
+	}
+
+	public function getChoices($array)
+	{
+		$result = array();
+		foreach ($array as $key => $value) {
+			$result[$key] = ( $value['label'] . ( $value['cost'] ? ( ' ( + ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' ) : null ) );
+		}
+		return $result;
 	}
 
 	public function getName()

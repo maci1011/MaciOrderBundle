@@ -47,12 +47,22 @@ class Order
     /**
      * @var string
      */
-    private $spedition;
+    private $shipping;
 
     /**
      * @var string
      */
     private $payment;
+
+    /**
+     * @var string
+     */
+    private $shipping_cost;
+
+    /**
+     * @var string
+     */
+    private $payment_cost;
 
     /**
      * @var string
@@ -112,12 +122,12 @@ class Order
     /**
      * @var \Maci\UserBundle\Entity\Address
      */
-    private $billing;
+    private $billing_address;
 
     /**
      * @var \Maci\UserBundle\Entity\Address
      */
-    private $shipping;
+    private $shipping_address;
 
     /**
      * Constructor
@@ -133,7 +143,7 @@ class Order
         $this->type = 'order';
         $this->status = 'new';
         $this->checkout = 'checkout';
-        $this->spedition = null;
+        $this->shipping = null;
         $this->payment = null;
         $this->amount = 0;
         $this->shipment = false;
@@ -275,54 +285,40 @@ class Order
         return $this->payment;
     }
 
-    public function getPaymentArray()
+    public function setShipping($shipping)
     {
-        return array(
-            'paypal' => 'PayPal',
-            'delivery' => 'Cash On Delivery',
-            'cash' => 'Cash'
-        );
-    }
-
-    public function getPaymentLabel()
-    {
-        $array = $this->getPaymentArray();
-        if (array_key_exists($this->payment, $array)) {
-            return $array[$this->payment];
-        }
-        $str = str_replace('_', ' ', $this->payment);
-        return ucwords($str);
-    }
-
-    public function setSpedition($spedition)
-    {
-        $this->spedition = $spedition;
+        $this->shipping = $shipping;
 
         return $this;
     }
 
-    public function getSpedition()
+    public function getShipping()
     {
-        return $this->spedition;
+        return $this->shipping;
     }
 
-    public function getSpeditionArray()
+    public function setPaymentCost($payment_cost)
     {
-        return array(
-            'standard' => 'Standard',
-            'express' => 'Express',
-            'pickup' => 'Pickup in Store'
-        );
+        $this->payment_cost = $payment_cost;
+
+        return $this;
     }
 
-    public function getSpeditionLabel()
+    public function getPaymentCost()
     {
-        $array = $this->getSpeditionArray();
-        if (array_key_exists($this->spedition, $array)) {
-            return $array[$this->spedition];
-        }
-        $str = str_replace('_', ' ', $this->spedition);
-        return ucwords($str);
+        return $this->payment_cost;
+    }
+
+    public function setShippingCost($shipping_cost)
+    {
+        $this->shipping_cost = $shipping_cost;
+
+        return $this;
+    }
+
+    public function getShippingCost()
+    {
+        return $this->shipping_cost;
     }
 
     /**
@@ -352,13 +348,26 @@ class Order
     {
         return array(
             'new' => 'New',
+            'wishlist' => 'Wish List',
             'current' => 'Current',
-            'complete' => 'Complete',
             'confirm' => 'Confirm',
+            'complete' => 'Complete',
             'paid' => 'Paid',
             'refuse' => 'Refuse',
             'foo' => 'Foo'
         );
+    }
+
+    public function getOrderProgression()
+    {
+        $i = 0;
+        foreach ($this->getStatusArray() as $key => $value) {
+            if ($key === $this->status) {
+                return $i;
+            }
+            $i++;
+        }
+        return null;
     }
 
     public function getStatusLabel()
@@ -679,49 +688,49 @@ class Order
     }
 
     /**
-     * Set billing
+     * Set billing_address
      *
-     * @param \Maci\UserBundle\Entity\Address $billing
+     * @param \Maci\UserBundle\Entity\Address $billing_address
      * @return Order
      */
-    public function setBilling(\Maci\AddressBundle\Entity\Address $billing = null)
+    public function setBillingAddress(\Maci\AddressBundle\Entity\Address $billing_address = null)
     {
-        $this->billing = $billing;
+        $this->billing_address = $billing_address;
 
         return $this;
     }
 
     /**
-     * Get billing
+     * Get billing_address
      *
      * @return \Maci\UserBundle\Entity\Address 
      */
-    public function getBilling()
+    public function getBillingAddress()
     {
-        return $this->billing;
+        return $this->billing_address;
     }
 
     /**
-     * Set shipping
+     * Set shipping_address
      *
-     * @param \Maci\UserBundle\Entity\Address $shipping
+     * @param \Maci\UserBundle\Entity\Address $shipping_address
      * @return Order
      */
-    public function setShipping(\Maci\AddressBundle\Entity\Address $shipping = null)
+    public function setShippingAddress(\Maci\AddressBundle\Entity\Address $shipping_address = null)
     {
-        $this->shipping = $shipping;
+        $this->shipping_address = $shipping_address;
 
         return $this;
     }
 
     /**
-     * Get shipping
+     * Get shipping_address
      *
      * @return \Maci\UserBundle\Entity\Address 
      */
-    public function getShipping()
+    public function getShippingAddress()
     {
-        return $this->shipping;
+        return $this->shipping_address;
     }
 
     /**
@@ -762,6 +771,15 @@ class Order
     public function getBalance()
     {
         return ( $this->getTransactionsAmount() - $this->getAmount() );
+    }
+
+    public function getArrayLabel($array, $key)
+    {
+        if (array_key_exists($key, $array)) {
+            return $array[$key];
+        }
+        $str = str_replace('_', ' ', $key);
+        return ucwords($str);
     }
 
     public function getOrderDocuments()
@@ -815,6 +833,12 @@ class Order
         foreach ($amounts as $amount) {
             $tot += $amount;
         }
+        if ( $this->getShippingCost() ) {
+            $tot += $this->getShippingCost();
+        }
+        if ( $this->getPaymentCost() ) {
+            $tot += $this->getPaymentCost();
+        }
         return $this->amount = $tot;
     }
 
@@ -834,7 +858,7 @@ class Order
 
     public function confirmOrder()
     {
-        if ( $this->status === 'confirm' || ( $this->status !== 'new' && $this->status !== 'current' ) ) {
+        if ( 2 < $this->getOrderProgression() ) {
             return false;
         }
 

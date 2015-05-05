@@ -34,7 +34,7 @@
 
 <section class="page_content page_container row">
 
-	{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order } %}
+	{{ render(controller('MaciOrderBundle:Default:showOrder', {'order': order})) }}
 
 </section>
 
@@ -54,7 +54,7 @@
 
 	<br/><br/>
 
-	{% if order.checkout == 'pickup' or order.checkout == 'booking' or order.shipping is not null %}
+	{% if order.checkout == 'pickup' or order.checkout == 'booking' or order.shippingAddress is not null %}
 
 	{% render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': path('maci_order_checkout_set_address', {'option': 'billing'})})) %}
 
@@ -80,7 +80,7 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.billing_to' | matra('Billing To') }}</h4>
 
-	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
+	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
 
 	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'billing'}) }}" class="btn btn-success">{{ 'form.edit' | matra('Edit') }}</a>
 
@@ -99,14 +99,14 @@
 {% endif %} {# --- End Billing ---  #}
 
 
-{% if checkout.shipping %} {# --- Shipping ---  #}
+{% if checkout.shipping %} {# --- Shipping Address ---  #}
 {% set i = i + 1 %}
 
 {% if checkout.shipping == 'set' %}
 
 <section class="page_content page_container row">
 
-	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Address') }}</h4>
 
 	{% render(controller('MaciAddressBundle:Default:list', { 'select': path('maci_order_checkout_set_address', {'option': 'shipping'}) } )) %}
 
@@ -122,7 +122,7 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping_to' | matra('Shipping To') }}</h4>
 
-	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shipping } %}
+	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
 
 	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'shipping'}) }}" class="btn btn-success">{{ 'form.edit' | matra('Edit') }}</a>
 
@@ -132,7 +132,7 @@
 
 <section class="page_content page_container row">
 
-	<h4>{{ i }} - {{ 'page.checkout.set_shipping' | matra('Set Shipping') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.set_shipping' | matra('Set Shipping Address') }}</h4>
 
 </section>
 
@@ -141,44 +141,44 @@
 {% endif %} {# --- End Shipping ---  #}
 
 
-{% if checkout.spedition %} {# --- Spedition ---  #}
+{% if checkout.shipping %} {# --- Shipping Method ---  #}
 {% set i = i + 1 %}
 
-{% if checkout.spedition == 'set' %}
+{% if checkout.shipping == 'set' %}
 
 <section class="page_content page_container row active">
 
-	<h4>{{ i }} - {{ 'page.checkout.spedition' | matra('Select Spedition') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Method') }}</h4>
 
-	{% render(controller('MaciOrderBundle:Default:cartSetSpedition')) %}
+	{% render(controller('MaciOrderBundle:Default:cartSetShipping')) %}
 
 </section>
 
-{% elseif checkout.spedition == 'setted' %}
+{% elseif checkout.shipping == 'setted' %}
 
 <section class="page_content page_container row setted">
 
-	<h4>{{ i }} - {{ 'page.checkout.spedition_to' | matra('Spedition') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.shipping_to' | matra('Shipping Method') }}</h4>
 
-	<span>{{ order.speditionLabel }}</span>
+	<span>{{ order.shippingLabel }}</span>
 
 	<br/><br/>
 
-	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'spedition'}) }}" class="btn btn-success">{{ 'form.edit' | matra('Edit') }}</a>
+	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'shipping'}) }}" class="btn btn-success">{{ 'form.edit' | matra('Edit') }}</a>
 
 </section>
 
-{% elseif checkout.spedition == 'toset' %}
+{% elseif checkout.shipping == 'toset' %}
 
 <section class="page_content page_container row">
 
-	<h4>{{ i }} - {{ 'page.checkout.set_spedition' | matra('Set Spedition') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.set_shipping' | matra('Set Shipping Method') }}</h4>
 
 </section>
 
 {% endif %}
 
-{% endif %} {# --- End Spedition ---  #}
+{% endif %} {# --- End Shipping Method ---  #}
 
 
 {% if checkout.payment %} {# --- Payment ---  #}

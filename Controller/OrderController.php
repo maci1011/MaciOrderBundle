@@ -29,12 +29,15 @@ class OrderController extends Controller
 
     private $ac;
 
-	public function __construct(EntityManager $doctrine, SecurityContext $securityContext, Session $session, AddressController $ac)
+    private $configs;
+
+	public function __construct(EntityManager $doctrine, SecurityContext $securityContext, Session $session, $configs, AddressController $ac)
 	{
     	$this->em = $doctrine;
 	    $this->securityContext = $securityContext;
 	    $this->user = $securityContext->getToken()->getUser();
 		$this->session = $session;
+        $this->configs = $configs;
         $this->ac = $ac;
         $this->cart = false;
     }
@@ -177,17 +180,25 @@ class OrderController extends Controller
         $this->saveCart();
     }
 
-    public function setCartPayment($payment)
+    public function setCartPayment($payment, $cost)
     {
         $this->getCurrentCart();
         $this->cart->setPayment($payment);
+        $this->cart->setPaymentCost($cost);
         $this->saveCart();
     }
 
-    public function setCartSpedition($spedition)
+    public function setCartShipping($shipping, $cost)
     {
         $this->getCurrentCart();
-        $this->cart->setSpedition($spedition);
+        $this->cart->setShipping($shipping);
+        if ( 0 < $this->configs['free_shipping_over'] ) {
+            if ( $this->configs['free_shipping_over'] < $this->cart->getAmount() ) {
+                $this->cart->setShippingCost(0);
+            } else {
+                $this->cart->setShippingCost($cost);
+            }
+        }
         $this->saveCart();
     }
 
@@ -198,28 +209,28 @@ class OrderController extends Controller
         $this->saveCart();
     }
 
-    public function setCartShipping($address)
+    public function setCartShippingAddress($address)
     {
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
             $this->getCurrentCart();
-            $this->cart->setShipping($address);
+            $this->cart->setShippingAddress($address);
             $this->em->flush();
         } else {
             $info = $this->getDefaultSession();
-            $info['shipping'] = $address;
+            $info['shippingAddress'] = $address;
             $this->session->set('order', $info);
         }
     }
 
-    public function setCartBilling($address)
+    public function setCartBillingAddress($address)
     {
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
             $this->getCurrentCart();
-            $this->cart->setBilling($address);
+            $this->cart->setBillingAddress($address);
             $this->em->flush();
         } else {
             $info = $this->getDefaultSession();
-            $info['billing'] = $address;
+            $info['billingAddress'] = $address;
             $this->session->set('order', $info);
         }
     }
@@ -305,7 +316,7 @@ class OrderController extends Controller
         $cart->setType( $order_arr['type'] );
         $cart->setMail( $order_arr['mail'] );
         $cart->setCheckout( $order_arr['checkout'] );
-        $cart->setSpedition( $order_arr['spedition'] );
+        $cart->setShipping( $order_arr['shipping'] );
         $cart->setPayment( $order_arr['payment'] );
         return $cart;
     }
@@ -327,9 +338,9 @@ class OrderController extends Controller
                 'type' => 'cart',
                 'mail' => null,
                 'checkout' => null,
+                'shippingAddress' => null,
+                'billingAddress' => null,
                 'shipping' => null,
-                'billing' => null,
-                'spedition' => null,
                 'payment' => null,
                 'amount' => 0
             ));
@@ -349,11 +360,11 @@ class OrderController extends Controller
             'type' => $order->getType(),
             'mail' => $order->getMail(),
             'amount' => $order->getAmount(),
-            'spedition' => $order->getSpedition(),
+            'shipping' => $order->getShipping(),
             'payment' => $order->getPayment(),
             'checkout' => $order->getCheckout(),
-            'shipping' => $info['shipping'],
-            'billing' => $info['billing']
+            'shippingAddress' => $info['shippingAddress'],
+            'billingAddress' => $info['billingAddress']
         );
 
         $this->session->set('order', $info);
@@ -416,21 +427,36 @@ class OrderController extends Controller
             }
         }
 
-        if ($order_arr['shipping'] !== null) {
-            $address = $this->ac->getAddress($order_arr['shipping']);
+        if ($order_arr['shippingAddress'] !== null) {
+            $address = $this->ac->getAddress($order_arr['shippingAddress']);
             if ($address) {
-                $cart->setShipping($address);
+                $cart->setShippingAddress($address);
             }
         }
-        if ($order_arr['billing'] !== null) {
-            $address = $this->ac->getAddress($order_arr['billing']);
+        if ($order_arr['billingAddress'] !== null) {
+            $address = $this->ac->getAddress($order_arr['billingAddress']);
             if ($address) {
-                $cart->setBilling($address);
+                $cart->setBillingAddress($address);
             }
         }
 
         $cart->refreshAmount();
 
         return $cart;
+    }
+
+    public function getConfigs()
+    {
+        return $this->configs;
+    }
+
+    public function getPaymentsArray()
+    {
+        return $this->configs['payments'];
+    }
+
+    public function getShippingsArray()
+    {
+        return $this->configs['shippings'];
     }
 }
