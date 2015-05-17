@@ -11,6 +11,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Maci\OrderBundle\Entity\Order;
 use Maci\OrderBundle\Entity\Item;
 
+use Maci\MailerBundle\Entity\Mail;
+
 class DefaultController extends Controller
 {
     public function indexAction()
@@ -157,6 +159,8 @@ class DefaultController extends Controller
     {
         if ( $cart = $this->get('maci.orders')->confirmCart() ) {
 
+            $this->get('maci.orders')->setLocale( $request->getLocale() );
+
             if ($cart->getPayment() === 'paypal') {
                 return $this->paypalForm($cart);
             }
@@ -169,28 +173,32 @@ class DefaultController extends Controller
                 $toint = $cart->getBilling()->getName() .' '. $cart->getBilling()->getSurname();
             }
 
-            $message = \Swift_Message::newInstance()
+            $mail = new Mail();
+
+            $mail
+                ->setName('Order Confirmation: ' . $cart->getCode())
                 ->setSubject('Order Confirmation')
                 ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                ->setTo($to, $toint)
-                ->setBody($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('order' => $cart)), 'text/html')
+                ->addTo($to, $toint)
+                ->setBcc($this->get('service_container')->getParameter('order_email'))
+                ->setLocale($request->getLocale())
+                ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $cart)), 'text/html')
             ;
 
-            $notify = \Swift_Message::newInstance()
-                ->setSubject('Payment Notify')
-                ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                ->setTo($this->get('service_container')->getParameter('order_email'))
-                ->setBody($this->renderView('MaciOrderBundle:Email:notify_email.html.twig',array('order' => $cart)), 'text/html')
-            ;
+            $message = $this->get('maci.mailer')->getSwiftMessage($mail);
 
-            //send message
-            $this->get('mailer')->send($message);
+            $mail->end();
 
-            //send notify
-            $this->get('mailer')->send($notify);
+            $em = $this->getDoctrine()->getManager();
 
-            $page = $this->getDoctrine()->getManager()
-                ->getRepository('MaciPageBundle:Page')
+            $em->persist($mail);
+
+            // ---> send message
+            // $this->get('mailer')->send($message);
+
+            $em->flush();
+
+            $page = $em->getRepository('MaciPageBundle:Page')
                 ->findOneByPath('order-complete');
 
             if ($page) {

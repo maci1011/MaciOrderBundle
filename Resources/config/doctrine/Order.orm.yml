@@ -56,6 +56,9 @@ Maci\OrderBundle\Entity\Order:
             type: string
             length: 63
             nullable: true
+        locale:
+            type: string
+            length: 10
         invoice:
             type: datetime
             nullable: true

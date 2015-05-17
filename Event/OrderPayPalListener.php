@@ -28,33 +28,36 @@ class OrderPayPalListener {
 
         $order = $this->om->getRepository('MaciOrderBundle:Order')->findOneById($id);
 
-        if ($order) {
-
-            $tx = new Transaction;
-
-            $tx->setTx( $ipnOrder->getTxnId() );
-
-            $tx->setAmount( $ipnOrder->getMcGross() );
-
-            $tx->setGateway( 'PayPal' );
-
-            $tx->setOrder( $order );
-
-            $this->om->persist( $tx );
-
-            $order->addTransaction( $tx );
-
-            $order->completeOrder();
-
-            $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
-                $order->getOrderDocuments(),
-                $order->getUser(),
-                'Created by Order: '.$order->getCode()
-            );
-
-            $this->om->flush();
-
+        if (!$order) {
+            $order = new Order;
+            $order->setAmount( $ipnOrder->getMcGross() );
+            $order->setStatus('paid');
+            $em->persist($order);
         }
+
+        $tx = new Transaction;
+
+        $tx->setTx( $ipnOrder->getTxnId() );
+
+        $tx->setAmount( $ipnOrder->getMcGross() );
+
+        $tx->setGateway( 'PayPal' );
+
+        $tx->setOrder( $order );
+
+        $this->om->persist( $tx );
+
+        $order->addTransaction( $tx );
+
+        $order->completeOrder();
+
+        $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
+            $order->getOrderDocuments(),
+            $order->getUser(),
+            'Created by Order: '.$order->getCode()
+        );
+
+        $this->om->flush();
 
     }
 }

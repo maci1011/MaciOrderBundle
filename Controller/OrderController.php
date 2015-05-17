@@ -209,6 +209,13 @@ class OrderController extends Controller
         $this->saveCart();
     }
 
+    public function setCartLocale($locale)
+    {
+        $this->getCurrentCart();
+        $this->cart->setLocale($locale);
+        $this->saveCart();
+    }
+
     public function setCartShippingAddress($address)
     {
         if (true === $this->securityContext->isGranted('ROLE_USER')) {

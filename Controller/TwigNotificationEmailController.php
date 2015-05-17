@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Orderly\PayPalIpnBundle\Ipn;
 use Orderly\PayPalIpnBundle\Event as Events;
 
+use Maci\OrderBundle\Entity\Order;
 
 /*
  * Copyright 2012 Orderly Ltd 
@@ -59,34 +60,28 @@ class TwigNotificationEmailController extends Controller
                 $order = $this->getDoctrine()->getManager()
                     ->getRepository('MaciOrderBundle:Order')->findOneById($id);
 
-                if ($order->getUser()) {
-                    $to = $order->getUser()->getEmail();
-                    $toint = $order->getUser()->getUsername();
-                } else {
-                    $to = $order->getBilling()->getMail();
-                    $toint = $order->getBilling()->getName() .' '. $order->getBilling()->getSurname();
+                if ($order) {
+
+                    if ($order->getUser()) {
+                        $to = $order->getUser()->getEmail();
+                        $toint = $order->getUser()->getUsername();
+                    } else {
+                        $to = $order->getBilling()->getMail();
+                        $toint = $order->getBilling()->getName() .' '. $order->getBilling()->getSurname();
+                    }
+
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject('Order Confirmation')
+                        ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
+                        ->setTo($to, $toint)
+                        ->setBcc($this->get('service_container')->getParameter('order_email'))
+                        ->setBody($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('order' => $order)), 'text/html')
+                    ;
+
+                    //send message
+                    $this->get('mailer')->send($message);
+
                 }
-
-                $message = \Swift_Message::newInstance()
-                    ->setSubject('Order Confirmation')
-                    ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                    ->setTo($to, $toint)
-                    ->setBody($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('order' => $order)), 'text/html')
-                ;
-
-                $notify = \Swift_Message::newInstance()
-                    ->setSubject('Payment Notify')
-                    ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                    ->setTo($this->get('service_container')->getParameter('order_email'))
-                    ->setBody($this->renderView('MaciOrderBundle:Email:notify_email.html.twig',array('order' => $order)), 'text/html')
-                ;
-
-                //send message
-                $this->get('mailer')->send($message);
-
-                //send notify
-                $this->get('mailer')->send($notify);
-
             }
         }
         else // Just redirect to the root URL
@@ -97,7 +92,7 @@ class TwigNotificationEmailController extends Controller
 
         $response = new Response();
         $response->setStatusCode(200);
-        
+
         return $response;
     }
 

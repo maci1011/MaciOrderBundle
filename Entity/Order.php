@@ -80,6 +80,11 @@ class Order
     private $token;
 
     /**
+     * @var string
+     */
+    private $locale;
+
+    /**
      * @var \DateTime
      */
     private $invoice;
@@ -358,7 +363,7 @@ class Order
         );
     }
 
-    public function getOrderProgression()
+    public function getProgression()
     {
         $i = 0;
         foreach ($this->getStatusArray() as $key => $value) {
@@ -435,6 +440,18 @@ class Order
     public function getToken()
     {
         return $this->token;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
     }
 
     /**
@@ -741,17 +758,11 @@ class Order
         return $this->getName();
     }
 
-    /**
-     * @ORM\PrePersist
-     */
     public function setUpdatedValue()
     {
         $this->updated = new \DateTime();
     }
 
-    /**
-     * @ORM\PrePersist
-     */
     public function setCreatedValue()
     {
         $this->created = new \DateTime();
@@ -858,7 +869,7 @@ class Order
 
     public function confirmOrder()
     {
-        if ( 2 < $this->getOrderProgression() ) {
+        if ( 2 < $this->getProgression() ) {
             return false;
         }
 
@@ -877,11 +888,15 @@ class Order
 
     public function completeOrder()
     {
-        if ($this->status === 'complete' || $this->status !== 'confirm') {
+        if ( 4 < $this->getProgression() ) {
             return false;
         }
 
-        $this->status = 'complete';
+        if ( ! $this->getBalance() < 0 ) {
+            $this->status = 'complete';
+        } else {
+            $this->status = 'paid';
+        }
 
         return true;
     }
