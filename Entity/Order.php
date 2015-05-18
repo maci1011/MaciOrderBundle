@@ -869,7 +869,7 @@ class Order
 
     public function confirmOrder()
     {
-        if ( 2 < $this->getProgression() ) {
+        if ( 2 < $this->getProgression() || !$this->amount || !$this->checkOrder() ) {
             return false;
         }
 

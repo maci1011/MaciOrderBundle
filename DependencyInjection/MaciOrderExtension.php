@@ -28,6 +28,7 @@ class MaciOrderExtension extends Extension
             'default_tax' => $config['default_tax'],
             'free_shipping_over' => $config['free_shipping_over']
         );
+
         $container->setParameter('maci.order.configs', $result);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));

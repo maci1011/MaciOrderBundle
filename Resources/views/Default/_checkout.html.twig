@@ -41,10 +41,10 @@
 
 {% if checkout is defined and checkout %}
 
-{% if checkout.billing %} {# --- Billing ---  #}
+{% if checkout.billingAddress %} {# --- Billing Address ---  #}
 {% set i = i + 1 %}
 
-{% if checkout.billing == 'set' %}
+{% if checkout.billingAddress == 'set' %}
 
 <section class="page_content page_container row active">
 
@@ -54,7 +54,7 @@
 
 	<br/><br/>
 
-	{% if order.checkout == 'pickup' or order.checkout == 'booking' or order.shippingAddress is not null %}
+	{% if not order.checkShipment or order.checkout == 'pickup' or order.checkout == 'booking' or order.shippingAddress is not null %}
 
 	{% render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': path('maci_order_checkout_set_address', {'option': 'billing'})})) %}
 
@@ -74,7 +74,7 @@
 
 </section>
 
-{% elseif checkout.billing == 'setted' %}
+{% elseif checkout.billingAddress == 'setted' %}
 
 <section class="page_content page_container row setted">
 
@@ -82,11 +82,11 @@
 
 	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
 
-	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'billing'}) }}" class="btn btn-success">{{ 'form.edit' | matra('Edit') }}</a>
+	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'billingAddress'}) }}" class="btn btn-success">{{ 'form.edit' | matra('Edit') }}</a>
 
 </section>
 
-{% elseif checkout.billing == 'toset' %}
+{% elseif checkout.billingAddress == 'toset' %}
 
 <section class="page_content page_container row">
 
@@ -96,13 +96,13 @@
 
 {% endif %}
 
-{% endif %} {# --- End Billing ---  #}
+{% endif %} {# --- End Billing Address ---  #}
 
 
-{% if checkout.shipping %} {# --- Shipping Address ---  #}
+{% if checkout.shippingAddress %} {# --- Shipping Address ---  #}
 {% set i = i + 1 %}
 
-{% if checkout.shipping == 'set' %}
+{% if checkout.shippingAddress == 'set' %}
 
 <section class="page_content page_container row">
 
@@ -116,7 +116,7 @@
 
 </section>
 
-{% elseif checkout.shipping == 'setted' %}
+{% elseif checkout.shippingAddress == 'setted' %}
 
 <section class="page_content page_container row setted">
 
@@ -124,11 +124,11 @@
 
 	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
 
-	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'shipping'}) }}" class="btn btn-success">{{ 'form.edit' | matra('Edit') }}</a>
+	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'shippingAddress'}) }}" class="btn btn-success">{{ 'form.edit' | matra('Edit') }}</a>
 
 </section>
 
-{% elseif checkout.shipping == 'toset' %}
+{% elseif checkout.shippingAddress == 'toset' %}
 
 <section class="page_content page_container row">
 
@@ -138,7 +138,7 @@
 
 {% endif %}
 
-{% endif %} {# --- End Shipping ---  #}
+{% endif %} {# --- End Shipping Address ---  #}
 
 
 {% if checkout.shipping %} {# --- Shipping Method ---  #}

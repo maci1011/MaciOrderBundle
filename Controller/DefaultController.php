@@ -81,30 +81,30 @@ class DefaultController extends Controller
         $edit = $request->get('checkout');
         $set = false;
 
-        if ($cart->getBillingAddress() && $edit !== 'billing') {
-            $checkout['billing'] = 'setted';
+        if ($cart->getBillingAddress() && $edit !== 'billingAddress') {
+            $checkout['billingAddress'] = 'setted';
         } else {
             if ($set) {
-                $checkout['billing'] = 'toset';
+                $checkout['billingAddress'] = 'toset';
             } else {
-                $checkout['billing'] = 'set';
+                $checkout['billingAddress'] = 'set';
                 $set = true;
             }
         }
 
-        if ($type === 'full_checkout' || $type === 'checkout' || $type === 'fast_checkout') {
-            if ($cart->getShippingAddress() && $edit !== 'shipping') {
-                $checkout['shipping'] = 'setted';
+        if ($cart->checkShipment() && ( $type === 'full_checkout' || $type === 'checkout' || $type === 'fast_checkout' ) ) {
+            if ($cart->getShippingAddress() && $edit !== 'shippingAddress') {
+                $checkout['shippingAddress'] = 'setted';
             } else {
                 if ($set) {
-                    $checkout['shipping'] = 'toset';
+                    $checkout['shippingAddress'] = 'toset';
                 } else {
-                    $checkout['shipping'] = 'set';
+                    $checkout['shippingAddress'] = 'set';
                     $set = true;
                 }
             }
         } else {
-            $checkout['shipping'] = false;
+            $checkout['shippingAddress'] = false;
         }
 
         if ($type === 'full_checkout') {
@@ -143,11 +143,8 @@ class DefaultController extends Controller
             $checkout['confirm'] = 'set';
         }
 
-        $cart->refreshAmount();
-
-        if (true === $this->get('security.context')->isGranted('ROLE_USER')) {
-            $this->getDoctrine()->getManager()->flush();
-        }
+        $this->get('maci.orders')->setCartLocale( $request->getLocale() );
+        $this->get('maci.orders')->refreshCartAmount();
 
         return $this->render('MaciOrderBundle:Default:checkout.html.twig', array(
             'checkout' => $checkout,
@@ -158,8 +155,6 @@ class DefaultController extends Controller
     public function cartConfirmAction(Request $request)
     {
         if ( $cart = $this->get('maci.orders')->confirmCart() ) {
-
-            $this->get('maci.orders')->setLocale( $request->getLocale() );
 
             if ($cart->getPayment() === 'paypal') {
                 return $this->paypalForm($cart);
@@ -173,6 +168,8 @@ class DefaultController extends Controller
                 $toint = $cart->getBilling()->getName() .' '. $cart->getBilling()->getSurname();
             }
 
+            $em = $this->getDoctrine()->getManager();
+
             $mail = new Mail();
 
             $mail
@@ -185,16 +182,18 @@ class DefaultController extends Controller
                 ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $cart)), 'text/html')
             ;
 
+            if (true === $this->get('security.context')->isGranted('ROLE_USER')) {
+                $mail->setUser( $this->getUser() );
+            }
+
             $message = $this->get('maci.mailer')->getSwiftMessage($mail);
 
             $mail->end();
 
-            $em = $this->getDoctrine()->getManager();
-
-            $em->persist($mail);
-
             // ---> send message
             // $this->get('mailer')->send($message);
+
+            $em->persist($mail);
 
             $em->flush();
 
@@ -353,13 +352,15 @@ class DefaultController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $payment = $form['payment']->getData();
-            $shipping = $form['shipping']->getData();
-            $payments = $this->get('maci.orders')->getPaymentsArray();
-            $shippings = $this->get('maci.orders')->getShippingsArray();
             $this->get('maci.orders')->setCartCheckout( $checkout );
+            $payment = $form['payment']->getData();
+            $payments = $this->get('maci.orders')->getPaymentsArray();
             $this->get('maci.orders')->setCartPayment( $payment, $payments[$payment]['cost'] );
-            $this->get('maci.orders')->setCartShipping( $shipping, $shippings[$shipping]['cost'] );
+            if ( $form->has('shipping') ) {
+                $shipping = $form['shipping']->getData();
+                $shippings = $this->get('maci.orders')->getShippingsArray();
+                $this->get('maci.orders')->setCartShipping( $shipping, $shippings[$shipping]['cost'] );
+            }
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'checkout')));
         }
 
@@ -484,14 +485,14 @@ class DefaultController extends Controller
         }
 
         if ($option === 'both') {
-            $this->get('maci.orders')->setCartShipping($address);
-            $this->get('maci.orders')->setCartBilling($address);
+            $this->get('maci.orders')->setCartShippingAddress($address);
+            $this->get('maci.orders')->setCartBillingAddress($address);
             return $this->redirect($this->generateUrl('maci_order_checkout', array('setted' => 'both')));
         } else if ($option === 'shipping') {
-            $this->get('maci.orders')->setCartShipping($address);
+            $this->get('maci.orders')->setCartShippingAddress($address);
             return $this->redirect($this->generateUrl('maci_order_checkout', array('setted' => 'shipping')));
         } else if ($option === 'billing') {
-            $this->get('maci.orders')->setCartBilling($address);
+            $this->get('maci.orders')->setCartBillingAddress($address);
             return $this->redirect($this->generateUrl('maci_order_checkout', array('setted' => 'billing')));
         }
 

@@ -92,7 +92,7 @@
 
 {# SHIPPING COST #}
 
-{% if order.shippingCost and edit is not defined or not edit %}
+{% if order.checkShipment and order.shippingCost and not edit %}
 
 <div class="row">
 
@@ -117,7 +117,7 @@
 			{% if 0 < order.shippingCost %}
 			{{ order.shippingCost | number_format(2, '.', ',') }} &euro;
 			{% else %}
-			&nbsp;
+			0
 			{% endif %}
 		</span>
 	</div>
@@ -155,7 +155,7 @@
 			{% if 0 < order.paymentCost %}
 			{{ order.paymentCost | number_format(2, '.', ',') }} &euro;
 			{% else %}
-			&nbsp;
+			0
 			{% endif %}
 		</span>
 	</div>

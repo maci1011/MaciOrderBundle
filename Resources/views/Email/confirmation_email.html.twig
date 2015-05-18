@@ -1,86 +1,119 @@
 <html>
-<body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor='#e6e6e6' font-family='verdana'>
-
-
-<table width="100%" cellpadding="10" cellspacing="0" class="backgroundTable" bgcolor='#e6e6e6' >
+<body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor='#fff' font-family='Gill Sans'>
+<table width="100%" cellpadding="10" cellspacing="0">
 
 <tr>
-<td valign="top" align="center">
-<h1>Thank you for your Order!</h1>
-<h2>Your order has been confirmed.</h2>
-<span>Order Id: {{ order.name }}</span>
+<td>
+
+	<h1>Thank you for your Order!</h1>
+	<h2>Your order has been confirmed.</h2>
+	<span>Order Id: {{ order.name }}</span>
+
 </td>
 </tr>
+
 
 {% if order.billingAddress is not null %}
+
 <tr>
-<td valign="top" align="center">
-<h3>Payment Address:</h3>
-{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
+<td>
+
+	<h3>Payment Address:</h3>
+
+	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
+
 </td>
 </tr>
+
 {% endif %}
+
 
 {% if order.shippingAddress is not null %}
-<tr>
-<td valign="top" align="center">
-<h3>Shipping Address:</h3>
-{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
-</td>
-</tr>
-{% endif %}
 
 <tr>
-<td valign="top" align="center">
-<h3>Order Details:</h3>
-<table>
-	{% for item in order.items %}
-	<tr>
-		<td>{{ item.product }}</td>
-		<td>
-			{% for variant in item.variants %}
-			{{ variant }}<br/>
-			{% endfor %}
-		</td>
-		<td>{{ item.quantity }}</td>
-		<td>{{ item.amount }} &euro;</td>
-	</tr>
-	{% endfor %}
-	<tr>
-		<td>Amount:</td>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td>{{ order.amount }} &euro;</td>
-	</tr>
-</table>
+<td>
+
+	<h3>Shipping Address:</h3>
+
+	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
+
 </td>
 </tr>
+
+{% endif %}
+
+
+<tr>
+<td>
+
+	<h3>Order Details:</h3>
+
+	<table>
+
+		{% for item in order.items %}
+		<tr>
+			<td>{{ item.product }}</td>
+			<td>
+				{% for variant in item.variants %}
+				{{ variant }}<br/>
+				{% endfor %}
+			</td>
+			<td>{{ item.quantity }}</td>
+			<td>{{ item.amount }} &euro;</td>
+		</tr>
+		{% endfor %}
+
+		<tr>
+			<td>Amount:</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>{{ order.amount }} &euro;</td>
+		</tr>
+
+	</table>
+
+</td>
+</tr>
+
 
 {% if order.orderDocuments|length %}
+
 <tr>
-<td valign="top" align="center">
-<h3>E-Books:</h3>
-<table>
-	{% for item in order.orderDocuments %}
-	<tr>
-		<td>- {{ item }}</td>
-		<td><a href="{{ path('maci_media_get', {'path': item.path}) }}">Get E-Book</a></td>
-	</tr>
-	{% endfor %}
-</table>
-<p>You can see all your ebooks in <a href="{{ path('maci_user_library') }}">Your Library</a>.</p>
+<td>
+
+	<h3>E-Books:</h3>
+
+	{% if order.user %}
+	<table>
+		{% for item in order.orderDocuments %}
+		<tr>
+			<td>- {{ item }}</td>
+			<td><a href="{{ path('maci_media_get', {'path': item.path}) }}">Get E-Book</a></td>
+		</tr>
+		{% endfor %}
+	</table>
+	<p>You can see all your ebooks in <a href="{{ path('maci_user_library') }}">Your Library</a></p>
+	{% else %}
+	<p>Contact us to get the ebooks.</p>
+	{% endif %}
+
 </td>
 </tr>
+
 {% endif %}
 
+
 <tr>
-<td valign="top" align="center">
-<h5>Contact us for more informations:</h5>
-{% include "MaciPageBundle:Default:_contacts.html.twig" %}
+<td>
+
+	<h3>Contact us for more informations:</h3>
+
+	{% include "MaciPageBundle:Default:_contacts.html.twig" %}
+
 </td>
 </tr>
 
-</table>
 
+</table>
 </body>
 </html>

@@ -25,12 +25,16 @@ class CartCheckoutType extends AbstractType
 
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
+		if ($builder->getData()->checkShipment()) {
+			$builder
+				->add('shipping', 'choice', array(
+	                'choices' => $this->getChoices($this->orders->getShippingsArray()),
+	                'expanded' => true,
+					'data' => 'standard'
+	            ))
+	        ;
+		}
 		$builder
-			->add('shipping', 'choice', array(
-                'choices' => $this->getChoices($this->orders->getShippingsArray()),
-                'expanded' => true,
-				'data' => 'standard'
-            ))
 			->add('payment', 'choice', array(
                 'choices' => $this->getChoices($this->orders->getPaymentsArray()),
                 'expanded' => true,
@@ -47,7 +51,7 @@ class CartCheckoutType extends AbstractType
 	{
 		$result = array();
 		foreach ($array as $key => $value) {
-			$result[$key] = ( $value['label'] . ( $value['cost'] ? ( ' ( + ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' ) : null ) );
+			$result[$key] = ( $value['label'] . ( $value['cost'] ? ( ' ( ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' ) : null ) );
 		}
 		return $result;
 	}

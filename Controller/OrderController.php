@@ -242,6 +242,13 @@ class OrderController extends Controller
         }
     }
 
+    public function refreshCartAmount()
+    {
+        $this->getCurrentCart();
+        $this->cart->refreshAmount();
+        $this->saveCart();
+    }
+
     public function confirmCart()
     {
         $cart = $this->getCurrentCart();
@@ -255,15 +262,26 @@ class OrderController extends Controller
                 }
             }
             $this->saveCart();
+            $this->resetCart();
             return $cart;
         }
         return false;
+    }
+
+    public function resetCart()
+    {
+        $this->cart = false;
+        $this->session->set('order', false);
+        $this->session->set('order_items', array());
     }
 
     public function saveCart()
     {
         $cart = $this->getCurrentCart();
         if (true === $this->securityContext->isGranted('ROLE_USER') || $cart->getStatus() === 'confirm') {
+            if ( ! $cart->getid() ) {
+                $this->em->persist($cart);
+            }
             $this->em->flush();
         }
         $this->refreshSession($cart);
@@ -283,9 +301,8 @@ class OrderController extends Controller
             $order_arr = $this->getDefaultSession();
 
             if (!$cart) {
-                if ( array_key_exists('id', $order_arr) ) {
-                    $this->session->set('order', false);
-                    $this->session->set('order_items', array());
+                if ( array_key_exists('status', $order_arr) && $order_arr['status'] !== 'current' ) {
+                    $this->resetCart();
                 }
                 $cart = $this->setCart(new Order);
                 $cart->setUser($this->user);
