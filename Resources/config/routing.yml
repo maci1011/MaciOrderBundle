@@ -1,4 +1,10 @@
 
+
+maci_paypal_ipn:
+    pattern:  /ipn/ipn-twig-email-notification
+    defaults: { _controller: MaciOrderBundle:TwigNotificationEmail:index }
+
+
 maci_order_cart_add:
     pattern:  /cart/item/add/{product}
     defaults: { _controller: MaciOrderBundle:Default:addToCart }

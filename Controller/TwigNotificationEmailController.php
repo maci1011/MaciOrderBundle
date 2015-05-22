@@ -35,7 +35,6 @@ class TwigNotificationEmailController extends Controller
     
     public $paypal_ipn;
     /**
-     * @Route("/ipn-twig-email-notification")
      * @Template()
      */
     public function indexAction()
