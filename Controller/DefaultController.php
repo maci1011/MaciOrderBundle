@@ -174,6 +174,7 @@ class DefaultController extends Controller
 
             $mail
                 ->setName('Order Confirmation: ' . $cart->getCode())
+                ->setType('notify')
                 ->setSubject('Order Confirmation')
                 ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
                 ->addTo($to, $toint)
@@ -182,16 +183,25 @@ class DefaultController extends Controller
                 ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $cart)), 'text/html')
             ;
 
+            $message = $this->get('maci.mailer')->getSwiftMessage($mail);
+
             if (true === $this->get('security.context')->isGranted('ROLE_USER')) {
                 $mail->setUser( $this->getUser() );
+            } else {
+                $documents = $cart->getOrderDocuments();
+                if (count($documents)) {
+                    foreach ($documents as $doc) {
+                        $message->attach(Swift_Attachment::fromPath( $doc->getAbsoluthPath() ));
+                    }
+                }
             }
-
-            $message = $this->get('maci.mailer')->getSwiftMessage($mail);
 
             $mail->end();
 
-            // ---> send message
-            // $this->get('mailer')->send($message);
+            if ($this->container->get( 'kernel' )->getEnvironment() === 'prod') {
+                // ---> send message
+                $this->get('mailer')->send($message);
+            }
 
             $em->persist($mail);
 

@@ -7,7 +7,7 @@ services:
 
     maci.orders:
         class: Maci\OrderBundle\Controller\OrderController
-        arguments: ["@doctrine.orm.entity_manager","@security.context","@session","%maci.order.configs%","@maci.addresses"]
+        arguments: ["@doctrine.orm.entity_manager","@security.context","@session","@maci.addresses","%maci.order.configs%"]
 
     maci.order.form.type.cart_add_product_item:
         class: Maci\OrderBundle\Form\Type\CartAddProductItemType

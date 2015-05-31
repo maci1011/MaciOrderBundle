@@ -25,20 +25,19 @@ class OrderController extends Controller
 
     private $session;
 
-    private $cart;
-
     private $ac;
+
+    private $cart;
 
     private $configs;
 
-	public function __construct(EntityManager $doctrine, SecurityContext $securityContext, Session $session, $configs, AddressController $ac)
+	public function __construct(EntityManager $doctrine, SecurityContext $securityContext, Session $session, AddressController $ac, $configs)
 	{
     	$this->em = $doctrine;
 	    $this->securityContext = $securityContext;
-	    $this->user = $securityContext->getToken()->getUser();
-		$this->session = $session;
-        $this->configs = $configs;
+        $this->session = $session;
         $this->ac = $ac;
+        $this->configs = $configs;
         $this->cart = false;
     }
 
@@ -154,7 +153,7 @@ class OrderController extends Controller
                 !$item ||
                 (
                     $item->getOrder()->getUser() &&
-                    $item->getOrder()->getUser()->getId() !== $this->user->getId() &&
+                    $item->getOrder()->getUser()->getId() !== $this->securityContext->getToken()->getUser()->getId() &&
                     false === $this->securityContext->isGranted('ROLE_SUPER_ADMIN')
                 )
             ) {
@@ -296,7 +295,7 @@ class OrderController extends Controller
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
 
             $cart = $this->em->getRepository('MaciOrderBundle:Order')
-                ->findOneBy(array( 'user' => $this->user, 'type' => 'cart', 'status' => 'current' ));
+                ->findOneBy(array( 'user' => $this->securityContext->getToken()->getUser(), 'type' => 'cart', 'status' => 'current' ));
 
             $order_arr = $this->getDefaultSession();
 
@@ -305,7 +304,7 @@ class OrderController extends Controller
                     $this->resetCart();
                 }
                 $cart = $this->setCart(new Order);
-                $cart->setUser($this->user);
+                $cart->setUser($this->securityContext->getToken()->getUser());
                 $this->em->persist($cart);
             }
 
@@ -457,6 +456,7 @@ class OrderController extends Controller
                 $cart->setShippingAddress($address);
             }
         }
+
         if ($order_arr['billingAddress'] !== null) {
             $address = $this->ac->getAddress($order_arr['billingAddress']);
             if ($address) {
