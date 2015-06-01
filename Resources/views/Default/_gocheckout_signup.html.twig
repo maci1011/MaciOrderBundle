@@ -1,0 +1,33 @@
+
+
+<div class="row">
+
+
+<div class="col-md-6">
+
+	<h3>{{ 'gocheckout.login' | matra('Login') }}</h3>
+
+	<h4>{{ 'gocheckout.login.title' | matra('Already a registered member?') }}</h4>
+
+	<p>{{ 'gocheckout.login.description' | matra('Login for to complete the order.') }}</p>
+
+	{% render url('fos_user_security_login') %}
+
+</div>
+
+
+<div class="col-md-6">
+
+	<h3>{{ 'gocheckout.new_users' | matra('New Users') }}</h3>
+
+	<h4>{{ 'gocheckout.sign_up_required.title' | matra('Sign Up') }}</h4>
+
+	<p>{{ 'gocheckout.sign_up_required.description' | matra("You need to create an account to complete the order.") }}</p>
+
+	{% render url('fos_user_registration_register') %}
+
+</div>
+
+
+</div>
+

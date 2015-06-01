@@ -70,6 +70,10 @@ class DefaultController extends Controller
             return $this->redirect($this->generateUrl('maci_order_invoice', array('id'=>$cart->getId())));
         }
 
+        if ( $this->get('service_container')->getParameter('registration_required') && false === $this->get('security.context')->isGranted('ROLE_USER') ) {
+            return $this->redirect($this->generateUrl('maci_order_checkout'));
+        }
+
         $checkout = array();
         $type = $cart->getCheckout();
         $type_array = array_keys($cart->getCheckoutArray());
@@ -513,7 +517,7 @@ class DefaultController extends Controller
     {
         $form = $this->createFormBuilder($order);
 
-        if ($this->get('service_container')->getParameter('paypal_islive')) {
+        if ($this->get('service_container')->getParameter('shop_islive')) {
 
             $form = $form->setAction('https://www.paypal.com/cgi-bin/webscr')
                 ->add('business', 'hidden', array('mapped' => false, 'data' => $this->get('service_container')->getParameter('maciorder_paypalform_business')));
