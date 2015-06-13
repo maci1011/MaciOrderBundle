@@ -353,7 +353,9 @@ class OrderController extends Controller
         $cart->setMail( $order_arr['mail'] );
         $cart->setCheckout( $order_arr['checkout'] );
         $cart->setShipping( $order_arr['shipping'] );
+        $cart->setShippingCost( $order_arr['shipping_cost'] );
         $cart->setPayment( $order_arr['payment'] );
+        $cart->setPaymentCost( $order_arr['payment_cost'] );
         return $cart;
     }
 
@@ -377,7 +379,9 @@ class OrderController extends Controller
                 'shippingAddress' => null,
                 'billingAddress' => null,
                 'shipping' => null,
+                'shipping_cost' => 0,
                 'payment' => null,
+                'payment_cost' => 0,
                 'amount' => 0
             ));
             $this->session->set('order_items', array());
@@ -389,7 +393,7 @@ class OrderController extends Controller
     {
         $info = $this->getDefaultSession();
 
-        $info = array(
+        $order_arr = array(
             'name' => $order->getName(),
             'code' => $order->getCode(),
             'status' => $order->getStatus(),
@@ -397,13 +401,15 @@ class OrderController extends Controller
             'mail' => $order->getMail(),
             'amount' => $order->getAmount(),
             'shipping' => $order->getShipping(),
+            'shipping_cost' => $order->getShippingCost(),
             'payment' => $order->getPayment(),
+            'payment_cost' => $order->getPaymentCost(),
             'checkout' => $order->getCheckout(),
             'shippingAddress' => $info['shippingAddress'],
             'billingAddress' => $info['billingAddress']
         );
 
-        $this->session->set('order', $info);
+        $this->session->set('order', array_merge($info, $order_arr));
 
         $items = array();
 
@@ -464,14 +470,20 @@ class OrderController extends Controller
         }
 
         if ($order_arr['shippingAddress'] !== null) {
-            $address = $this->ac->getAddress($order_arr['shippingAddress']);
+            $address = $order_arr['shippingAddress'];
+            if (is_numeric($address)) {
+                $address = $this->ac->getAddress($address);
+            }
             if ($address) {
                 $cart->setShippingAddress($address);
             }
         }
 
         if ($order_arr['billingAddress'] !== null) {
-            $address = $this->ac->getAddress($order_arr['billingAddress']);
+            $address = $order_arr['billingAddress'];
+            if (is_numeric($address)) {
+                $address = $this->ac->getAddress($address);
+            }
             if ($address) {
                 $cart->setBillingAddress($address);
             }

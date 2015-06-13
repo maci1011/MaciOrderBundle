@@ -29,9 +29,9 @@ class CartBillingAddressType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('billing_address', 'entity', array(
-				'class' => 'MaciAddressBundle:Address',
-				'choices' => $this->addresses->getAddressList(),
+			->add('billing_address', 'choice', array(
+				'choices' => $this->addresses->getAddressChoices(),
+				'mapped' => false
 			))
 			->add('save', 'submit')
 		;

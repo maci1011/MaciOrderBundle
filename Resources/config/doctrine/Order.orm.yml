@@ -84,11 +84,13 @@ Maci\OrderBundle\Entity\Order:
             joinColumn:
                 name: billing_id
                 referencedColumnName: id
+            cascade: ['persist']
         shipping_address:
             targetEntity: Maci\AddressBundle\Entity\Address
             joinColumn:
                 name: shipping_id
                 referencedColumnName: id
+            cascade: ['persist']
     oneToMany:
         items:
             targetEntity: Item

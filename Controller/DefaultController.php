@@ -373,7 +373,7 @@ class DefaultController extends Controller
                 $toint = $cart->getUser()->getUsername();
             } else {
                 $to = $cart->getMail();
-                $toint = $cart->getBilling()->getName() .' '. $cart->getBilling()->getSurname();
+                $toint = $cart->getBillingAddress()->getName() .' '. $cart->getBillingAddress()->getSurname();
             }
 
             $em = $this->getDoctrine()->getManager();

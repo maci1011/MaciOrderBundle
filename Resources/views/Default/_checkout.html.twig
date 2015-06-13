@@ -50,29 +50,9 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.billing' | matra('Billing') }}</h4>
 
-	{% render(controller('MaciOrderBundle:Default:cartSetBillingAddress')) %}
-
-	<br/><br/>
-
-	{% if not order.checkShipment or order.checkout == 'pickup' or order.checkout == 'booking' or order.shippingAddress is not null %}
+	{% if maci_addresses.addressList|length %} {% render(controller('MaciOrderBundle:Default:cartSetBillingAddress')) %} <br/><br/> {% endif %}
 
 	{% render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': 'billing'} )) %}
-
-	{% else %}
-
-	{#%
-		render(controller('MaciAddressBundle:Default:form', {
-			'id': null,
-			'method': {
-				'The Billing Address is the same as that of Shipment.': path('maci_order_checkout_set_address', {'option': 'both'}),
-				'The Billing Address is different from that of Shipment.': path('maci_order_checkout_set_address', {'option': 'billing'})
-			}
-		} ))
-	%#}
-
-	{% render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': 'billing'} )) %}
-
-	{% endif %}
 
 </section>
 
@@ -110,9 +90,7 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Address') }}</h4>
 
-	{% render(controller('MaciOrderBundle:Default:cartSetShippingAddress')) %}
-
-	<br/><br/>
+	{% if maci_addresses.addressList|length %} {% render(controller('MaciOrderBundle:Default:cartSetShippingAddress')) %} <br/><br/> {% endif %}
 
 	{% render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': 'shipping'} )) %}
 
