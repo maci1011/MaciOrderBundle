@@ -29,7 +29,7 @@ class CartCheckoutType extends AbstractType
 			$builder
 				->add('shipping', 'choice', array(
 	                'choices' => $this->getChoices($this->orders->getShippingsArray()),
-	                'preferred_choices' => array($this->orders->getCartShippingCountry()),
+	                'preferred_choices' => (is_string($str = $this->orders->getCartShippingCountry()) ? array($str) : array()),
 					'data' => 'standard'
 	            ))
 	        ;
