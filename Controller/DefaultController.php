@@ -528,7 +528,7 @@ class DefaultController extends Controller
             ->add('rm', 'hidden', array('mapped' => false, 'data' => '1'))
             ->add('return', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_order_paypal_complete', array(), true)))
             ->add('cancel_return', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_order', array(), true)))
-            ->add('notify_url', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('orderly_paypalipn_twignotificationemail_index', array(), true)))
+            ->add('notify_url', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_paypal_ipn', array(), true)))
             ->getForm();
 
         return $this->render('MaciOrderBundle:Default:_paypal.html.twig', array(
