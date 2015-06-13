@@ -599,14 +599,11 @@ class OrderController extends Controller
         }
 
         $countries  = array();
+
         foreach ($this->getCouriersArray() as $key => $value) {
             if (array_key_exists('countries', $value)) {
                 $countries = array_merge($countries, $value['countries']);
             }
-        }
-
-        if (!count($countries)) {
-            $countries = false;
         }
 
         return $this->countries = $countries;
