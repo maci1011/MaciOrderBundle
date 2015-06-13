@@ -109,7 +109,7 @@
 	</div>
 
 	<div class="col-xs-2">
-		<span class="order-amount-label">{{ order.shipping | matra(configs.shippings[order.shipping].label) }}</span>
+		<span class="order-amount-label">{{ order.shipping | matra(maci_orders.shippingsArray[order.shipping].label) }}</span>
 	</div>
 
 	<div class="col-xs-1">
@@ -147,7 +147,7 @@
 	</div>
 
 	<div class="col-xs-2">
-		<span class="order-amount-label">{{ order.payment | matra(configs.payments[order.payment].label) }}</span>
+		<span class="order-amount-label">{{ order.payment | matra(maci_orders.paymentsArray[order.payment].label) }}</span>
 	</div>
 
 	<div class="col-xs-1">

@@ -24,7 +24,7 @@ class MaciOrderExtension extends Extension
 
         $result = array(
             'payments' => $config['payments'],
-            'shippings' => $config['shippings'],
+            'couriers' => $config['couriers'],
             'default_tax' => $config['default_tax'],
             'free_shipping_over' => $config['free_shipping_over']
         );

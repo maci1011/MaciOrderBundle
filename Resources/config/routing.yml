@@ -17,10 +17,6 @@ maci_order_remove_cart_item:
     pattern:  /cart/item/remove/{id}
     defaults: { _controller: MaciOrderBundle:Default:removeCartItem }
 
-maci_order_checkout_set_address:
-    pattern:  /cart/checkout/set-address/{option}
-    defaults: { _controller: MaciOrderBundle:Default:cartSetAddress }
-
 maci_order_gocheckout:
     pattern:  /cart/gocheckout/{option}
     defaults: { _controller: MaciOrderBundle:Default:cartGoCheckout, option: checkout }
@@ -36,6 +32,14 @@ maci_order_checkout_set_checkout:
 maci_order_checkout_set_mail:
     pattern:  /cart/checkout/set-mail
     defaults: { _controller: MaciOrderBundle:Default:cartSetMail }
+
+maci_order_checkout_set_billing_address:
+    pattern:  /cart/checkout/set-billing-address
+    defaults: { _controller: MaciOrderBundle:Default:cartSetBillingAddress }
+
+maci_order_checkout_set_shipping_address:
+    pattern:  /cart/checkout/set-shipping-address
+    defaults: { _controller: MaciOrderBundle:Default:cartSetShippingAddress }
 
 maci_order_checkout_set_payment:
     pattern:  /cart/checkout/set-payment

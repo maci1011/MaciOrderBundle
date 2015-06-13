@@ -28,7 +28,7 @@ class ShippingType extends AbstractType
 		$builder
 			->add('shipping', 'choice', array(
                 'choices' => $this->getChoices($this->orders->getShippingsArray()),
-                'expanded' => true
+	            'preferred_choices' => array($this->orders->getCartShippingCountry())
             ))
 			->add('cancel', 'reset')
 			->add('send', 'submit')

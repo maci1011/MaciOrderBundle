@@ -34,6 +34,18 @@ services:
         tags:
             - { name: form.type, alias: cart_pickup }
 
+    maci.order.form.type.billing_address:
+        class: Maci\OrderBundle\Form\Type\CartBillingAddressType
+        arguments: ["@maci.orders","@maci.addresses"]
+        tags:
+            - { name: form.type, alias: cart_billing_address }
+
+    maci.order.form.type.shipping_address:
+        class: Maci\OrderBundle\Form\Type\CartShippingAddressType
+        arguments: ["@maci.orders","@maci.addresses"]
+        tags:
+            - { name: form.type, alias: cart_shipping_address }
+
     maci.order.form.type.checkout:
         class: Maci\OrderBundle\Form\Type\CartCheckoutType
         arguments: ["@maci.orders"]

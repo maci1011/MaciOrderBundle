@@ -324,7 +324,7 @@ class Item
         $this->created = new \DateTime();
     }
 
-    public function getPrivateDocuments($quantity = false)
+    public function getPrivateDocuments()
     {
         $documents = array();
 

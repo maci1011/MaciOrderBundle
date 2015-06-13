@@ -797,7 +797,8 @@ class Order
     {
         $documents = array();
         foreach ($this->items as $item) {
-            if (count($docs = $item->getPrivateDocuments())) {
+            $docs = $item->getPrivateDocuments();
+            if (is_array($docs) && count($docs)) {
                 foreach ($docs as $id => $doc) {
                     $documents[$id] = $doc;
                 }

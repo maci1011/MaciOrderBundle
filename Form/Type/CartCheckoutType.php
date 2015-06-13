@@ -29,7 +29,7 @@ class CartCheckoutType extends AbstractType
 			$builder
 				->add('shipping', 'choice', array(
 	                'choices' => $this->getChoices($this->orders->getShippingsArray()),
-	                'expanded' => true,
+	                'preferred_choices' => array($this->orders->getCartShippingCountry()),
 					'data' => 'standard'
 	            ))
 	        ;
@@ -51,7 +51,15 @@ class CartCheckoutType extends AbstractType
 	{
 		$result = array();
 		foreach ($array as $key => $value) {
-			$result[$key] = ( $value['label'] . ( $value['cost'] ? ( ' ( ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' ) : null ) );
+			if (array_key_exists('label', $value)) {
+				$label = $value['label'];
+			} else {
+				$label = ucfirst($key);
+			}
+			if (array_key_exists('country', $value)) {
+				$label = $this->orders->getCountryName($value['country']) . ' - ' . $label;
+			}
+			$result[$key] = ( $label . ( $value['cost'] ? ( ' ( ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' ) : null ) );
 		}
 		return $result;
 	}

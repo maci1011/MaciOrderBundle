@@ -77,6 +77,15 @@ class TwigNotificationEmailController extends Controller
                         ->setBody($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('order' => $order)), 'text/html')
                     ;
 
+                    if (!$order->getUser()) {
+                        $documents = $order->getOrderDocuments();
+                        if (count($documents)) {
+                            foreach ($documents as $doc) {
+                                $message->attach(Swift_Attachment::fromPath( $doc->getAbsoluthPath() ));
+                            }
+                        }
+                    }
+
                     //send message
                     $this->get('mailer')->send($message);
 
