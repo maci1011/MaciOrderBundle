@@ -503,7 +503,7 @@ class DefaultController extends Controller
     {
         $form = $this->createFormBuilder($order);
 
-        if ($this->get('service_container')->getParameter('shop_islive')) {
+        if ($this->get('service_container')->getParameter('shop_is_live')) {
 
             $form = $form->setAction('https://www.paypal.com/cgi-bin/webscr')
                 ->add('business', 'hidden', array('mapped' => false, 'data' => $this->get('service_container')->getParameter('maciorder_paypalform_business')));
