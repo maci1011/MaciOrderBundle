@@ -24,12 +24,13 @@ class OrderPayPalListener {
 
         $ipnOrder = $ipn->getOrder();
 
-        $id = $ipn->getCustom();
+        $id = $ipnOrder->getCustom();
 
         $order = $this->om->getRepository('MaciOrderBundle:Order')->findOneById($id);
 
         if (!$order) {
             $order = new Order;
+            $order->setName('SAVED IPN ORDER')
             $order->setAmount( $ipnOrder->getMcGross() );
             $order->setStatus('paid');
             $em->persist($order);
