@@ -30,7 +30,7 @@ class OrderPayPalListener {
 
         if (!$order) {
             $order = new Order;
-            $order->setName('SAVED IPN ORDER')
+            $order->setName('SAVED IPN ORDER');
             $order->setAmount( $ipnOrder->getMcGross() );
             $order->setStatus('paid');
             $em->persist($order);
