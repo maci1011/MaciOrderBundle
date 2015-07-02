@@ -367,10 +367,10 @@ class Item
         return true;
     }
 
-    public function checkAvailability()
+    public function checkAvailability($quantity = false)
     {
         if ( $this->product ) {
-            if ( !$this->product->isAvailable() || !$this->checkProduct() || !$this->checkVariants() ) {
+            if ( !$this->product->isAvailable() || !$this->checkProduct($quantity) || !$this->checkVariants($quantity) ) {
                 return false;
             }
         }

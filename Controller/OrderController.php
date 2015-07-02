@@ -121,7 +121,7 @@ class OrderController extends Controller
 
             $item->setQuantity($quantity);
 
-            if (!$item->checkProductQuantity($quantity) || !$item->checkVariantsQuantity($quantity)) {
+            if (!$item->checkAvailability($quantity)) {
                 return false;
             }
 

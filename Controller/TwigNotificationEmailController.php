@@ -10,6 +10,7 @@ use Orderly\PayPalIpnBundle\Ipn;
 use Orderly\PayPalIpnBundle\Event as Events;
 
 use Maci\OrderBundle\Entity\Order;
+use Maci\MailerBundle\Entity\Mail;
 
 /*
  * Copyright 2012 Orderly Ltd 
@@ -69,15 +70,27 @@ class TwigNotificationEmailController extends Controller
                         $toint = $order->getBilling()->getName() .' '. $order->getBilling()->getSurname();
                     }
 
-                    $message = \Swift_Message::newInstance()
+                    $em = $this->getDoctrine()->getManager();
+
+                    $mail = new Mail();
+
+                    $mail
+                        ->setName('Order Confirmation: ' . $cart->getCode())
+                        ->setType('notify')
                         ->setSubject('Order Confirmation')
                         ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
                         ->setTo($to, $toint)
-                        ->setBcc($this->get('service_container')->getParameter('order_email'))
-                        ->setBody($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('order' => $order)), 'text/html')
+                        ->setLocale($request->getLocale())
+                        ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $cart)), 'text/html')
                     ;
 
-                    if (!$order->getUser()) {
+                    $message = $this->get('maci.mailer')->getSwiftMessage($mail);
+
+                    $notify = clone $message;
+
+                    if ($order->getUser()) {
+                        $mail->setUser($order->getUser());
+                    } else {
                         $documents = $order->getOrderDocuments();
                         if (count($documents)) {
                             foreach ($documents as $doc) {
@@ -86,8 +99,19 @@ class TwigNotificationEmailController extends Controller
                         }
                     }
 
-                    //send message
+                    $mail->end();
+
+                    // ---> send message
                     $this->get('mailer')->send($message);
+
+                    $notify->setTo($this->get('service_container')->getParameter('order_email'));
+
+                    // ---> send notify
+                    $this->get('mailer')->send($notify);
+
+                    $em->persist($mail);
+
+                    $em->flush();
 
                 }
             }
