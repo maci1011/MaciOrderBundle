@@ -86,7 +86,7 @@ class TwigNotificationEmailController extends Controller
 
                     $message = $this->get('maci.mailer')->getSwiftMessage($mail);
 
-                    $notify = clone $message;
+                    // $notify = clone $message;
 
                     if ($order->getUser()) {
                         $mail->setUser($order->getUser());
@@ -104,10 +104,10 @@ class TwigNotificationEmailController extends Controller
                     // ---> send message
                     $this->get('mailer')->send($message);
 
-                    $notify->setTo($this->get('service_container')->getParameter('order_email'));
+                    // $notify->setTo($this->get('service_container')->getParameter('order_email'));
 
                     // ---> send notify
-                    $this->get('mailer')->send($notify);
+                    // $this->get('mailer')->send($notify);
 
                     $em->persist($mail);
 

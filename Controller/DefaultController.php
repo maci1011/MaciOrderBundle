@@ -385,24 +385,28 @@ class DefaultController extends Controller
                 ->setType('notify')
                 ->setSubject('Order Confirmation')
                 ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                ->addTo($to, $toint)
-                ->setBcc($this->get('service_container')->getParameter('order_email'))
+                ->setTo($to, $toint)
                 ->setLocale($request->getLocale())
                 ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $cart)), 'text/html')
             ;
 
             $message = $this->get('maci.mailer')->getSwiftMessage($mail);
 
-            if (true === $this->get('security.context')->isGranted('ROLE_USER')) {
-                $mail->setUser( $this->getUser() );
+            // $notify = clone $message;
+
+            if ($cart->getUser()) {
+                $mail->setUser($cart->getUser());
             }
 
             $mail->end();
 
-            if ($this->container->get( 'kernel' )->getEnvironment() === 'prod') {
-                // ---> send message
-                $this->get('mailer')->send($message);
-            }
+            // ---> send message
+            $this->get('mailer')->send($message);
+
+            // $notify->setTo($this->get('service_container')->getParameter('order_email'));
+
+            // ---> send notify
+            // $this->get('mailer')->send($notify);
 
             $em->persist($mail);
 
