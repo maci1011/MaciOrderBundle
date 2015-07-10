@@ -37,6 +37,18 @@ class DefaultController extends Controller
         ));
     }
 
+    public function adminShowAction($id)
+    {
+        $order = $this->getDoctrine()->getManager()
+            ->getRepository('MaciOrderBundle:Order')
+            ->findOneById($id);
+
+        return $this->render('MaciOrderBundle:Default:show.html.twig', array(
+            'order' => $order,
+            'edit' => false
+        ));
+    }
+
     public function cartAction()
     {
         return $this->render('MaciOrderBundle:Default:cart.html.twig', array(
