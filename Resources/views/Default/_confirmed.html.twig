@@ -1,0 +1,59 @@
+
+<header class="row">
+
+	<div class="col-xs-1">
+		<span>Id</span>
+	</div>
+
+	<div class="col-xs-3">
+		<span>Name</span>
+	</div>
+
+	<div class="col-xs-3">
+		<span>User</span>
+	</div>
+
+	<div class="col-xs-2">
+		<span>Status</span>
+	</div>
+
+	<div class="col-xs-3">
+		<span>Invoice</span>
+	</div>
+
+</header>
+
+{% for item in list %}
+
+<div class="row">
+
+	<div class="col-xs-1">
+		{{ item.id }}
+	</div>
+
+	<div class="col-xs-3">
+		{{ item.name }}
+	</div>
+
+	<div class="col-xs-3">
+		{{ item.user }}
+	</div>
+
+	<div class="col-xs-2">
+		{{ item.status }}
+	</div>
+
+	<div class="col-xs-3">
+		{{ item.invoice|date('d/m/Y') }}
+	</div>
+
+</div>
+
+{% else %}
+
+<div class="row">
+	<h3 class="noitems">No Items.</h3>
+</div>
+
+{% endfor %}
+

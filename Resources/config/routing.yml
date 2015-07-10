@@ -73,6 +73,10 @@ maci_order_notfound:
     pattern:  /order/notfound
     defaults: { _controller: MaciOrderBundle:Default:notfound }
 
+maci_order_confirmed:
+    pattern:  /admin/confirmed_orders
+    defaults: { _controller: MaciOrderBundle:Default:confirmed }
+
 maci_order:
     pattern:  /user/orders
     defaults: { _controller: MaciOrderBundle:Default:index }

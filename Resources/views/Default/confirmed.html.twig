@@ -1,0 +1,19 @@
+
+{% extends "MaciOrderBundle::layout.html.twig" %}
+
+
+{% block title %}
+
+{{ 'order.confirmed.meta_title' | matra('Confirmed Orders') }}
+
+{% endblock %}
+
+
+{% block content %}
+
+{% include "MaciOrderBundle:Default:_confirmed.html.twig" with { 'list': list } %}
+
+{% endblock %}
+
+
+

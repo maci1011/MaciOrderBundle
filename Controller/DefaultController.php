@@ -26,6 +26,17 @@ class DefaultController extends Controller
         ));
     }
 
+    public function confirmedAction()
+    {
+        $list = $this->getDoctrine()->getManager()
+            ->getRepository('MaciOrderBundle:Order')
+            ->getConfirmed();
+
+        return $this->render('MaciOrderBundle:Default:confirmed.html.twig', array(
+            'list' => $list
+        ));
+    }
+
     public function cartAction()
     {
         return $this->render('MaciOrderBundle:Default:cart.html.twig', array(
