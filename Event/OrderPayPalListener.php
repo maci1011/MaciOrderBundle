@@ -34,7 +34,7 @@ class OrderPayPalListener {
             $order->setName('SAVED IPN ORDER');
             $order->setAmount( $ipnOrder->getMcGross() );
             $order->setStatus('paid');
-            $em->persist($order);
+            $this->om->persist($order);
         }
 
         $tx = new Transaction;
@@ -53,11 +53,15 @@ class OrderPayPalListener {
 
         $order->completeOrder();
 
-        $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
-            $order->getOrderDocuments(),
-            $order->getUser(),
-            'Created by Order: '.$order->getCode()
-        );
+        if ( $order->getUser() && count( $documents = $order->getOrderDocuments() ) ) {
+
+            $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
+                $documents,
+                $order->getUser(),
+                'Created by Order: '.$order->getCode()
+            );
+
+        }
 
         $this->om->flush();
 

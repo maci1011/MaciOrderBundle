@@ -1,0 +1,21 @@
+
+<div id="order_show_addresses" class="row">
+
+<div class="col-xs-12 col-sm-6">
+
+	<h4>Shipping Address:</h4>
+
+	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
+
+</div>
+
+
+<div class="col-xs-12 col-sm-6">
+
+	<h4>Payment Address:</h4>
+
+	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
+
+</div>
+
+</div>
