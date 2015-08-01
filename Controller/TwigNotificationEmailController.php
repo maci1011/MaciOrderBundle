@@ -75,13 +75,13 @@ class TwigNotificationEmailController extends Controller
                     $mail = new Mail();
 
                     $mail
-                        ->setName('Order Confirmation: ' . $cart->getCode())
+                        ->setName('Order Confirmation: ' . $order->getCode())
                         ->setType('notify')
                         ->setSubject('Order Confirmation')
                         ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
                         ->setTo($to, $toint)
                         ->setLocale($request->getLocale())
-                        ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $cart)), 'text/html')
+                        ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $order)), 'text/html')
                     ;
 
                     $message = $this->get('maci.mailer')->getSwiftMessage($mail);
