@@ -3,6 +3,7 @@
 namespace Maci\OrderBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -38,7 +39,7 @@ class TwigNotificationEmailController extends Controller
     /**
      * @Template()
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         //getting ipn service registered in container
         $this->paypal_ipn = $this->get('orderly_pay_pal_ipn');
