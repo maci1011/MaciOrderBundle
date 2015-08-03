@@ -80,7 +80,7 @@ class TwigNotificationEmailController extends Controller
                         ->setType('notify')
                         ->setSubject('Order Confirmation')
                         ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                        ->setTo($to, $toint)
+                        ->addTo($to, $toint)
                         ->setLocale($request->getLocale())
                         ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $order)), 'text/html')
                     ;
@@ -105,7 +105,7 @@ class TwigNotificationEmailController extends Controller
                     // ---> send message
                     $this->get('mailer')->send($message);
 
-                    // $notify->setTo($this->get('service_container')->getParameter('order_email'));
+                    // $notify->addTo(array($this->get('service_container')->getParameter('order_email')));
 
                     // ---> send notify
                     // $this->get('mailer')->send($notify);
