@@ -56,65 +56,97 @@ class TwigNotificationEmailController extends Controller
             // Now let's check what the payment status is and act accordingly
             if ($this->paypal_ipn->getOrderStatus() == Ipn::PAID)
             {
-                $id = $this->paypal_ipn->getOrder()->getCustom();
+                $ipnOrder = $this->paypal_ipn->getOrder();
 
-                $order = $this->getDoctrine()->getManager()
-                    ->getRepository('MaciOrderBundle:Order')->findOneById($id);
+                $id = intval( $ipnOrder->getCustom() );
 
-                if ($order) {
+                $em = $this->getDoctrine()->getManager();
 
-                    if ($order->getUser()) {
-                        $to = $order->getUser()->getEmail();
-                        $toint = $order->getUser()->getUsername();
-                    } else {
-                        $to = $order->getBilling()->getMail();
-                        $toint = $order->getBilling()->getName() .' '. $order->getBilling()->getSurname();
-                    }
+                $order = $em->getRepository('MaciOrderBundle:Order')->findOneById( $id );
 
-                    $em = $this->getDoctrine()->getManager();
+                if (!$order) {
+                    $order = new Order;
+                    $order->setName('SAVED IPN ORDER');
+                    $order->setAmount( $ipnOrder->getMcGross() );
+                    $order->setStatus('confirm');
+                    $em->persist($order);
+                }
 
-                    $mail = new Mail();
+                $tx = new Transaction;
 
-                    $mail
-                        ->setName('Order Confirmation: ' . $order->getCode())
-                        ->setType('notify')
-                        ->setSubject('Order Confirmation')
-                        ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                        ->addTo($to, $toint)
-                        ->setLocale($request->getLocale())
-                        ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $order)), 'text/html')
-                    ;
+                $tx->setTx( $ipnOrder->getTxnId() );
 
-                    $message = $this->get('maci.mailer')->getSwiftMessage($mail);
+                $tx->setAmount( $ipnOrder->getMcGross() );
 
-                    // $notify = clone $message;
+                $tx->setGateway( 'PayPal' );
 
-                    if ($order->getUser()) {
-                        $mail->setUser($order->getUser());
-                    } else {
-                        $documents = $order->getOrderDocuments();
-                        if (count($documents)) {
-                            foreach ($documents as $doc) {
-                                $message->attach(Swift_Attachment::fromPath( $doc->getAbsoluthPath() ));
-                            }
-                        }
-                    }
+                $tx->setOrder( $order );
 
-                    $mail->end();
+                $em->persist( $tx );
 
-                    // ---> send message
-                    $this->get('mailer')->send($message);
+                $order->addTransaction( $tx );
 
-                    // $notify->addTo(array($this->get('service_container')->getParameter('order_email')));
+                $order->completeOrder();
 
-                    // ---> send notify
-                    // $this->get('mailer')->send($notify);
+                if ( $order->getUser() && count( $documents = $order->getOrderDocuments() ) ) {
 
-                    $em->persist($mail);
-
-                    $em->flush();
+                    $em->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
+                        $documents,
+                        $order->getUser(),
+                        'Created by Order: '.$order->getCode()
+                    );
 
                 }
+
+                if ($order->getUser()) {
+                    $to = $order->getUser()->getEmail();
+                    $toint = $order->getUser()->getUsername();
+                } else {
+                    $to = $order->getBilling()->getMail();
+                    $toint = $order->getBilling()->getName() .' '. $order->getBilling()->getSurname();
+                }
+
+                $mail = new Mail();
+
+                $mail
+                    ->setName('Order Confirmation: ' . $order->getCode())
+                    ->setType('notify')
+                    ->setSubject('Order Confirmation')
+                    ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
+                    ->addTo($to, $toint)
+                    ->setLocale($request->getLocale())
+                    ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $order)), 'text/html')
+                ;
+
+                $message = $this->get('maci.mailer')->getSwiftMessage($mail);
+
+                $notify = clone $message;
+
+                if ($order->getUser()) {
+                    $mail->setUser($order->getUser());
+                } else {
+                    $documents = $order->getOrderDocuments();
+                    if (count($documents)) {
+                        foreach ($documents as $doc) {
+                            $message->attach(Swift_Attachment::fromPath( $doc->getAbsoluthPath() ));
+                        }
+                    }
+                }
+
+                $mail->end();
+
+                // ---> send message
+                $this->get('mailer')->send($message);
+
+                $notify->setTo($this->get('service_container')->getParameter('order_email'));
+
+                // ---> send notify
+                $this->get('mailer')->send($notify);
+
+                $em->persist($mail);
+
+                $em->flush();
+
             }
         }
         else // Just redirect to the root URL

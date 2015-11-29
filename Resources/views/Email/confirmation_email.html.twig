@@ -108,9 +108,9 @@ td > table {
 		<tr>
 			<td>
 				{% if item.product.preview %}
-				<img src="{{ asset(item.product.preview.webPreview | imagine_filter('maci_product_preview_list'), null, true) }}">
+				<img src="{{ asset(item.product.preview.webPreview | imagine_filter('maci_product_preview_list'), null, true) }}" style="width: 100px;">
 				{% else %}
-				<img src="{{ asset('/images/defaults/no-icon.png' | imagine_filter('maci_product_preview_list'), null, true) }}">
+				<img src="{{ asset('/images/defaults/no-icon.png' | imagine_filter('maci_product_preview_list'), null, true) }}" style="width: 100px;">
 				{% endif %}
 			</td>
 			<td>
@@ -190,7 +190,7 @@ td > table {
 <tr>
 <td>
 
-	<h3>Contact us for more informations:</h3>
+	<h3>Contact us for more informations.</h3>
 
 	{% include "MaciPageBundle:Default:_contacts.html.twig" %}
 
