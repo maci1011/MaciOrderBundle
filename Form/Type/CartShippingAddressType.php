@@ -33,7 +33,7 @@ class CartShippingAddressType extends AbstractType
 				'choices' => $this->addresses->getAddressChoices(),
 				'mapped' => false
 			))
-			->add('save', 'submit')
+			->add('proceed', 'submit')
 		;
 	}
 
