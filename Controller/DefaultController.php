@@ -356,7 +356,6 @@ class DefaultController extends Controller
         if ($form->isValid()) {
             $address = $this->get('maci.addresses')->getAddress($form['billing_address']->getData());
             $this->get('maci.orders')->setCartBillingAddress($address);
-            $this->getDoctrine()->getManager()->flush();
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'billing')));
         }
 
@@ -374,7 +373,6 @@ class DefaultController extends Controller
         if ($form->isValid()) {
             $address = $this->get('maci.addresses')->getAddress($form['shipping_address']->getData());
             $this->get('maci.orders')->setCartShippingAddress($address);
-            $this->getDoctrine()->getManager()->flush();
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'shipping')));
         }
 
