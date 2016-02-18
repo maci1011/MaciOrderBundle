@@ -383,11 +383,17 @@ class DefaultController extends Controller
 
     public function cartConfirmAction(Request $request)
     {
-        if ( $cart = $this->get('maci.orders')->confirmCart() ) {
+        $cart = $this->get('maci.orders')->getCurrentCart();
 
-            if ($cart->getPayment() === 'paypal') {
-                return $this->paypalForm($cart);
-            }
+        if (!$cart->checkConfirmation()) {
+
+            return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'error.order_not_valid')));
+
+        } else if ($cart->getPayment() === 'paypal') {
+
+            return $this->paypalForm($cart);
+
+        } else if ( $cart->confirmCart() ) {
 
             if ($cart->getUser()) {
                 $to = $cart->getUser()->getEmail();
@@ -413,7 +419,7 @@ class DefaultController extends Controller
 
             $message = $this->get('maci.mailer')->getSwiftMessage($mail);
 
-            // $notify = clone $message;
+            $notify = clone $message;
 
             if ($cart->getUser()) {
                 $mail->setUser($cart->getUser());
@@ -424,10 +430,10 @@ class DefaultController extends Controller
             // ---> send message
             $this->get('mailer')->send($message);
 
-            // $notify->addTo(array($this->get('service_container')->getParameter('order_email')));
+            $notify->addTo(array($this->get('service_container')->getParameter('order_email')));
 
             // ---> send notify
-            // $this->get('mailer')->send($notify);
+            $this->get('mailer')->send($notify);
 
             $em->persist($mail);
 
@@ -476,11 +482,6 @@ class DefaultController extends Controller
             $status = $pdtArray['payment_status'];
         } else if ($this->getRequest()->get('st')) {
             $status = $this->getRequest()->get('st');
-        }
-
-        if ($status === 'Completed') {
-            $order->setStatus('paid');
-            $om->flush();
         }
 
         $page = $this->getDoctrine()->getManager()

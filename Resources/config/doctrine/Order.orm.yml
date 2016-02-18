@@ -73,6 +73,8 @@ Maci\OrderBundle\Entity\Order:
             type: datetime
         updated:
             type: datetime
+        removed:
+            type: boolean
     manyToOne:
         user:
             targetEntity: Maci\UserBundle\Entity\User

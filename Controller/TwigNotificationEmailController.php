@@ -68,9 +68,11 @@ class TwigNotificationEmailController extends Controller
                     $order = new Order;
                     $order->setName('SAVED IPN ORDER');
                     $order->setAmount( $ipnOrder->getMcGross() );
-                    $order->setStatus('confirm');
+                    $order->setStatus('paid');
                     $em->persist($order);
                 }
+
+                $order->confirmOrder();
 
                 $tx = new Transaction;
 

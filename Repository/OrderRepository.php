@@ -10,6 +10,7 @@ class OrderRepository extends EntityRepository
     {
         $query = $this->createQueryBuilder('o')
             ->where('o.invoice IS NOT NULL')
+            ->andWhere('o.removed = false')
             ->orderBy('o.invoice', 'DESC')
             ->getQuery()
         ;

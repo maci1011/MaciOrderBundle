@@ -236,9 +236,6 @@ class OrderController extends Controller
             $info['shippingAddress'] = $address;
             $this->session->set('order', $info);
         }
-        if ($address !== null && $this->getCartShippingCountry() !== $address->getCountry()) {
-            $this->setCartShipping($this->getShippingByCountry($address->getCountry()));
-        }
     }
 
     public function setCartBillingAddress($address)

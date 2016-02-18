@@ -77,6 +77,11 @@ class Order
     /**
      * @var string
      */
+    private $sub_amount;
+
+    /**
+     * @var string
+     */
     private $token;
 
     /**
@@ -108,6 +113,11 @@ class Order
      * @var \DateTime
      */
     private $updated;
+
+    /**
+     * @var boolean
+     */
+    private $removed;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -151,10 +161,12 @@ class Order
         $this->shipping = null;
         $this->payment = null;
         $this->amount = 0;
+        $this->sub_amount = 0;
         $this->shipment = false;
         $this->invoice = null;
         $this->paid = null;
         $this->due = null;
+        $this->removed = false;
     }
 
     /**
@@ -500,6 +512,11 @@ class Order
         return $this->amount;
     }
 
+    public function getSubAmount()
+    {
+        return $this->sub_amount;
+    }
+
     /**
      * Set invoice
      *
@@ -613,6 +630,18 @@ class Order
     public function getUpdated()
     {
         return $this->updated;
+    }
+
+    public function setRemoved($removed)
+    {
+        $this->removed = $removed;
+
+        return $this;
+    }
+
+    public function getRemoved()
+    {
+        return $this->removed;
     }
 
     /**
@@ -841,16 +870,22 @@ class Order
             $e->refreshAmount();
             return $e->getAmount();
         });
+
         $tot = 0;
+
         foreach ($amounts as $amount) {
             $tot += $amount;
         }
+
+        $this->sub_amount = $tot;
+
         if ( $this->getShippingCost() ) {
             $tot += $this->getShippingCost();
         }
         if ( $this->getPaymentCost() ) {
             $tot += $this->getPaymentCost();
         }
+
         return $this->amount = $tot;
     }
 
@@ -868,12 +903,31 @@ class Order
         }
     }
 
-    public function confirmOrder()
+    public function reverseOrder()
+    {
+        foreach ($this->items as $item) {
+            if ($product = $item->getProduct()) {
+                $product->addQuantity($item->getQuantity());
+            }
+            if (count($item->getVariants())) {
+                foreach ($item->getVariants() as $variant) {
+                    $variant->addQuantity($item->getQuantity());
+                }
+            }
+        }
+    }
+
+    public function checkConfirmation()
     {
         if ( 2 < $this->getProgression() || !$this->amount || !$this->checkOrder() ) {
             return false;
         }
 
+        return true;
+    }
+
+    public function confirmOrder()
+    {
         $this->status = 'confirm';
 
         $this->subItemsQuantity();
