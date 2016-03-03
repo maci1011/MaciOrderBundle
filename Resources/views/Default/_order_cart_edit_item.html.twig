@@ -5,6 +5,17 @@
     	{{ form_errors(form) }}
 	</div>
 
-    {{ form_rest(form) }}
+	<div class="form-group">
+		<label class="sr-only required control-label" for="cart_edit_item_quantity">Quantity</label>
+		<div class="controls">
+			<input id="cart_edit_item_quantity" class="edit-quantity-field form-control" type="number" value="1" required="required" name="cart_edit_item[quantity]">
+		</div>
+	</div>
+
+    {{ form_row(form._token) }}
+
+	<button id="cart_edit_item_edit" class="btn-success btn-primary btn" name="cart_edit_item[edit]" type="submit">
+		<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+	</button>
 
 </form>

@@ -1,10 +1,14 @@
 
+
 {% set i = 0 %}
 
-<div class="page">
+
+<div class="page page-checkout">
 
 
 <section class="page_header page_container row">
+
+<div class="container">
 
 {% if order.checkout == 'pickup' %}
 
@@ -18,13 +22,15 @@
 
 {% if is_granted('ROLE_USER') %}
 
-<h4>You are ordering as {{ app.user.username }}</h4>
+<span class="page-checkout-identity">You are ordering as {{ app.user.username }}</span>
 
 {% else %}
 
-<h4>You are ordering with this e-mail address: {{ order.mail }} ( <a href="{{ path('maci_order_gocheckout', {'edit': true}) }}">Change Email</a> )</h4>
+<span class="page-checkout-identity">You are ordering with this e-mail address: {{ order.mail }} ( <a href="{{ path('maci_order_gocheckout', {'edit': true}) }}">Change Email</a> )</span>
 
 {% endif %}
+
+</div>
 
 </section>
 
@@ -39,7 +45,9 @@
 </section>
 
 
-{% if checkout is defined and checkout %}
+{% if checkout is defined and checkout %} {# --- Checkout Defined ---  #}
+
+<div class="container">
 
 {% if checkout.billingAddress %} {# --- Billing Address ---  #}
 {% set i = i + 1 %}
@@ -228,20 +236,21 @@
 
 {% endif %} {# --- End Confirm ---  #}
 
-
+</div>
 
 {% endif %} {# --- Checkout Defined ---  #}
 
 
-
 {% else %} {# --- InValid Checkout ---  #}
 
-<div class="row">
+<div class="container">
 
-	<p>{{ 'page.no_content' | matra('No Content.') }}</p>
+	<h3>{{ 'page.no_content' | matra('No Content.') }}</h3>
 
 </div>
 
 {% endif %} {# --- EndIf Checkout ---  #}
 
+
 </div>
+

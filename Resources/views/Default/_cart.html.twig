@@ -5,12 +5,16 @@
 
 {% if cart and cart.items|length %}
 
+<div class="container">
+
 <div class="checkout-options">
 
 		<h3>{{ 'page.cart.checkout' | matra('Checkout') }}</h3>
 		<p>{{ 'page.cart.checkout.description' | matra('Pay the order and get it at home.') }}</p>
 
 		{{ render(controller('MaciOrderBundle:Default:cartSetCheckout')) }}
+
+</div>
 
 </div>
 
