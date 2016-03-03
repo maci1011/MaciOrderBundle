@@ -917,6 +917,20 @@ class Order
         }
     }
 
+    public function getItemsNumber()
+    {
+        return count($this->items);
+    }
+
+    public function getTotalItemsQuantity()
+    {
+        $tot = 0;
+        foreach ($this->items as $item) {
+            $tot += $item->getQuantity();
+        }
+        return $tot;
+    }
+
     public function checkConfirmation()
     {
         if ( 2 < $this->getProgression() || !$this->amount || !$this->checkOrder() ) {

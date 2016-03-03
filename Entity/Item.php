@@ -385,4 +385,20 @@ class Item
         }
         $this->amount = $tot;
     }
+
+    public function getPrice()
+    {
+        if ($this->product) {
+            return ( $this->product->getPrice() );
+        }
+        return 0;
+    }
+
+    public function getSale()
+    {
+        if ($this->product) {
+            return ( $this->product->getSale() );
+        }
+        return 0;
+    }
 }

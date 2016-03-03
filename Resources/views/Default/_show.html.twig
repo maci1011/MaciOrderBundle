@@ -65,7 +65,12 @@
 	</div>
 
 	<div class="col-xs-12 col-sm-2">
-		<span class="order-item-amount">
+		{% if item.sale %}
+		<span class="product-sale">
+			{{ item.sale | number_format(2, '.', ',') }} &euro;
+		</span><br/>
+		{% endif %}
+		<span class="order-item-price">
 			{{ item.amount | number_format(2, '.', ',') }} &euro;
 		</span>
 	</div>
@@ -159,7 +164,7 @@
 	{% if edit is defined and edit %}
 
 	<div class="col-xs-6 col-sm-5 col-sm-offset-2">
-		<h4 class="order-amount-label">{{ 'order.subtotal' | matra('SubTotal') }}</h4>
+		<h4 class="order-amount-label">{{ 'order.subtotal' | matra('SubTotal') }} ( {{ order.totalItemsQuantity }} {{ 'order.subtotal-items' | matra('Items') }} )</h4>
 	</div>
 
 	<div class="col-xs-6 col-sm-2">
