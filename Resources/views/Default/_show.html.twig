@@ -6,14 +6,11 @@
 
 {% if order and order.items|length %}
 
+<h3>{{ 'menu.user.cart' | matra('My Cart') }}</h3>
 
 <div class="row cart-header">
 
-	<div class="col-xs-12 col-sm-2">
-		<h3>{{ 'menu.user.cart' | matra('My Cart') }}</h3>
-	</div>
-
-	<div class="col-xs-12 col-sm-5">
+	<div class="col-xs-12 col-sm-5 col-sm-offset-2">
 		<h4 class="order-show-title">{{ 'product.cart_title' | matra('Product') }}</h4>
 	</div>
 
