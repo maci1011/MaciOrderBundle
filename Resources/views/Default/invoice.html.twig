@@ -1,31 +1,52 @@
 <html>
-	<head>
-
-		<title>Invoice {{ order }}</title>
-
-        <link rel="shortcut icon" href="favicon.ico" />
-
-		<link rel="stylesheet" href="{{ asset('/bundles/maciorder/css/invoice.style.css') }}" />
-
-	</head>
-
-	<body>
-
-		<div class="container">
-
-		{% include "MaciOrderBundle:Default:_invoice.html.twig" with { 'order': order } %}
-
-		<footer id="footer" class="row">
-			<p align="center">
-				<a href="{{ path('maci_order') }}">&laquo; Back to Client Area</a> | 
-				<a href="javascript:window.close()">Close Window</a>
-			</p>
-		</footer>
+<head>
 
 
-		</div>
+<title>{{ 'order.invoice.title'|matra('Invoice') }}</title>
 
 
-	</body>
+<link rel="shortcut icon" href="favicon.ico" />
+
+
+<style type="text/css">
+
+body {
+    padding: 0;
+    background-color: #efefef;
+    font-family: Tahoma;
+}
+
+.container {
+    margin: 0 auto;
+    width: 720px;
+}
+
+</style>
+
+
+</head>
+<body>
+
+
+<div class="container">
+
+
+{% include "MaciOrderBundle:Default:_invoice.html.twig" with { 'order': order } %}
+
+
+<footer id="footer">
+
+<p align="center">
+
+<a href="{{ path('maci_order') }}">&laquo; Back to Client Area</a>
+
+</p>
+
+</footer>
+
+
+</div>
+
+
+</body>
 </html>
-
