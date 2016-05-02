@@ -1,11 +1,12 @@
 
 
+<div class="container">
+
+
 {{ render(controller('MaciOrderBundle:Default:showOrder', {'order': cart, 'edit': true})) }}
 
 
 {% if cart and cart.items|length %}
-
-<div class="container">
 
 <div class="checkout-options">
 
@@ -16,6 +17,8 @@
 
 </div>
 
-</div>
 
 {% endif %}
+
+
+</div>

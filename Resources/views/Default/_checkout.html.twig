@@ -5,10 +5,13 @@
 
 <div class="page page-checkout">
 
-
-<section class="page_header page_container row">
-
 <div class="container">
+
+
+{% if order.items|length %} {# --- Valid Checkout (^^) ---  #}
+
+
+<section class="page_header checkout_container row">
 
 {% if order.checkout == 'pickup' %}
 
@@ -30,15 +33,10 @@
 
 {% endif %}
 
-</div>
-
 </section>
 
 
-{% if order.items|length %} {# --- Valid Checkout (^^) ---  #}
-
-
-<section class="page_content page_container row">
+<section class="page_content checkout_container row">
 
 	{{ render(controller('MaciOrderBundle:Default:showOrder', {'order': order})) }}
 
@@ -47,14 +45,12 @@
 
 {% if checkout is defined and checkout %} {# --- Checkout Defined ---  #}
 
-<div class="container">
-
 {% if checkout.billingAddress %} {# --- Billing Address ---  #}
 {% set i = i + 1 %}
 
 {% if checkout.billingAddress == 'set' %}
 
-<section class="page_content page_container row active">
+<section class="page_content checkout_container row active">
 
 	<h4>{{ i }} - {{ 'page.checkout.billing' | matra('Billing') }}</h4>
 
@@ -66,7 +62,7 @@
 
 {% elseif checkout.billingAddress == 'setted' %}
 
-<section class="page_content page_container row setted">
+<section class="page_content checkout_container row setted">
 
 	<h4>{{ i }} - {{ 'page.checkout.billing_to' | matra('Billing To') }}</h4>
 
@@ -78,7 +74,7 @@
 
 {% elseif checkout.billingAddress == 'toset' %}
 
-<section class="page_content page_container row">
+<section class="page_content checkout_container row">
 
 	<h4>{{ i }} - {{ 'page.checkout.set_billing' | matra('Set Billing') }}</h4>
 
@@ -94,7 +90,7 @@
 
 {% if checkout.shippingAddress == 'set' %}
 
-<section class="page_content page_container row">
+<section class="page_content checkout_container row">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Address') }}</h4>
 
@@ -106,7 +102,7 @@
 
 {% elseif checkout.shippingAddress == 'setted' %}
 
-<section class="page_content page_container row setted">
+<section class="page_content checkout_container row setted">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping_to' | matra('Shipping To') }}</h4>
 
@@ -118,7 +114,7 @@
 
 {% elseif checkout.shippingAddress == 'toset' %}
 
-<section class="page_content page_container row">
+<section class="page_content checkout_container row">
 
 	<h4>{{ i }} - {{ 'page.checkout.set_shipping' | matra('Set Shipping Address') }}</h4>
 
@@ -134,7 +130,7 @@
 
 {% if checkout.shipping == 'set' %}
 
-<section class="page_content page_container row active">
+<section class="page_content checkout_container row active">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Method') }}</h4>
 
@@ -144,7 +140,7 @@
 
 {% elseif checkout.shipping == 'setted' %}
 
-<section class="page_content page_container row setted">
+<section class="page_content checkout_container row setted">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping_to' | matra('Shipping Method') }}</h4>
 
@@ -158,7 +154,7 @@
 
 {% elseif checkout.shipping == 'toset' %}
 
-<section class="page_content page_container row">
+<section class="page_content checkout_container row">
 
 	<h4>{{ i }} - {{ 'page.checkout.set_shipping' | matra('Set Shipping Method') }}</h4>
 
@@ -174,7 +170,7 @@
 
 {% if checkout.payment == 'set' %}
 
-<section class="page_content page_container row active">
+<section class="page_content checkout_container row active">
 
 	<h4>{{ i }} - {{ 'page.checkout.payment' | matra('Select Payment') }}</h4>
 
@@ -184,7 +180,7 @@
 
 {% elseif checkout.payment == 'setted' %}
 
-<section class="page_content page_container row setted">
+<section class="page_content checkout_container row setted">
 
 	<h4>{{ i }} - {{ 'page.checkout.payment_to' | matra('Payment') }}</h4>
 
@@ -198,7 +194,7 @@
 
 {% elseif checkout.payment == 'toset' %}
 
-<section class="page_content page_container row">
+<section class="page_content checkout_container row">
 
 	<h4>{{ i }} - {{ 'page.checkout.set_payment' | matra('Set Payment') }}</h4>
 
@@ -214,7 +210,7 @@
 
 {% if checkout.confirm == 'set' %}
 
-<section class="page_content page_container row active">
+<section class="page_content checkout_container row active">
 
 	<h4>{{ i }} - {{ 'page.checkout.confirm' | matra('Confirm Order') }}</h4>
 
@@ -226,7 +222,7 @@
 
 {% elseif checkout.confirm == 'toset' %}
 
-<section class="page_content page_container row">
+<section class="page_content checkout_container row">
 
 	<h4>{{ i }} - {{ 'page.checkout.confirm' | matra('Confirm Order') }}</h4>
 
@@ -236,21 +232,18 @@
 
 {% endif %} {# --- End Confirm ---  #}
 
-</div>
 
 {% endif %} {# --- Checkout Defined ---  #}
 
 
 {% else %} {# --- InValid Checkout ---  #}
 
-<div class="container">
-
-	<h3>{{ 'page.no_content' | matra('No Content.') }}</h3>
-
-</div>
+<h3>{{ 'page.no_content' | matra('No Content.') }}</h3>
 
 {% endif %} {# --- EndIf Checkout ---  #}
 
+
+</div>
 
 </div>
 

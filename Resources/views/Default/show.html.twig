@@ -11,8 +11,11 @@
 
 {% block content %}
 
+<div class="container-fluid">
 
 {% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order, 'edit': edit } %}
+
+</div>
 
 {% include "MaciOrderBundle:Default:_show_addresses.html.twig" with { 'order': order } %}
 
