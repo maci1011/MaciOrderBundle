@@ -1,9 +1,11 @@
 
 <section class="cart-list">
 
-{% if order and order.items|length %}
-
 <h3>{{ 'menu.user.cart' | matra('My Cart') }}</h3>
+
+<div class="container-fluid">
+
+{% if order and order.items|length %}
 
 <div class="row cart-header">
 
@@ -188,6 +190,8 @@
 
 {% endif %}
 
+
+</div>
 
 </section>
 
