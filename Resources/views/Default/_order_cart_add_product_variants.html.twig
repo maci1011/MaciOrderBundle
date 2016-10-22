@@ -3,22 +3,6 @@
 
 <div class="product-variant-row">
 
-{% if is_granted("ROLE_ADMIN") %}
-
-<div class="btn-group">
-
-	{% include 'MaciAdminBundle:Modal:edit.html.twig' with {'entity': 'product_variant', 'item': variant, '_hide': '#product_variant_product,#product_variant_parent', 'label': '', 'btnxs': true} %}
-
-	{% include 'MaciAdminBundle:Modal:remove.html.twig' with {'entity': 'product_variant', 'item': variant, 'label': '', 'btnxs': true} %}
-
-	{% include 'MaciAdminBundle:Modal:new.html.twig' with {'entity': 'product_variant', '_parent': '#product_variant_parent', '_parentval': variant.id, '_hide': '#product_variant_product', 'label': '', 'btnxs': true} %}
-
-	{% include 'MaciAdminBundle:Modal:edit.html.twig' with {'entity': 'product_variant', 'item': variant, '_clone': true, 'label': '', 'btnxs': true} %}
-
-</div>
-
-{% endif %}
-
 
 {% if variant.hasAvailableChildren %}
 
