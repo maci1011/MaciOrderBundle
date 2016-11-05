@@ -5,13 +5,13 @@ namespace Maci\OrderBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Maci\OrderBundle\Entity\Order;
 use Maci\OrderBundle\Entity\Item;
-use Maci\MediaBundle\Entity\Permission;
 
-use Maci\AddressBundle\Entity\Address;
+use Maci\MailerBundle\Entity\Mail;
 
 class DefaultController extends Controller
 {
@@ -26,61 +26,436 @@ class DefaultController extends Controller
         ));
     }
 
-    public function cartAction()
+    public function confirmedAction()
     {
-        $om = $this->getDoctrine()->getManager();
-        $cart = $om->getRepository('MaciOrderBundle:Order')
-            ->findOneBy(array( 'user' => $this->getUser(), 'type' => 'cart', 'status' => 'current' ));
+        $list = $this->getDoctrine()->getManager()
+            ->getRepository('MaciOrderBundle:Order')
+            ->getConfirmed();
 
-        if ($cart) {
-            $cart->refreshAmount();
-            $om->flush();
-        }
-
-        return $this->render('MaciOrderBundle:Default:cart.html.twig', array(
-            'cart' => $cart
+        return $this->render('MaciOrderBundle:Default:confirmed.html.twig', array(
+            'list' => $list
         ));
     }
 
-    public function checkoutAction(Request $request, $id)
+    public function adminShowAction($id)
     {
-        $om = $this->getDoctrine()->getManager();
-
-        $order = $om->getRepository('MaciOrderBundle:Order')
+        $order = $this->getDoctrine()->getManager()
+            ->getRepository('MaciOrderBundle:Order')
             ->findOneById($id);
 
-        if (!$order) {
-            return $this->redirect($this->generateUrl('maci_order_notfound'));
+        return $this->render('MaciOrderBundle:Default:show.html.twig', array(
+            'order' => $order,
+            'edit' => false
+        ));
+    }
+
+    public function cartAction()
+    {
+        return $this->render('MaciOrderBundle:Default:cart.html.twig', array(
+            'cart' => $this->get('maci.orders')->getCurrentCart()
+        ));
+    }
+
+    public function showOrderAction($order, $edit = false)
+    {
+        return $this->render('MaciOrderBundle:Default:_show.html.twig', array(
+            'order' => $order,
+            'edit' => $edit
+        ));
+    }
+
+    public function notfoundAction()
+    {
+        return $this->render('MaciOrderBundle:Default:notfound.html.twig');
+    }
+
+    public function addToCartAction(Request $request, $product)
+    {
+        if (is_numeric($product)) {
+            $product = $this->getDoctrine()->getManager()->getRepository('MaciProductBundle:Product')
+                ->findOneById($product);
         }
 
-        if ($order->getStatus() === 'complete') {
-            return $this->redirect($this->generateUrl('maci_order_invoice', array('id'=>$order->getId())));
+        if (!is_object($product) || !$product->isAvailable()) {
+            return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.noavailable')));
         }
 
-        if ($request->get('set')) {
-            return $this->set($order, $request);
-        }
+        $item = new Item;
+        $item->setProduct($product);
 
-        $checkout = ( $request->get('checkout') ? $request->get('checkout') : 'checkout' );
+        $form = $this->createForm('cart_add_product_item', $item);
+        $form->handleRequest($request);
 
-        if ( $checkout === 'checkout' ) {
-            if ( $order->checkShipment() && !$order->getShipping() ) {
-                $checkout = 'shipping';
-            } else if (!$order->getBilling() ) {
-                $checkout = 'billing';
-            } else {
-                $checkout = 'confirm';
+        if ($form->isValid()) {
+            $variants = array();
+            if ($form->has('variants')) {
+                $variants = $form['variants']->getData();
+            }
+
+            $quantity = intval($form['quantity']->getData());
+            if (!$product->checkQuantity($quantity)) {
+                return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.noavailable')));
+            }
+
+            if ( $this->get('maci.orders')->addProductToCart($product, $quantity, $variants) ) {
+                return $this->redirect($this->generateUrl('maci_order_cart'));
             }
         }
 
-        $order->refreshAmount();
+        return $this->render('MaciOrderBundle:Default:_order_cart_add_product.html.twig', array(
+            'product' => $product,
+            'form' => $form->createView()
+        ));
+    }
 
-        $om->flush();
+    public function editCartItemAction(Request $request, $id, $quantity = 1)
+    {
+        $form = $this->createForm('cart_edit_item');
+        $form['quantity']->setData(intval($quantity));
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            if ( $this->get('maci.orders')->editItemQuantity(intval($id), intval($form['quantity']->getData()) ) ) {
+                return $this->redirect($this->generateUrl('maci_order_cart', array('edited' => true)));
+            } else {
+                return $this->redirect($this->generateUrl('maci_order_cart', array('error' => true)));
+            }
+        }
+
+        return $this->render('MaciOrderBundle:Default:_order_cart_edit_item.html.twig', array(
+            'id' => $id,
+            'form' => $form->createView()
+        ));
+    }
+
+    public function removeCartItemAction(Request $request, $id)
+    {
+        $form = $this->createForm('cart_remove_item');
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            if ( $this->get('maci.orders')->removeItem(intval($id)) ) {
+                return $this->redirect($this->generateUrl('maci_order_cart', array('removed' => true)));
+            } else {
+                return $this->redirect($this->generateUrl('maci_order_cart', array('error' => true)));
+            }
+        }
+
+        return $this->render('MaciOrderBundle:Default:_order_cart_remove_item.html.twig', array(
+            'id' => $id,
+            'form' => $form->createView()
+        ));
+    }
+
+    public function cartGoCheckoutAction(Request $request, $option)
+    {
+        if (true === $this->get('security.context')->isGranted('ROLE_USER')) {
+            return $this->redirect($this->generateUrl('maci_order_checkout'));
+        }
+
+        $edit = $request->get('edit', false);
+        $cart = $this->get('maci.orders')->getCurrentCart();
+
+        if ($cart->getMail() !== null && !$edit) {
+            return $this->redirect($this->generateUrl('maci_order_checkout'));
+        }
+
+        return $this->render('MaciOrderBundle:Default:gocheckout.html.twig');
+    }
+
+    public function cartCheckoutAction(Request $request)
+    {
+        $cart = $this->get('maci.orders')->getCurrentCart();
+
+        if ( !$cart ) {
+            return $this->redirect($this->generateUrl('maci_order_cart'));
+        }
+
+        if ($cart->getStatus() === 'complete' || $cart->getStatus() === 'confirm') {
+            return $this->redirect($this->generateUrl('maci_order_invoice', array('id'=>$cart->getId())));
+        }
+
+        if ( $this->get('service_container')->getParameter('registration_required') && false === $this->get('security.context')->isGranted('ROLE_USER') ) {
+            return $this->redirect($this->generateUrl('maci_order_gocheckout'));
+        }
+
+        $checkout = array();
+        $type = $cart->getCheckout();
+        $type_array = array_keys($cart->getCheckoutArray());
+
+        if ( !$type || !in_array($type, $type_array) ) {
+            return $this->redirect($this->generateUrl('maci_order_cart'));
+        }
+
+        $edit = $request->get('checkout');
+        $set = false;
+
+        if ($cart->getBillingAddress() && $edit !== 'billingAddress') {
+            $checkout['billingAddress'] = 'setted';
+        } else {
+            if ($set) {
+                $checkout['billingAddress'] = 'toset';
+            } else {
+                $checkout['billingAddress'] = 'set';
+                $set = true;
+            }
+        }
+
+        if ($cart->checkShipment() && ( $type === 'full_checkout' || $type === 'checkout' || $type === 'fast_checkout' ) ) {
+            if ($cart->getShippingAddress() && $edit !== 'shippingAddress') {
+                $checkout['shippingAddress'] = 'setted';
+            } else {
+                if ($set) {
+                    $checkout['shippingAddress'] = 'toset';
+                } else {
+                    $checkout['shippingAddress'] = 'set';
+                    $set = true;
+                }
+            }
+        } else {
+            $checkout['shippingAddress'] = false;
+        }
+
+        if ($type === 'full_checkout') {
+            if ($cart->getShipping() && $edit !== 'shipping') {
+                $checkout['shipping'] = 'setted';
+            } else {
+                if ($set) {
+                    $checkout['shipping'] = 'toset';
+                } else {
+                    $checkout['shipping'] = 'set';
+                    $set = true;
+                }
+            }
+        } else {
+            $checkout['shipping'] = false;
+        }
+
+        if ($type === 'full_checkout') {
+            if ($cart->getPayment() && $edit !== 'payment') {
+                $checkout['payment'] = 'setted';
+            } else {
+                if ($set) {
+                    $checkout['payment'] = 'toset';
+                } else {
+                    $checkout['payment'] = 'set';
+                    $set = true;
+                }
+            }
+        } else {
+            $checkout['payment'] = false;
+        }
+
+        if ($set) {
+            $checkout['confirm'] = 'toset';
+        } else {
+            $checkout['confirm'] = 'set';
+        }
+
+        $this->get('maci.orders')->setCartLocale( $request->getLocale() );
+        $this->get('maci.orders')->refreshCartAmount();
 
         return $this->render('MaciOrderBundle:Default:checkout.html.twig', array(
             'checkout' => $checkout,
-            'order' => $order
+            'order' => $cart
         ));
+    }
+
+    public function cartSetCheckoutAction(Request $request, $checkout = null)
+    {
+        $cart = $this->get('maci.orders')->getCurrentCart();
+
+        if ($checkout === null || !in_array($checkout, array_keys($cart->getCheckoutArray()))) {
+            $checkout = 'checkout';
+        }
+
+        if ($checkout === 'pickup') {
+            $form = 'cart_pickup';
+        } else if ($checkout === 'booking') {
+            $form = 'cart_booking';
+        } else {
+            $form = 'cart_checkout';
+        }
+
+        $form = $this->createForm($form, $cart);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $this->get('maci.orders')->setCartCheckout( $checkout );
+            $payment = $form['payment']->getData();
+            $payments = $this->get('maci.orders')->getPaymentsArray();
+            $this->get('maci.orders')->setCartPayment( $payment, $payments[$payment]['cost'] );
+            if ( $form->has('shipping') ) {
+                $this->get('maci.orders')->setCartShipping( $form['shipping']->getData() );
+            }
+            return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'checkout')));
+        }
+
+        return $this->render('MaciOrderBundle:Default:_order_cart_checkout.html.twig', array(
+            'checkout' => $checkout,
+            'form' => $form->createView()
+        ));
+    }
+
+    public function cartSetMailAction(Request $request)
+    {
+        $cart = $this->get('maci.orders')->getCurrentCart();
+        $form = $this->createForm('order_mail', $cart);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $this->get('maci.orders')->setCartMail( $form['mail']->getData() );
+            return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'mail')));
+        }
+
+        return $this->render('MaciOrderBundle:Default:_order_mail.html.twig', array(
+            'form' => $form->createView()
+        ));
+    }
+
+    public function cartSetPaymentAction(Request $request)
+    {
+        $cart = $this->get('maci.orders')->getCurrentCart();
+        $form = $this->createForm('order_payment', $cart);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $payments = $this->get('maci.orders')->getPaymentsArray();
+            $payment = $form['payment']->getData();
+            $this->get('maci.orders')->setCartPayment( $payment, $payments[$payment]['cost'] );
+            return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'payment')));
+        }
+
+        return $this->render('MaciOrderBundle:Default:_order_payment.html.twig', array(
+            'form' => $form->createView()
+        ));
+    }
+
+    public function cartSetShippingAction(Request $request)
+    {
+        $cart = $this->get('maci.orders')->getCurrentCart();
+        $form = $this->createForm('order_shipping', $cart);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $this->get('maci.orders')->setCartShipping( $form['shipping']->getData() );
+            return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'shipping')));
+        }
+
+        return $this->render('MaciOrderBundle:Default:_order_shipping.html.twig', array(
+            'form' => $form->createView()
+        ));
+    }
+
+    public function cartSetBillingAddressAction(Request $request)
+    {
+        $cart = $this->get('maci.orders')->getCurrentCart();
+        $form = $this->createForm('cart_billing_address', $cart);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $address = $this->get('maci.addresses')->getAddress($form['billing_address']->getData());
+            $this->get('maci.orders')->setCartBillingAddress($address);
+            return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'billing')));
+        }
+
+        return $this->render('MaciOrderBundle:Default:_order_billing_address.html.twig', array(
+            'form' => $form->createView()
+        ));
+    }
+
+    public function cartSetShippingAddressAction(Request $request)
+    {
+        $cart = $this->get('maci.orders')->getCurrentCart();
+        $form = $this->createForm('cart_shipping_address', $cart);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $address = $this->get('maci.addresses')->getAddress($form['shipping_address']->getData());
+            $this->get('maci.orders')->setCartShippingAddress($address);
+            return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'shipping')));
+        }
+
+        return $this->render('MaciOrderBundle:Default:_order_shipping_address.html.twig', array(
+            'form' => $form->createView()
+        ));
+    }
+
+    public function cartConfirmAction(Request $request)
+    {
+        $cart = $this->get('maci.orders')->getCurrentCart();
+
+        if (!$cart->checkConfirmation()) {
+
+            return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'error.order_not_valid')));
+
+        } else if ($cart->getPayment() === 'paypal') {
+
+            return $this->paypalForm($cart);
+
+        } else if ( $cart->confirmCart() ) {
+
+            if ($cart->getUser()) {
+                $to = $cart->getUser()->getEmail();
+                $toint = $cart->getUser()->getUsername();
+            } else {
+                $to = $cart->getMail();
+                $toint = $cart->getBillingAddress()->getName() .' '. $cart->getBillingAddress()->getSurname();
+            }
+
+            $em = $this->getDoctrine()->getManager();
+
+            $mail = new Mail();
+
+            $mail
+                ->setName('Order Confirmation: ' . $cart->getCode())
+                ->setType('notify')
+                ->setSubject('Order Confirmation')
+                ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
+                ->addTo($to, $toint)
+                ->setLocale($request->getLocale())
+                ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $cart)), 'text/html')
+            ;
+
+            $message = $this->get('maci.mailer')->getSwiftMessage($mail);
+
+            $notify = clone $message;
+
+            if ($cart->getUser()) {
+                $mail->setUser($cart->getUser());
+            }
+
+            $mail->end();
+
+            // ---> send message
+            $this->get('mailer')->send($message);
+
+            $notify->addTo(array($this->get('service_container')->getParameter('order_email')));
+
+            // ---> send notify
+            $this->get('mailer')->send($notify);
+
+            $em->persist($mail);
+
+            $em->flush();
+
+            $page = $em->getRepository('MaciPageBundle:Page')
+                ->findOneByPath('order-complete');
+
+            if ($page) {
+                return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete')));
+            }
+
+            return $this->redirect($this->generateUrl('maci_order_checkout_complete'));
+
+        }
+
+        return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => true)));
+    }
+
+    public function cartCompleteAction(Request $request)
+    {
+        return $this->render('MaciOrderBundle:Default:complete.html.twig');
     }
 
     public function paypalCompleteAction()
@@ -109,9 +484,12 @@ class DefaultController extends Controller
             $status = $this->getRequest()->get('st');
         }
 
-        if ($status === 'Completed' && $order->getStatus() === 'current') {
-            $order->setStatus('confirmed');
-            $om->flush();
+        $page = $this->getDoctrine()->getManager()
+            ->getRepository('MaciPageBundle:Page')
+            ->findOneByPath('order-complete-paypal');
+
+        if ($page) {
+            return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete-paypal')));
         }
 
         $page = $this->getDoctrine()->getManager()
@@ -119,10 +497,10 @@ class DefaultController extends Controller
             ->findOneByPath('order-complete');
 
         if ($page) {
-            return $this->render('MaciPageBundle:Default:page.html.twig', array('page' => $page));
+            return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete')));
         }
 
-        return $this->render('MaciOrderBundle:Default:complete.html.twig');
+        return $this->redirect($this->generateUrl('maci_order_checkout_complete'));
     }
 
     public function invoiceAction($id)
@@ -147,164 +525,11 @@ class DefaultController extends Controller
         ));
     }
 
-    public function addToCartAction(Request $request)
-    {
-        $om = $this->getDoctrine()->getManager();
-
-        $product_id = $request->get('product');
-
-        $product = $om->getRepository('MaciProductBundle:Product')
-            ->findOneById($product_id);
-
-        if (!$product) {
-            return $this->redirect($this->generateUrl('maci_order_notfound'));
-        }
-
-        $cart = $om->getRepository('MaciOrderBundle:Order')
-            ->findOneBy(array( 'user' => $this->getUser(), 'type' => 'cart', 'status' => 'current' ));
-
-        if (!$cart) {
-
-            $cart = new Order;
-            $cart->setName('My Cart');
-            $cart->setCode(
-                'CRT-' . rand(10000, 99999) . '-' . 
-                date('h') . date('i') . date('s') . date('m') . date('d') . date('Y')
-            );
-            $cart->setStatus('current');
-            $cart->setType('cart');
-            $cart->setUser($this->getUser());
-
-            $om->persist($cart);
-
-        }
-
-        $item = new Item;
-
-        $variants_id = $request->get('variants');
-
-        if ($quantity = $request->get('quantity')) {
-            $item->setQuantity($quantity);
-        }
-
-        $item->setProduct($product);
-
-        foreach ($variants_id as $id) {
-            if (in_array($id, $product->getVariantsId())) {
-                $variant = $om->getRepository('MaciProductBundle:Variant')
-                    ->findOneById($id);
-                if ($variant) {
-                    $item->addVariant($variant);
-                }
-            }
-        }
-
-        if (!$item->checkProductQuantity($quantity) || !$item->checkVariantsQuantity($quantity)) {
-            return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.noquantity')));
-        }
-
-        $item->setOrder($cart);
-
-        $cart->refreshAmount();
-
-        $om->persist($item);
-
-        $om->flush();
-
-        return $this->redirect($this->generateUrl('maci_order_cart'));
-    }
-
-    public function editCartItemAction(Request $request, $id)
-    {
-        $om = $this->getDoctrine()->getManager();
-
-        $item = $om->getRepository('MaciOrderBundle:Item')
-            ->findOneById($id);
-
-        if (!$item) {
-            return $this->redirect($this->generateUrl('maci_order_notfound'));
-        }
-
-        $quantity = $request->get('quantity', 1);
-
-        $item->setQuantity($quantity);
-
-        if (!$item->checkProductQuantity($quantity) || !$item->checkVariantsQuantity($quantity)) {
-            return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.noquantity')));
-        }
-
-        $item->getOrder()->refreshAmount();
-
-        $om->flush();
-
-        return $this->redirect($this->generateUrl('maci_order_cart'));
-    }
-
-    public function removeCartItemAction(Request $request, $id)
-    {
-        if ($this->removeItem($request, $id)) {
-            return $this->redirect($this->generateUrl('maci_order_cart', array('removed' => true)));
-        } else {
-            return $this->redirect($this->generateUrl('maci_order_cart', array('error' => true)));
-        }
-    }
-
-    public function removeItem(Request $request, $id)
-    {
-        $item = $this->getDoctrine()->getEntityManager()->getRepository('MaciOrderBundle:Item')
-            ->findOneBy(array(
-                'id' => $id
-            ))
-        ;
-
-        if (
-            !$item ||
-            ( $item->getOrder()->getUser() && $item->getOrder()->getUser()->getId() !== $this->getUser()->getId() ) &&
-            false === $this->get('security.context')->isGranted('ROLE_SUPER_ADMIN')
-        ) {
-            return false;
-        }
-
-        $em = $this->getDoctrine()->getEntityManager();
-
-        $em->remove($item);
-
-        $em->flush();
-
-        return true;
-    }
-
-    public function set($order, $request)
-    {
-        $set = $request->get('set');
-        $om = $this->getDoctrine()->getManager();
-        $address = $om->getRepository('MaciAddressBundle:Address')
-                ->findOneBy(array('user' => $this->getUser(), 'id' => $request->get('address')));
-        if (!$address) {
-            return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'address.notfound')));
-        }
-        if ($set === 'shipping') {
-            $order->setShipping($address);
-            $om->flush();
-            return $this->redirect($this->generateUrl('maci_order_checkout', array('id' => $order->getId(), 'setted' => 'shipping')));
-        } else if ($set === 'billing') {
-            $order->setBilling($address);
-            $om->flush();
-            return $this->redirect($this->generateUrl('maci_order_checkout', array('id' => $order->getId(), 'setted' => 'billing')));
-        }
-        return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'checkout.nothingsetted')));
-    }
-
-    public function notfoundAction()
-    {
-        return $this->render('MaciOrderBundle:Default:notfound.html.twig');
-    }
-
-    public function paypalFormAction($order)
+    public function paypalForm($order)
     {
         $form = $this->createFormBuilder($order);
 
-        if ($this->get('service_container')->getParameter('paypal_islive')) {
+        if ($this->get('service_container')->getParameter('shop_is_live')) {
 
             $form = $form->setAction('https://www.paypal.com/cgi-bin/webscr')
                 ->add('business', 'hidden', array('mapped' => false, 'data' => $this->get('service_container')->getParameter('maciorder_paypalform_business')));
@@ -329,23 +554,11 @@ class DefaultController extends Controller
             ->add('rm', 'hidden', array('mapped' => false, 'data' => '1'))
             ->add('return', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_order_paypal_complete', array(), true)))
             ->add('cancel_return', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_order', array(), true)))
-            ->add('notify_url', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('orderly_paypalipn_twignotificationemail_index', array(), true)))
+            ->add('notify_url', 'hidden', array('mapped' => false, 'data' => $this->generateUrl('maci_paypal_ipn', array(), true)))
             ->getForm();
 
         return $this->render('MaciOrderBundle:Default:_paypal.html.twig', array(
             'form' => $form->createView(),
-        ));
-    }
-
-    public function testAction(Request $request, $id)
-    {
-        $om = $this->getDoctrine()->getManager();
-
-        $order = $om->getRepository('MaciOrderBundle:Order')
-            ->findOneById($id);
-
-        return $this->render('MaciOrderBundle:Default:invoice.html.twig', array(
-            'order' => $order
         ));
     }
 }

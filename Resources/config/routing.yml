@@ -1,46 +1,91 @@
 
 
+maci_paypal_ipn:
+    pattern:  /ipn/ipn-twig-email-notification
+    defaults: { _controller: MaciOrderBundle:TwigNotificationEmail:index }
+
+
+maci_order_cart_add:
+    pattern:  /cart/item/add/{product}
+    defaults: { _controller: MaciOrderBundle:Default:addToCart }
+
 maci_order_edit_cart_item:
-    pattern:  /order/cart-item/{id}/edit
+    pattern:  /cart/item/edit/{id}
     defaults: { _controller: MaciOrderBundle:Default:editCartItem }
 
 maci_order_remove_cart_item:
-    pattern:  /order/cart-item/{id}/remove
+    pattern:  /cart/item/remove/{id}
     defaults: { _controller: MaciOrderBundle:Default:removeCartItem }
 
-maci_order_checkout:
-    pattern:  /order/checkout/{id}
-    defaults: { _controller: MaciOrderBundle:Default:checkout }
+maci_order_gocheckout:
+    pattern:  /cart/gocheckout/{option}
+    defaults: { _controller: MaciOrderBundle:Default:cartGoCheckout, option: checkout }
 
 maci_order_invoice:
     pattern:  /order/invoice/{id}
     defaults: { _controller: MaciOrderBundle:Default:invoice }
 
-# maci_order_test:
-#     pattern:  /order/test/{id}
-#     defaults: { _controller: MaciOrderBundle:Default:test, id: 0 }
+maci_order_checkout_set_checkout:
+    pattern:  /cart/checkout/set-checkout/{checkout}
+    defaults: { _controller: MaciOrderBundle:Default:cartSetCheckout, checkout: checkout }
+
+maci_order_checkout_set_mail:
+    pattern:  /cart/checkout/set-mail
+    defaults: { _controller: MaciOrderBundle:Default:cartSetMail }
+
+maci_order_checkout_set_billing_address:
+    pattern:  /cart/checkout/set-billing-address
+    defaults: { _controller: MaciOrderBundle:Default:cartSetBillingAddress }
+
+maci_order_checkout_set_shipping_address:
+    pattern:  /cart/checkout/set-shipping-address
+    defaults: { _controller: MaciOrderBundle:Default:cartSetShippingAddress }
+
+maci_order_checkout_set_payment:
+    pattern:  /cart/checkout/set-payment
+    defaults: { _controller: MaciOrderBundle:Default:cartSetPayment }
+
+maci_order_checkout_set_shipping:
+    pattern:  /cart/checkout/set-shipping
+    defaults: { _controller: MaciOrderBundle:Default:cartSetShipping }
 
 maci_order_paypal_complete:
     pattern:  /order/paypal/complete
     defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
 
+maci_order_checkout_complete:
+    pattern:  /cart/checkout/complete
+    defaults: { _controller: MaciOrderBundle:Default:cartComplete }
+
+maci_order_checkout_confirm:
+    pattern:  /cart/checkout/confirm
+    defaults: { _controller: MaciOrderBundle:Default:cartConfirm }
+
+maci_order_checkout:
+    pattern:  /cart/checkout
+    defaults: { _controller: MaciOrderBundle:Default:cartCheckout }
+
 maci_order_cart_form:
-    pattern:  /order/cart/form
+    pattern:  /cart/form
     defaults: { _controller: MaciOrderBundle:Default:cartForm }
-
-maci_order_cart_add:
-    pattern:  /order/cart/add
-    defaults: { _controller: MaciOrderBundle:Default:addToCart }
-
-maci_order_cart:
-    pattern:  /order/cart
-    defaults: { _controller: MaciOrderBundle:Default:cart }
 
 maci_order_notfound:
     pattern:  /order/notfound
     defaults: { _controller: MaciOrderBundle:Default:notfound }
 
+maci_order_admin_confirmed:
+    pattern:  /admin/order/confirmed_orders
+    defaults: { _controller: MaciOrderBundle:Default:confirmed }
+
+maci_order_admin_show_order:
+    pattern:  /admin/order/show/{id}
+    defaults: { _controller: MaciOrderBundle:Default:adminShow }
+
 maci_order:
-    pattern:  /order
+    pattern:  /user/orders
     defaults: { _controller: MaciOrderBundle:Default:index }
+
+maci_order_cart:
+    pattern:  /cart
+    defaults: { _controller: MaciOrderBundle:Default:cart }
 

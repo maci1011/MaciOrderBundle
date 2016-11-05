@@ -1,14 +1,17 @@
 <?php
 
-namespace Orderly\PayPalIpnBundle\Controller;
+namespace Maci\OrderBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Orderly\PayPalIpnBundle\Ipn;
 use Orderly\PayPalIpnBundle\Event as Events;
 
+use Maci\OrderBundle\Entity\Order;
+use Maci\MailerBundle\Entity\Mail;
 
 /*
  * Copyright 2012 Orderly Ltd 
@@ -34,10 +37,9 @@ class TwigNotificationEmailController extends Controller
     
     public $paypal_ipn;
     /**
-     * @Route("/ipn-twig-email-notification")
      * @Template()
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         //getting ipn service registered in container
         $this->paypal_ipn = $this->get('orderly_pay_pal_ipn');
@@ -54,10 +56,49 @@ class TwigNotificationEmailController extends Controller
             // Now let's check what the payment status is and act accordingly
             if ($this->paypal_ipn->getOrderStatus() == Ipn::PAID)
             {
-                $id = $this->paypal_ipn->getOrder()->getCustom();
+                $ipnOrder = $this->paypal_ipn->getOrder();
 
-                $order = $this->getDoctrine()->getManager()
-                    ->getRepository('MaciOrderBundle:Order')->findOneById($id);
+                $id = intval( $ipnOrder->getCustom() );
+
+                $em = $this->getDoctrine()->getManager();
+
+                $order = $em->getRepository('MaciOrderBundle:Order')->findOneById( $id );
+
+                if (!$order) {
+                    $order = new Order;
+                    $order->setName('SAVED IPN ORDER');
+                    $order->setAmount( $ipnOrder->getMcGross() );
+                    $order->setStatus('paid');
+                    $em->persist($order);
+                }
+
+                $order->confirmOrder();
+
+                $tx = new Transaction;
+
+                $tx->setTx( $ipnOrder->getTxnId() );
+
+                $tx->setAmount( $ipnOrder->getMcGross() );
+
+                $tx->setGateway( 'PayPal' );
+
+                $tx->setOrder( $order );
+
+                $em->persist( $tx );
+
+                $order->addTransaction( $tx );
+
+                $order->completeOrder();
+
+                if ( $order->getUser() && count( $documents = $order->getOrderDocuments() ) ) {
+
+                    $em->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
+                        $documents,
+                        $order->getUser(),
+                        'Created by Order: '.$order->getCode()
+                    );
+
+                }
 
                 if ($order->getUser()) {
                     $to = $order->getUser()->getEmail();
@@ -67,24 +108,46 @@ class TwigNotificationEmailController extends Controller
                     $toint = $order->getBilling()->getName() .' '. $order->getBilling()->getSurname();
                 }
 
-                $message = \Swift_Message::newInstance()
+                $mail = new Mail();
+
+                $mail
+                    ->setName('Order Confirmation: ' . $order->getCode())
+                    ->setType('notify')
                     ->setSubject('Order Confirmation')
                     ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                    ->setTo($to, $toint)
-                    ->setBody($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('order' => $order)), 'text/html')
+                    ->addTo($to, $toint)
+                    ->setLocale($request->getLocale())
+                    ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $order)), 'text/html')
                 ;
 
-                $notify = \Swift_Message::newInstance()
-                    ->setSubject('Order Notify')
-                    ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                    ->setTo($this->get('service_container')->getParameter('order_email'))
-                    ->setBody($this->renderView('MaciOrderBundle:Email:notify_email.html.twig',array('order' => $order)), 'text/html')
-                ;
+                $message = $this->get('maci.mailer')->getSwiftMessage($mail);
 
-                //send message
+                $notify = clone $message;
+
+                if ($order->getUser()) {
+                    $mail->setUser($order->getUser());
+                } else {
+                    $documents = $order->getOrderDocuments();
+                    if (count($documents)) {
+                        foreach ($documents as $doc) {
+                            $message->attach(Swift_Attachment::fromPath( $doc->getAbsoluthPath() ));
+                        }
+                    }
+                }
+
+                $mail->end();
+
+                // ---> send message
                 $this->get('mailer')->send($message);
-                //send notify
+
+                $notify->setTo($this->get('service_container')->getParameter('order_email'));
+
+                // ---> send notify
                 $this->get('mailer')->send($notify);
+
+                $em->persist($mail);
+
+                $em->flush();
 
             }
         }
@@ -92,11 +155,12 @@ class TwigNotificationEmailController extends Controller
         {
             return $this->redirect('/');
         }
+
         $this->triggerEvent(Events\PayPalEvents::RECEIVED);
 
         $response = new Response();
         $response->setStatusCode(200);
-        
+
         return $response;
     }
 

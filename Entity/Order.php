@@ -27,12 +27,42 @@ class Order
     /**
      * @var string
      */
+    private $mail;
+
+    /**
+     * @var string
+     */
     private $status;
 
     /**
      * @var string
      */
+    private $checkout;
+
+    /**
+     * @var string
+     */
     private $type;
+
+    /**
+     * @var string
+     */
+    private $shipping;
+
+    /**
+     * @var string
+     */
+    private $payment;
+
+    /**
+     * @var string
+     */
+    private $shipping_cost;
+
+    /**
+     * @var string
+     */
+    private $payment_cost;
 
     /**
      * @var string
@@ -47,7 +77,17 @@ class Order
     /**
      * @var string
      */
+    private $sub_amount;
+
+    /**
+     * @var string
+     */
     private $token;
+
+    /**
+     * @var string
+     */
+    private $locale;
 
     /**
      * @var \DateTime
@@ -75,6 +115,11 @@ class Order
     private $updated;
 
     /**
+     * @var boolean
+     */
+    private $removed;
+
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $items;
@@ -92,12 +137,12 @@ class Order
     /**
      * @var \Maci\UserBundle\Entity\Address
      */
-    private $billing;
+    private $billing_address;
 
     /**
      * @var \Maci\UserBundle\Entity\Address
      */
-    private $shipping;
+    private $shipping_address;
 
     /**
      * Constructor
@@ -110,8 +155,18 @@ class Order
             'MaciOrderBundle_Entity_Order-' . rand(10000, 99999) . '-' . 
             date('h') . date('i') . date('s') . date('m') . date('d') . date('Y')
         );
+        $this->type = 'order';
+        $this->status = 'new';
+        $this->checkout = 'checkout';
+        $this->shipping = null;
+        $this->payment = null;
         $this->amount = 0;
+        $this->sub_amount = 0;
         $this->shipment = false;
+        $this->invoice = null;
+        $this->paid = null;
+        $this->due = null;
+        $this->removed = false;
     }
 
     /**
@@ -170,6 +225,29 @@ class Order
     }
 
     /**
+     * Set mail
+     *
+     * @param string $mail
+     * @return Address
+     */
+    public function setMail($mail)
+    {
+        $this->mail = $mail;
+
+        return $this;
+    }
+
+    /**
+     * Get mail
+     *
+     * @return string 
+     */
+    public function getMail()
+    {
+        return $this->mail;
+    }
+
+    /**
      * Set type
      *
      * @param string $type
@@ -190,6 +268,74 @@ class Order
     public function getType()
     {
         return $this->type;
+    }
+
+    public function getTypeArray()
+    {
+        return array(
+            'cart' => 'Cart',
+            'order' => 'Order',
+            'booking' => 'Booking',
+            'none' => 'None'
+        );
+    }
+
+    public function getTypeLabel()
+    {
+        $array = $this->getTypeArray();
+        if (array_key_exists($this->type, $array)) {
+            return $array[$this->type];
+        }
+        $str = str_replace('_', ' ', $this->type);
+        return ucwords($str);
+    }
+
+    public function setPayment($payment)
+    {
+        $this->payment = $payment;
+
+        return $this;
+    }
+
+    public function getPayment()
+    {
+        return $this->payment;
+    }
+
+    public function setShipping($shipping)
+    {
+        $this->shipping = $shipping;
+
+        return $this;
+    }
+
+    public function getShipping()
+    {
+        return $this->shipping;
+    }
+
+    public function setPaymentCost($payment_cost)
+    {
+        $this->payment_cost = $payment_cost;
+
+        return $this;
+    }
+
+    public function getPaymentCost()
+    {
+        return $this->payment_cost;
+    }
+
+    public function setShippingCost($shipping_cost)
+    {
+        $this->shipping_cost = $shipping_cost;
+
+        return $this;
+    }
+
+    public function getShippingCost()
+    {
+        return $this->shipping_cost;
     }
 
     /**
@@ -215,6 +361,76 @@ class Order
         return $this->status;
     }
 
+    public function getStatusArray()
+    {
+        return array(
+            'new' => 'New',
+            'wishlist' => 'Wish List',
+            'current' => 'Current',
+            'confirm' => 'Confirm',
+            'complete' => 'Complete',
+            'paid' => 'Paid',
+            'refuse' => 'Refuse',
+            'foo' => 'Foo'
+        );
+    }
+
+    public function getProgression()
+    {
+        $i = 0;
+        foreach ($this->getStatusArray() as $key => $value) {
+            if ($key === $this->status) {
+                return $i;
+            }
+            $i++;
+        }
+        return null;
+    }
+
+    public function getStatusLabel()
+    {
+        $array = $this->getStatusArray();
+        if (array_key_exists($this->status, $array)) {
+            return $array[$this->status];
+        }
+        $str = str_replace('_', ' ', $this->status);
+        return ucwords($str);
+    }
+
+    public function setCheckout($checkout)
+    {
+        $this->checkout = $checkout;
+
+        return $this;
+    }
+
+    public function getCheckout()
+    {
+        return $this->checkout;
+    }
+
+    public function getCheckoutArray()
+    {
+        return array(
+            'full_checkout' => 'Full Checkout',
+            'checkout' => 'Checkout',
+            'fast_checkout' => 'Fast Checkout',
+            'pickup' => 'Pickup In Store',
+            'booking' => 'Booking',
+            'foo' => 'Foo'
+        );
+    }
+
+    public function getCheckoutLabel()
+    {
+        $array = $this->getCheckoutArray();
+        if (array_key_exists($this->checkout, $array)) {
+            return $array[$this->checkout];
+        }
+        $str = str_replace('_', ' ', $this->checkout);
+        return ucwords($str);
+    }
+
     /**
      * Set token
      *
@@ -236,6 +452,18 @@ class Order
     public function getToken()
     {
         return $this->token;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
     }
 
     /**
@@ -282,6 +510,11 @@ class Order
     public function getAmount()
     {
         return $this->amount;
+    }
+
+    public function getSubAmount()
+    {
+        return $this->sub_amount;
     }
 
     /**
@@ -399,6 +632,18 @@ class Order
         return $this->updated;
     }
 
+    public function setRemoved($removed)
+    {
+        $this->removed = $removed;
+
+        return $this;
+    }
+
+    public function getRemoved()
+    {
+        return $this->removed;
+    }
+
     /**
      * Add items
      *
@@ -489,49 +734,49 @@ class Order
     }
 
     /**
-     * Set billing
+     * Set billing_address
      *
-     * @param \Maci\UserBundle\Entity\Address $billing
+     * @param \Maci\UserBundle\Entity\Address $billing_address
      * @return Order
      */
-    public function setBilling(\Maci\AddressBundle\Entity\Address $billing = null)
+    public function setBillingAddress(\Maci\AddressBundle\Entity\Address $billing_address = null)
     {
-        $this->billing = $billing;
+        $this->billing_address = $billing_address;
 
         return $this;
     }
 
     /**
-     * Get billing
+     * Get billing_address
      *
      * @return \Maci\UserBundle\Entity\Address 
      */
-    public function getBilling()
+    public function getBillingAddress()
     {
-        return $this->billing;
+        return $this->billing_address;
     }
 
     /**
-     * Set shipping
+     * Set shipping_address
      *
-     * @param \Maci\UserBundle\Entity\Address $shipping
+     * @param \Maci\UserBundle\Entity\Address $shipping_address
      * @return Order
      */
-    public function setShipping(\Maci\AddressBundle\Entity\Address $shipping = null)
+    public function setShippingAddress(\Maci\AddressBundle\Entity\Address $shipping_address = null)
     {
-        $this->shipping = $shipping;
+        $this->shipping_address = $shipping_address;
 
         return $this;
     }
 
     /**
-     * Get shipping
+     * Get shipping_address
      *
      * @return \Maci\UserBundle\Entity\Address 
      */
-    public function getShipping()
+    public function getShippingAddress()
     {
-        return $this->shipping;
+        return $this->shipping_address;
     }
 
     /**
@@ -542,17 +787,11 @@ class Order
         return $this->getName();
     }
 
-    /**
-     * @ORM\PrePersist
-     */
     public function setUpdatedValue()
     {
         $this->updated = new \DateTime();
     }
 
-    /**
-     * @ORM\PrePersist
-     */
     public function setCreatedValue()
     {
         $this->created = new \DateTime();
@@ -574,16 +813,23 @@ class Order
         return ( $this->getTransactionsAmount() - $this->getAmount() );
     }
 
+    public function getArrayLabel($array, $key)
+    {
+        if (array_key_exists($key, $array)) {
+            return $array[$key];
+        }
+        $str = str_replace('_', ' ', $key);
+        return ucwords($str);
+    }
+
     public function getOrderDocuments()
     {
         $documents = array();
         foreach ($this->items as $item) {
-            if ($product = $item->getProduct()) {
-                if (count($product->getPrivateDocuments())) {
-                    foreach ($product->getPrivateDocuments() as $item) {
-                        $document = $item->getMedia();
-                        $documents[$document->getId()] = $document;
-                    }
+            $docs = $item->getPrivateDocuments();
+            if (is_array($docs) && count($docs)) {
+                foreach ($docs as $id => $doc) {
+                    $documents[$id] = $doc;
                 }
             }
         }
@@ -593,16 +839,10 @@ class Order
 
     public function checkOrder()
     {
-        $errors = false;
-
         foreach ($this->items as $item) {
-            if ( !$item->checkProductQuantity() || !$item->checkVariantsQuantity() ) {
-                $errors = true;
+            if ( !$item->checkAvailability() ) {
+                return false;
             }
-        }
-
-        if ($errors) {
-            return false;
         }
 
         return true;
@@ -630,11 +870,23 @@ class Order
             $e->refreshAmount();
             return $e->getAmount();
         });
+
         $tot = 0;
+
         foreach ($amounts as $amount) {
             $tot += $amount;
         }
-        $this->amount = $tot;
+
+        $this->sub_amount = $tot;
+
+        if ( $this->getShippingCost() ) {
+            $tot += $this->getShippingCost();
+        }
+        if ( $this->getPaymentCost() ) {
+            $tot += $this->getPaymentCost();
+        }
+
+        return $this->amount = $tot;
     }
 
     public function subItemsQuantity()
@@ -651,15 +903,48 @@ class Order
         }
     }
 
-    public function completeOrder()
+    public function reverseOrder()
     {
-        if ($this->status === 'complete') {
-            return;
+        foreach ($this->items as $item) {
+            if ($product = $item->getProduct()) {
+                $product->addQuantity($item->getQuantity());
+            }
+            if (count($item->getVariants())) {
+                foreach ($item->getVariants() as $variant) {
+                    $variant->addQuantity($item->getQuantity());
+                }
+            }
+        }
+    }
+
+    public function getItemsNumber()
+    {
+        return count($this->items);
+    }
+
+    public function getTotalItemsQuantity()
+    {
+        $tot = 0;
+        foreach ($this->items as $item) {
+            $tot += $item->getQuantity();
+        }
+        return $tot;
+    }
+
+    public function checkConfirmation()
+    {
+        if ( 2 < $this->getProgression() || !$this->amount || !$this->checkOrder() ) {
+            return false;
         }
 
-        $this->subItemsQuantity();
+        return true;
+    }
 
-        $this->status = 'complete';
+    public function confirmOrder()
+    {
+        $this->status = 'confirm';
+
+        $this->subItemsQuantity();
 
         $this->invoice = new \DateTime();
 
@@ -667,5 +952,21 @@ class Order
 
         $this->due->modify('+1 month');
 
+        return true;
+    }
+
+    public function completeOrder()
+    {
+        if ( 4 < $this->getProgression() ) {
+            return false;
+        }
+
+        if ( ! $this->getBalance() < 0 ) {
+            $this->status = 'complete';
+        } else {
+            $this->status = 'paid';
+        }
+
+        return true;
     }
 }

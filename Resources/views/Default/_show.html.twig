@@ -1,51 +1,83 @@
 
+<section class="cart-list">
+
+<h3>{{ 'menu.user.cart' | matra('My Cart') }}</h3>
+
+<div class="container-fluid">
 
 {% if order and order.items|length %}
+
+<div class="row cart-header">
+
+	<div class="col-xs-12 col-sm-5 col-sm-offset-2">
+		<h4 class="order-show-title">{{ 'product.cart_title' | matra('Product') }}</h4>
+	</div>
+
+	<div class="col-xs-4 col-sm-2">
+		<h4 class="order-show-title">{{ 'product.price' | matra('Price') }}</h4>
+	</div>
+
+	<div class="col-xs-8 col-sm-3">
+		<h4 class="order-show-title">{{ 'product.quantity' | matra('Quantity') }}</h4>
+	</div>
+
+</div>
 
 
 {% for item in order.items %}
 
-<div class="row">
+{% if item.id %}
+{% set id = item.id %}
+{% else %}
+{% set id = loop.index0 %}
+{% endif %}
 
-	<div class="col-xs-3">
+<div class="row cart-row">
 
-	<a href="{{ path('maci_product_show', { 'id': item.product.id }) }}">
-		{{ item.product }}
-	</a>
+	<div class="col-xs-12 col-sm-2">
+
+		<img class="img-responsive" src="{{ asset(item.product.preview.webPath | imagine_filter('maci_product_preview_cart')) }}" {% if item.product.description %} title="{{ item.product }}" alt="{{ item.product.description }}" {% else %} alt="{{ item.product }}" {% endif %} />
 
 	</div>
 
-	<div class="col-xs-3">
+	<div class="col-xs-12 col-sm-5">
+
 		{% if edit is defined and edit %}
-		<form class="form-inline" action="{{ path('maci_order_edit_cart_item', {'id': item.id}) }}" method="post">
-			<div class="form-group">
-				<input type="text" class="form-control edit-quantity-field" name="quantity"  value="{{ item.quantity }}" />
-				<input type="submit" class="btn btn-success" value="Edit" />
-			</div>
-		</form>
+		<a href="{{ path('maci_product_show', { 'id': item.product.id }) }}">
+			<h4 class="order-item-name">{{ item.product }}</h4>
+		</a>
 		{% else %}
-		<p>{{ item.quantity }}</p>
+		<h4 class="order-item-name">{{ item.product }}</h4>
 		{% endif %}
-	</div>
-
-	<div class="col-xs-3">
 
 		{% for variant in item.variants %}
-
-		<span>{{ variant }}</span>
-
+		{% if variant.parent %}
+		<span class="order-item-variant">{{ variant.parent }}: {{ variant }}</span><br/>
+		{% else %}
+		<span class="order-item-variant">- {{ variant }}</span><br/>
+		{% endif %}
 		{% endfor %}
 
 	</div>
 
-	<div class="col-xs-2">
-		<p>
-			{{ item.product.price }} &euro;
-		</p>
+	<div class="col-xs-12 col-sm-2">
+		{% if item.sale %}
+		<span class="product-sale">
+			{{ item.sale | number_format(2, '.', ',') }} &euro;
+		</span><br/>
+		{% endif %}
+		<span class="order-item-price">
+			{{ item.amount | number_format(2, '.', ',') }} &euro;
+		</span>
 	</div>
 
-	<div class="col-xs-1">
-		<a class="btn btn-danger" href="{{ path('maci_order_remove_cart_item', {'id': item.id}) }}">Remove</a>
+	<div class="col-xs-12 col-sm-3">
+		{% if edit is defined and edit %}
+		{% render(controller('MaciOrderBundle:Default:editCartItem', { 'id': id, 'quantity': item.quantity } )) %}
+		{% render(controller('MaciOrderBundle:Default:removeCartItem', { 'id': id } )) %}
+		{% else %}
+		<span class="order-item-quantity">{{ item.quantity }}</span>
+		{% endif %}
 	</div>
 
 </div>
@@ -53,17 +85,102 @@
 {% endfor %}
 
 
-<div class="row">
+{# SHIPPING COST #}
 
-	<div class="col-xs-8">
+{% if order.checkShipment and order.shippingCost and not edit %}
 
+<div class="row cart-footer">
+
+	<div class="col-xs-4 col-sm-3 col-sm-offset-2">
+		<span class="order-amount-label">{{ 'order.shipping' | matra('Shipping') }}</span>
 	</div>
 
-	<div class="col-xs-4">
-		<span>Amount: {{ order.amount }} &euro;</span>
+	<div class="col-xs-4 col-sm-2">
+		{% if maci_orders.shippingsArray[order.shipping] is defined %}
+		<span class="order-amount-description">{{ ('order.shippings.' ~ order.shipping) | matra(maci_orders.shippingsArray[order.shipping].label) }}</span>
+		{% else %}
+		<span class="order-amount-description">{{ ('order.shippings.' ~ order.shipping) | matra(order.shipping) }}</span>
+		{% endif %}
+	</div>
+
+	<div class="col-xs-4 col-sm-2">
+		<span class="order-amount-value">
+			{% if 0 < order.shippingCost %}
+			{{ order.shippingCost | number_format(2, '.', ',') }} &euro;
+			{% else %}
+			0
+			{% endif %}
+		</span>
 	</div>
 
 </div>
+
+{% endif %}
+
+
+
+{# PAYMENT COST #}
+
+{% if order.paymentCost and edit is not defined or not edit %}
+
+<div class="row cart-footer">
+
+	<div class="col-xs-4 col-sm-3 col-sm-offset-2">
+		<span class="order-amount-label">{{ 'order.payment' | matra('Payment') }}</span>
+	</div>
+
+	<div class="col-xs-4 col-sm-2">
+		{% if maci_orders.shippingsArray[order.payment] is defined %}
+		<span class="order-amount-description">{{ ('order.payments.' ~ order.payment) | matra(maci_orders.paymentsArray[order.payment].label) }}</span>
+		{% else %}
+		<span class="order-amount-description">{{ ('order.payments.' ~ order.payment) | matra(order.payment) }}</span>
+		{% endif %}
+	</div>
+
+	<div class="col-xs-4 col-sm-2">
+		<span class="order-amount-value">
+			{% if 0 < order.paymentCost %}
+			{{ order.paymentCost | number_format(2, '.', ',') }} &euro;
+			{% else %}
+			&nbsp;
+			{% endif %}
+		</span>
+	</div>
+
+</div>
+
+{% endif %}
+
+
+
+{# AMOUNT #}
+
+<div class="row cart-footer">
+
+	{% if edit is defined and edit %}
+
+	<div class="col-xs-6 col-sm-5 col-sm-offset-2">
+		<h4 class="order-amount-label">{{ 'order.subtotal' | matra('SubTotal') }} ( {{ order.totalItemsQuantity }} {{ 'order.subtotal-items' | matra('Items') }} )</h4>
+	</div>
+
+	<div class="col-xs-6 col-sm-2">
+		<h4 class="order-amount-value">{{ order.subAmount | number_format(2, '.', ',') }} &euro;</h4>
+	</div>
+
+	{% else %}
+
+	<div class="col-xs-8 col-sm-5 col-sm-offset-2">
+		<h4 class="order-amount-label">{{ 'order.amount' | matra('Amount') }}</h4>
+	</div>
+
+	<div class="col-xs-4 col-sm-2">
+		<h4 class="order-amount-value">{{ order.amount | number_format(2, '.', ',') }} &euro;</h4>
+	</div>
+
+	{% endif %}
+
+</div>
+
 
 {% else %}
 
@@ -72,4 +189,9 @@
 </div>
 
 {% endif %}
+
+
+</div>
+
+</section>
 

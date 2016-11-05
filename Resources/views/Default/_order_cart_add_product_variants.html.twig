@@ -1,0 +1,52 @@
+
+{% for variant in list %}
+
+<div class="product-variant-row">
+
+
+{% if variant.hasAvailableChildren %}
+
+<span>{{ variant.name }}</span>
+
+{% if variant.description %}
+<p>{{ variant.description }}</p>
+{% endif %}
+
+{% include "MaciOrderBundle:Default:_order_cart_add_product_variants.html.twig" with { 'list': variant.getAvailableChildren } %}
+
+{% else %}
+
+
+{# --- RADIO ---#}
+
+{% if variant.style == 'radio' %}
+
+{% if variant.parent %}
+<input id="variant_{{ variant.id }}" type="radio" name="cart_add_product_item[variants][{{ variant.parent.value }}]" value="{{ variant.id }}" {% if loop.first %}checked{% endif %} />
+{% else %}
+<input id="variant_{{ variant.id }}" type="radio" name="cart_add_product_item[variants][{{ list.first.value }}]" value="{{ variant.id }}" {% if loop.first %}checked{% endif %} />
+{% endif %}
+<label for="variant_{{ variant.id }}">{{ variant.name }}</label>
+
+{# --- CHECKBOX ---#}
+
+{% elseif variant.style == 'checkbox' %}
+
+<input id="variant_{{ variant.id }}" type="checkbox" name="variants[{{ variant.value }}]" value="{{ variant.id }}" />
+<label for="variant_{{ variant.id }}">{{ variant.name }}</label>
+
+{% endif %}
+
+
+{% if variant.description %}
+<p>{{ variant.description }}</p>
+{% endif %}
+
+
+{% endif %}
+
+
+</div>
+
+{% endfor %}
+

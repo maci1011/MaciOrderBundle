@@ -9,21 +9,8 @@
 {% endblock %}
 
 
-{% block content %}
+{% block container %}
 
-<h3>Cart:</h3>
-
-{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': cart, 'edit': true } %}
-
-{% if cart and cart.items|length %}
-
-<div class="row">
-	<a href="{{ path('maci_order_checkout', {'id': cart.id}) }}" class="btn btn-default">Checkout</a>
-</div>
-
-{% endif %}
+{% include "MaciOrderBundle:Default:_cart.html.twig" with { 'cart': cart } %}
 
 {% endblock %}
-
-
-

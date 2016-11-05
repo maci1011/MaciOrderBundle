@@ -1,0 +1,19 @@
+
+{% extends "MaciOrderBundle::layout.html.twig" %}
+
+
+{% block title %}
+
+{{ 'order.index.meta_title' | matra('Order List') }}
+
+{% endblock %}
+
+
+{% block content %}
+
+{% include "MaciOrderBundle:Default:_list.html.twig" with { 'list': list } %}
+
+{% endblock %}
+
+
+

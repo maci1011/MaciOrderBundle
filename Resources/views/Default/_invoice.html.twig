@@ -1,62 +1,73 @@
 
 {% if order and order.items|length %}
 
+<div id="invoice">
 
-<div class="invoice">
 
-
-<header id="header" class="row">
+<div id="invoice-header" class="row">
 <table>
 	<tr>
 
-		<td width="50%">
+		<td id="invoice-header-brand" width="50%">
 
 			{% include "MaciOrderBundle:Default:_invoice_header.html.twig" %}
 
 		</td>
 
-		<td width="50%">
+		<td id="invoice-header-details" width="50%">
 
 			{% if order.status == 'complete' %}
 
-			<span class="paid">PAID</span>
-			<p>Paid: {{ order.due|date('d/m/Y') }}</p>
+			<span class="invoice-status paid">PAID</span>
+
+			<span class="invoice-paid-date">Paid: {{ order.due|date('d/m/Y') }}</span>
 
 			{% elseif order.status == 'refounded' %}
 
-			<span class="refounded">REFOUNDED</span>
+			<span class="invoice-status refounded">REFOUNDED</span>
 
 			{% elseif order.status == 'canceled' %}
 
-			<span class="canceled">CANCELED</span>
+			<span class="invoice-status canceled">CANCELED</span>
 
 			{% else %}
 
-			<span class="unpaid">UNPAID</span>
+			<span class="invoice-status unpaid">UNPAID</span>
 
 			{% endif %}
+
 		</td>
 
 	</tr>
 </table>
-</header>
+</div>
 
 
-<div id="addresses" class="row">
+<div id="invoice-dates" class="row">
+
+	<h3>Invoice {{ order.code }}</h3>
+
+	<span>Invoice Date: {{ order.invoice|date('d/m/Y') }}</span>
+	<span>Due Date: {{ order.due|date('d/m/Y') }}</span>
+
+</div>
+
+
+<div id="invoice-addresses" class="row">
 <table>
 	<tr>
-		<td width="50%">
+		<td id="invoice-addresses-client" width="50%">
 
-			<h4>Invoiced To:</h4>
+			<h3>Invoiced To:</h3>
 
-			{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billing } %}
+			{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
 
 		</td>
-		<td width="50%">
+		<td id="invoice-addresses-company" width="50%">
 
-			<h4>Pay To:</h4>
+			<h3>Pay To:</h3>
 
-			{% include "MaciPageBundle:Default:_contacts.html.twig" } %}
+			{% include "MaciPageBundle:Default:_contacts.html.twig" %}
 
 		</td>
 	</tr>
@@ -64,85 +75,62 @@
 </div>
 
 
-<div id="dates" class="row">
+<div id="invoice-details" class="row">
 
-	<h4>Invoice {{ order.code }}</h4>
-
-	<p>
-		Invoice Date: {{ order.invoice|date('d/m/Y') }}<br/>
-		Due Date: {{ order.due|date('d/m/Y') }}
-	</p>
-
-</div>
-
-
-<div id="details" class="row">
-
-	<h4>Details</h4>
+	<h3>Details</h3>
 
 <table>
 
 	<thead>
 	    <tr>
-	        <td class="description" width="60%">Description</td>
-	        <td class="quantity" width="20%">Quantity</td>
-	        <td class="amount" width="20%">Amount</td>
+	        <td class="invoice-details description" width="60%">Description</td>
+	        <td class="invoice-details quantity" width="20%">Quantity</td>
+	        <td class="invoice-details amount" width="20%">Amount</td>
 	    </tr>
 	</thead>
+
 
 	<tbody>
 
 	{% for item in order.items %}
 
 	    <tr>
-	        <td class="description">
-	        	<p>{{ item.product }}</p>
-	        </td>
-	        <td class="quantity">
-	        	<span>{{ item.quantity }}</span>
-	        </td>
-	        <td class="amount">
-	        	<span>{{ item.amount }} &euro;</span>
-	        </td>
+	        <td class="invoice-details description">{{ item.product }}</td>
+	        <td class="invoice-details quantity">{{ item.quantity }}</td>
+	        <td class="invoice-details amount">{{ item.amount }} &euro;</td>
 	    </tr>
 
 	{% endfor %}
 
 	</tbody>
 
+
 	<tfoot>
-	    <tr class="subtotal">
-	        <td class="label" colspan="2">Sub Total:</td>
+
+	    <tr class="invoice-details-total">
+	        <td class="invoice-label" colspan="2">Total:</td>
 	        <td>{{ order.amount }} &euro;</td>
 	    </tr>
-	    <tr class="total">
-	        <td class="label" colspan="2">Total:</td>
-	        <td>{{ order.amount }} &euro;</td>
-	    </tr>
+
 	</tfoot>
 
 </table>
 </div>
 
 
-<div id="transactions" class="row">
+<div id="invoice-transactions" class="row">
 
-	<h4>Transactions</h4>
+	<h3>Transactions</h3>
 
 <table>
 
 	<thead>
 
 	    <tr>
-
-	        <td class="tx-date" width="30%">Transaction Date</td>
-
-	        <td class="gateway" width="25%">Gateway</td>
-
-	        <td class="tx-id" width="25%">Transaction ID</td>
-
-	        <td class="amount" width="20%">Amount</td>
-
+	        <td class="invoice-transactions tx-date" width="30%">Transaction Date</td>
+	        <td class="invoice-transactions gateway" width="25%">Gateway</td>
+	        <td class="invoice-transactions tx-id" width="25%">Transaction ID</td>
+	        <td class="invoice-transactions amount" width="20%">Amount</td>
 	    </tr>
 
 	</thead>
@@ -152,15 +140,10 @@
 	{% for item in order.transactions %}
 
 	    <tr>
-
-	        <td class="tx-date">{{ item.product }}</td>
-
-	        <td class="gateway">{{ item.gateway }}</td>
-
-	        <td class="tx-id">{{ item.tx }}</td>
-
-	        <td class="amount">{{ item.amount }} &euro;</td>
-
+	        <td class="invoice-transactions tx-date">{{ item.product }}</td>
+	        <td class="invoice-transactions gateway">{{ item.gateway }}</td>
+	        <td class="invoice-transactions tx-id">{{ item.tx }}</td>
+	        <td class="invoice-transactions amount">{{ item.amount }} &euro;</td>
 	    </tr>
 
 	{% endfor %}
@@ -169,12 +152,9 @@
 
 	<tfoot>
 
-	    <tr>
-
-	        <td class="label" colspan="3">Balance:</td>
-
+	    <tr class="invoice-transactions-balance">
+	        <td class="invoice-label" colspan="3">Balance:</td>
 	        <td>{{ order.balance }} &euro;</td>
-
 	    </tr>
 
 	</tfoot>
@@ -186,10 +166,126 @@
 </div>
 
 
-{% else %}
+<style type="text/css">
 
-<div class="row">
-	<h3 class="noitems">Nothing here.</h3>
-</div>
+#invoice {
+    background-color: #fff;
+    font-family: Tahoma;
+    font-size: 12pt;
+    color: #000000;
+    padding: 15px 30px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+#invoice h3 {
+	padding: 0 0 5px;
+	margin: 0;
+	letter-spacing: 0.4px;
+	font-size: 11pt;
+}
+
+#invoice span {
+	display: block;
+	padding: 10px 0 0;
+	margin: 0;
+}
+
+#invoice span,
+#invoice table tr td {
+	font-size: 10pt;
+	letter-spacing: 0.2px;
+}
+
+#invoice .row {
+	padding-top: 15px;
+}
+
+#invoice table,
+#invoice table tr,
+#invoice table tr td {
+	border: 0 none;
+	margin: 0;
+	padding: 0;
+}
+
+#invoice table {
+	padding: 15px 0;
+	background-color: #fff;
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: separate;
+}
+
+#invoice table thead tr td {
+	text-transform: uppercase;
+	font-size: 10pt;
+	font-weight: bold;
+	letter-spacing: 0.4px;
+}
+
+#invoice-header {
+	padding-bottom: 15px;
+}
+
+#invoice-header td {
+	text-align: center;
+}
+
+#invoice-addresses address {
+    padding: 10px 15px;
+}
+
+#invoice-addresses-client,
+#invoice-addresses-company {
+    padding: 0;
+}
+
+#invoice-addresses .address-detail {
+    padding: 0;
+    display: inline;
+    line-height: 20px;
+}
+
+#invoice-details table thead tr,
+#invoice-details table tfoot tr,
+#invoice-transactions table thead tr,
+#invoice-transactions table tfoot tr {
+	padding: 5px 0;
+}
+
+#invoice-details table tbody tr:nth-child(even),
+#invoice-transactions table tbody tr:nth-child(even) {
+	background-color: #ededed;
+}
+
+#invoice-details table tr td,
+#invoice-transactions table tr td {
+	padding: 6px;
+}
+
+#invoice .invoice-status {
+	font-size: 16pt;
+	font-weight: bold;
+}
+
+.unpaid {
+    color: #cc0000;
+}
+
+.paid {
+    color: #779500;
+}
+
+.refunded {
+    color: #224488;
+}
+
+.cancelled {
+    color: #cccccc;
+}
+
+</style>
+
 
 {% endif %}

@@ -171,15 +171,6 @@ class Item
         return $this->amount;
     }
 
-    public function refreshAmount()
-    {
-        $tot = 0;
-        if ($this->getProduct()) {
-            $tot += $this->getProduct()->getPrice();
-        }
-        $this->amount = $tot;
-    }
-
     /**
      * Set created
      *
@@ -305,6 +296,16 @@ class Item
         return $this->variants;
     }
 
+    public function getVariantsId()
+    {
+        $list = $this->getVariants();
+        $res = array();
+        foreach ($list as $el) {
+            array_push($res, $el->getId());
+        }
+        return $res;
+    }
+
     /**
      * __toString()
      */
@@ -323,33 +324,81 @@ class Item
         $this->created = new \DateTime();
     }
 
-    public function checkProductQuantity($quantity = false)
+    public function getPrivateDocuments()
     {
-        $quantity = $quantity ? $quantity : $this->getQuantity();
+        $documents = array();
 
-        if ($product = $this->getProduct()) {
-            if ( !$product->checkQuantity($quantity) ) {
+        if ($this->product) {
+            foreach ($this->product->getPrivateDocuments() as $item) {
+                $document = $item->getMedia();
+                $documents[$document->getId()] = $document;
+            }
+        }
+
+        if (count($documents)) {
+            return $documents;
+        }
+
+        return false;
+    }
+
+    public function checkProduct($quantity = false)
+    {
+        if ($this->product) {
+            if ( !$this->product->isAvailable() ) {
+                return false;
+            }
+            $quantity = $quantity ? $quantity : $this->quantity;
+            if ( !$this->product->checkQuantity($quantity) ) {
                 return false;
             }
         }
-
         return true;
     }
 
-    public function checkVariantsQuantity($quantity = false)
+    public function checkVariants($quantity = false)
     {
-        $quantity = $quantity ? $quantity : $this->getQuantity();
-        $errors = false;
-
-        if (count($this->getVariants())) {
-            foreach ($this->getVariants() as $variant) {
-                if ( !$variant->checkQuantity($quantity) ) {
-                    $errors = true;
-                }
+        $quantity = $quantity ? $quantity : $this->quantity;
+        foreach ($this->variants as $variant) {
+            if ( !$variant->checkQuantity($quantity) && $this->product->isAvalaible() ) {
+                return false;
             }
         }
-
-        if ($errors) { return false; }
         return true;
+    }
+
+    public function checkAvailability($quantity = false)
+    {
+        if ( $this->product ) {
+            if ( !$this->product->isAvailable() || !$this->checkProduct($quantity) || !$this->checkVariants($quantity) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function refreshAmount()
+    {
+        $tot = 0;
+        if ($this->product) {
+            $tot += ( $this->product->getPrice() * $this->quantity );
+        }
+        $this->amount = $tot;
+    }
+
+    public function getPrice()
+    {
+        if ($this->product) {
+            return ( $this->product->getPrice() );
+        }
+        return 0;
+    }
+
+    public function getSale()
+    {
+        if ($this->product) {
+            return ( $this->product->getSale() );
+        }
+        return 0;
     }
 }

@@ -6,6 +6,7 @@ use Orderly\PayPalIpnBundle\Event\PayPalEvent;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Maci\OrderBundle\Entity\Transaction;
+use Maci\OrderBundle\Entity\Order;
 
 
 class OrderPayPalListener {
@@ -20,45 +21,9 @@ class OrderPayPalListener {
 
     public function onIPNReceive(PayPalEvent $event) {
 
-        $ipn = $event->getIPN();
+        // $ipn = $event->getIPN();
 
-        $ipnOrder = $ipn->getOrder();
-
-        $id = $ipn->getCustom();
-
-        $order = $this->om->getRepository('MaciOrderBundle:Order')->findOneById($id);
-
-        if ($order) {
-
-            $tx = new Transaction;
-
-            $tx->setTx( $ipnOrder->getTxnId() );
-
-            $tx->setAmount( $ipnOrder->getMcGross() );
-
-            $tx->setGateway( 'PayPal' );
-
-            $tx->setOrder( $order );
-
-            $this->om->persist( $tx );
-
-            $order->addTransaction( $tx );
-
-            if ( 0 <= $order->getBalance() ) {
-
-                $order->completeOrder();
-
-                $this->om->getRepository('MaciMediaBundle:Permission')->setDocumentsPermissions(
-                    $order->getOrderDocuments(),
-                    $order->getUser(),
-                    'Created by Order: '.$order->getCode()
-                );
-                
-            } 
-
-            $this->om->flush();
-
-        }
+        // $ipnOrder = $ipn->getOrder();
 
     }
 }

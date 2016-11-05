@@ -1,0 +1,19 @@
+
+{% extends "MaciOrderBundle::layout.html.twig" %}
+
+
+{% block title %}
+
+{{ 'order.show.meta_title' | matra('Show Order') }}: {{ order.name }}
+
+{% endblock %}
+
+
+{% block content %}
+
+{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order, 'edit': edit } %}
+
+{% include "MaciOrderBundle:Default:_show_addresses.html.twig" with { 'order': order } %}
+
+
+{% endblock %}

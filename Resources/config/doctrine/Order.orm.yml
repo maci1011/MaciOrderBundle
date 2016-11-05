@@ -16,9 +16,27 @@ Maci\OrderBundle\Entity\Order:
         description:
             type: text
             nullable: true
+        mail:
+            type: string
+            length: 63
+            nullable: true
         type:
             type: string
             length: 31
+            nullable: true
+        payment:
+            type: string
+            length: 31
+            nullable: true
+        shipping:
+            type: string
+            length: 31
+            nullable: true
+        payment_cost:
+            type: decimal
+            nullable: true
+        shipping_cost:
+            type: decimal
             nullable: true
         code:
             type: string
@@ -28,11 +46,19 @@ Maci\OrderBundle\Entity\Order:
             type: string
             length: 31
             nullable: true
+        checkout:
+            type: string
+            length: 31
+            nullable: true
         amount:
             type: decimal
         token:
             type: string
             length: 63
+            nullable: true
+        locale:
+            type: string
+            length: 10
             nullable: true
         invoice:
             type: datetime
@@ -47,22 +73,26 @@ Maci\OrderBundle\Entity\Order:
             type: datetime
         updated:
             type: datetime
+        removed:
+            type: boolean
     manyToOne:
         user:
             targetEntity: Maci\UserBundle\Entity\User
             joinColumn:
                 name: user_id
                 referencedColumnName: id
-        billing:
+        billing_address:
             targetEntity: Maci\AddressBundle\Entity\Address
             joinColumn:
                 name: billing_id
                 referencedColumnName: id
-        shipping:
+            cascade: ['persist']
+        shipping_address:
             targetEntity: Maci\AddressBundle\Entity\Address
             joinColumn:
                 name: shipping_id
                 referencedColumnName: id
+            cascade: ['persist']
     oneToMany:
         items:
             targetEntity: Item
