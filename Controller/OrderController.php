@@ -8,9 +8,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Security\Core\SecurityContext;
-use Doctrine\ORM\EntityManager;
-
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Doctrine\Common\Persistence\ObjectManager;
 use Maci\AddressBundle\Controller\AddressController;
 use Maci\AddressBundle\Entity\Address;
 use Maci\OrderBundle\Entity\Order;
@@ -18,9 +18,11 @@ use Maci\OrderBundle\Entity\Item;
 
 class OrderController extends Controller
 {
-	private $em;
+	private $om;
 
-	private $securityContext;
+    private $authorizationChecker;
+
+    private $tokenStorage;
 
 	private $user;
 
@@ -36,10 +38,11 @@ class OrderController extends Controller
 
     private $countries;
 
-	public function __construct(EntityManager $doctrine, SecurityContext $securityContext, Session $session, AddressController $ac, $configs)
+	public function __construct(ObjectManager $objectManager, AuthorizationCheckerInterface $authorizationChecker, TokenStorageInterface $tokenStorage, Session $session, AddressController $ac, $configs)
 	{
-    	$this->em = $doctrine;
-	    $this->securityContext = $securityContext;
+    	$this->om = $objectManager;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenStorage = $tokenStorage;
         $this->session = $session;
         $this->ac = $ac;
         $this->configs = $configs;
@@ -59,7 +62,7 @@ class OrderController extends Controller
         $cart->refreshAmount();
 
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
-            $this->em->persist($item);
+            $this->om->persist($item);
         }
 
         $this->saveCart();
@@ -112,7 +115,7 @@ class OrderController extends Controller
     public function editItemQuantity($id, $quantity)
     {
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
-            $item = $this->em->getRepository('MaciOrderBundle:Item')
+            $item = $this->om->getRepository('MaciOrderBundle:Item')
                 ->findOneById($id);
 
             if (!$item) {
@@ -127,7 +130,7 @@ class OrderController extends Controller
 
             $item->getOrder()->refreshAmount();
 
-            $this->em->flush();
+            $this->om->flush();
         } else {
             $items = $this->session->get('order_items');
 
@@ -164,7 +167,7 @@ class OrderController extends Controller
             ) {
                 return false;
             }
-            $this->em->remove($item);
+            $this->om->remove($item);
             $this->saveCart();
         } else {
             $items = $this->session->get('order_items');
@@ -230,7 +233,7 @@ class OrderController extends Controller
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
             $this->getCurrentCart();
             $this->cart->setShippingAddress($address);
-            $this->em->flush();
+            $this->om->flush();
         } else {
             $info = $this->getDefaultSession();
             $info['shippingAddress'] = $address;
@@ -243,7 +246,7 @@ class OrderController extends Controller
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
             $this->getCurrentCart();
             $this->cart->setBillingAddress($address);
-            $this->em->flush();
+            $this->om->flush();
         } else {
             $info = $this->getDefaultSession();
             $info['billingAddress'] = $address;
@@ -263,11 +266,11 @@ class OrderController extends Controller
         $cart = $this->getCurrentCart();
         if ($cart->confirmOrder()) {
             if (!$cart->getId()) {
-                $this->em->persist($cart);
+                $this->om->persist($cart);
             }
             foreach ($cart->getItems() as $item) {
                 if (!$item->getId()) {
-                    $this->em->persist($item);
+                    $this->om->persist($item);
                 }
             }
             $this->saveCart();
@@ -289,9 +292,9 @@ class OrderController extends Controller
         $cart = $this->getCurrentCart();
         if (true === $this->securityContext->isGranted('ROLE_USER') || $cart->getStatus() === 'confirm') {
             if ( ! $cart->getid() ) {
-                $this->em->persist($cart);
+                $this->om->persist($cart);
             }
-            $this->em->flush();
+            $this->om->flush();
         }
         $this->refreshSession($cart);
     }
@@ -304,8 +307,8 @@ class OrderController extends Controller
 
         if (true === $this->securityContext->isGranted('ROLE_USER')) {
 
-            $cart = $this->em->getRepository('MaciOrderBundle:Order')
-                ->findOneBy(array( 'user' => $this->securityContext->getToken()->getUser(), 'type' => 'cart', 'status' => 'current' ));
+            $cart = $this->om->getRepository('MaciOrderBundle:Order')
+                ->findOneBy(array('user'=>$this->tokenStorage->getToken()->getUser(), 'type'=>'cart', 'status'=>'current'));
 
             $order_arr = $this->getDefaultSession();
 
@@ -315,20 +318,20 @@ class OrderController extends Controller
                 }
                 $cart = $this->setCart(new Order);
                 $cart->setUser($this->securityContext->getToken()->getUser());
-                $this->em->persist($cart);
+                $this->om->persist($cart);
             }
 
             if ($order_arr['status'] === 'session') {
                 $cart = $this->loadCartFromSession($cart);
                 $cart->setStatus('current');
                 foreach ($cart->getItems() as $item) {
-                    $this->em->persist($item);
+                    $this->om->persist($item);
                 }
                 $this->refreshSession($cart);
             }
 
             $cart->refreshAmount();
-            $this->em->flush();
+            $this->om->flush();
 
         } else {
 
@@ -442,13 +445,13 @@ class OrderController extends Controller
                 $available = true;
                 $quantity = $info['quantity'];
                 $variants = array();
-                $product = $this->em->getRepository('MaciProductBundle:Product')
+                $product = $this->om->getRepository('MaciProductBundle:Product')
                     ->findOneById($info['id']);
                 if ($product && $product->isAvailable() && $product->checkQuantity($quantity)) {
                     if (count($info['variants'])) {
                         foreach ($info['variants'] as $varinfo) {
                             $vid = $varinfo['id'];
-                            $variant = $this->em->getRepository('MaciProductBundle:Variant')
+                            $variant = $this->om->getRepository('MaciProductBundle:Variant')
                                 ->findOneById($vid);
                             if ($variant && $variant->isAvailable() && $variant->checkQuantity($quantity)) {
                                 array_push($variants, $variant);
