@@ -10,7 +10,7 @@
 
 	<p>{{ 'gocheckout.login.description' | matra('Login for to complete the order.') }}</p>
 
-	{% render url('fos_user_security_login') %}
+	{{ render url('fos_user_security_login') }}
 
 </div>
 
@@ -23,7 +23,7 @@
 
 	<p>{{ 'gocheckout.sign_up_required.description' | matra("You need to create an account to complete the order.") }}</p>
 
-	{% render url('fos_user_registration_register') %}
+	{{ render url('fos_user_registration_register') }}
 
 </div>
 

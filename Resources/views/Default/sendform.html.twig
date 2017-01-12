@@ -4,7 +4,7 @@
 
 {% block content %}
 
-{% render(controller('MaciOrderBundle:Default:paypalForm', {'order': order})) %}
+{{ render(controller('MaciOrderBundle:Default:paypalForm', {'order': order})) }}
 
 {% endblock %}
 

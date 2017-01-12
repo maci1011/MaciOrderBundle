@@ -54,9 +54,9 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.billing' | matra('Billing') }}</h4>
 
-	{% if maci_addresses.addressList|length %} {% render(controller('MaciOrderBundle:Default:cartSetBillingAddress')) %} <br/><br/> {% endif %}
+	{% if maci_addresses.addressList|length %} {{ render(controller('MaciOrderBundle:Default:cartSetBillingAddress')) }} <br/><br/> {% endif %}
 
-	{% render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': 'billing'} )) %}
+	{{ render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': 'billing'} )) }}
 
 </section>
 
@@ -94,9 +94,9 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Address') }}</h4>
 
-	{% if maci_addresses.addressList|length %} {% render(controller('MaciOrderBundle:Default:cartSetShippingAddress')) %} <br/><br/> {% endif %}
+	{% if maci_addresses.addressList|length %} {{ render(controller('MaciOrderBundle:Default:cartSetShippingAddress')) }} <br/><br/> {% endif %}
 
-	{% render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': 'shipping'} )) %}
+	{{ render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': 'shipping'} )) }}
 
 </section>
 
@@ -134,7 +134,7 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Method') }}</h4>
 
-	{% render(controller('MaciOrderBundle:Default:cartSetShipping')) %}
+	{{ render(controller('MaciOrderBundle:Default:cartSetShipping')) }}
 
 </section>
 
@@ -174,7 +174,7 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.payment' | matra('Select Payment') }}</h4>
 
-	{% render(controller('MaciOrderBundle:Default:cartSetPayment')) %}
+	{{ render(controller('MaciOrderBundle:Default:cartSetPayment')) }}
 
 </section>
 

@@ -10,7 +10,7 @@
 
 	<p>{{ 'gocheckout.fast_checkout.description' | matra('Login for faster checkout.') }}</p>
 
-	{% render url('fos_user_security_login') %}
+	{{ render url('fos_user_security_login') }}
 
 </div>
 
@@ -31,7 +31,7 @@
 
 	<p>{{ 'gocheckout.new_users.description' | matra("Enter your email address to proceed with purchase. We\'all only use your email to update you on this order.") }}</p>
 
-	{% render(controller('MaciOrderBundle:Default:cartSetMail')) %}
+	{{ render(controller('MaciOrderBundle:Default:cartSetMail')) }}
 
 </div>
 

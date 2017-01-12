@@ -61,7 +61,7 @@ class OrderController extends Controller
 
         $cart->refreshAmount();
 
-        if (true === $this->securityContext->isGranted('ROLE_USER')) {
+        if (true === $this->authorizationChecker->isGranted('ROLE_USER')) {
             $this->om->persist($item);
         }
 
@@ -114,7 +114,7 @@ class OrderController extends Controller
 
     public function editItemQuantity($id, $quantity)
     {
-        if (true === $this->securityContext->isGranted('ROLE_USER')) {
+        if (true === $this->authorizationChecker->isGranted('ROLE_USER')) {
             $item = $this->om->getRepository('MaciOrderBundle:Item')
                 ->findOneById($id);
 
@@ -148,7 +148,7 @@ class OrderController extends Controller
 
     public function removeItem($id)
     {
-        if (true === $this->securityContext->isGranted('ROLE_USER')) {
+        if (true === $this->authorizationChecker->isGranted('ROLE_USER')) {
             $cart = $this->getCurrentCart();
             $item = false;
             foreach ($cart->getItems() as $_item) {
@@ -161,8 +161,8 @@ class OrderController extends Controller
                 !$item ||
                 (
                     $item->getOrder()->getUser() &&
-                    $item->getOrder()->getUser()->getId() !== $this->securityContext->getToken()->getUser()->getId() &&
-                    false === $this->securityContext->isGranted('ROLE_SUPER_ADMIN')
+                    $item->getOrder()->getUser()->getId() !== $this->tokenStorage->getToken()->getUser()->getId() &&
+                    false === $this->authorizationChecker->isGranted('ROLE_SUPER_ADMIN')
                 )
             ) {
                 return false;
@@ -230,7 +230,7 @@ class OrderController extends Controller
 
     public function setCartShippingAddress($address)
     {
-        if (true === $this->securityContext->isGranted('ROLE_USER')) {
+        if (true === $this->authorizationChecker->isGranted('ROLE_USER')) {
             $this->getCurrentCart();
             $this->cart->setShippingAddress($address);
             $this->om->flush();
@@ -243,7 +243,7 @@ class OrderController extends Controller
 
     public function setCartBillingAddress($address)
     {
-        if (true === $this->securityContext->isGranted('ROLE_USER')) {
+        if (true === $this->authorizationChecker->isGranted('ROLE_USER')) {
             $this->getCurrentCart();
             $this->cart->setBillingAddress($address);
             $this->om->flush();
@@ -290,7 +290,7 @@ class OrderController extends Controller
     public function saveCart()
     {
         $cart = $this->getCurrentCart();
-        if (true === $this->securityContext->isGranted('ROLE_USER') || $cart->getStatus() === 'confirm') {
+        if (true === $this->authorizationChecker->isGranted('ROLE_USER') || $cart->getStatus() === 'confirm') {
             if ( ! $cart->getid() ) {
                 $this->om->persist($cart);
             }
@@ -305,7 +305,7 @@ class OrderController extends Controller
             return $this->cart;
         }
 
-        if (true === $this->securityContext->isGranted('ROLE_USER')) {
+        if (true === $this->authorizationChecker->isGranted('ROLE_USER')) {
 
             $cart = $this->om->getRepository('MaciOrderBundle:Order')
                 ->findOneBy(array('user'=>$this->tokenStorage->getToken()->getUser(), 'type'=>'cart', 'status'=>'current'));
@@ -317,7 +317,7 @@ class OrderController extends Controller
                     $this->resetCart();
                 }
                 $cart = $this->setCart(new Order);
-                $cart->setUser($this->securityContext->getToken()->getUser());
+                $cart->setUser($this->tokenStorage->getToken()->getUser());
                 $this->om->persist($cart);
             }
 
@@ -363,7 +363,7 @@ class OrderController extends Controller
     {
         $order_arr = $this->session->get('order');
         if (!is_array($order_arr)) {
-            if (true === $this->securityContext->isGranted('ROLE_USER')) {
+            if (true === $this->authorizationChecker->isGranted('ROLE_USER')) {
                 $status = 'current';
             } else {
                 $status = 'session';
