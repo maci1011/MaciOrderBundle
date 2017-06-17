@@ -11,7 +11,13 @@
 
 {% block content %}
 
+<section class="page_container user_page">
+
+<h1>{{ 'menu.user.order'|matra('Orders') }}</h1>
+
 {% include "MaciOrderBundle:Default:_list.html.twig" with { 'list': list } %}
+
+</section>
 
 {% endblock %}
 

@@ -1,8 +1,8 @@
 
-
 maci_paypal_ipn:
     path:  /ipn/ipn-twig-email-notification
     defaults: { _controller: MaciOrderBundle:TwigNotificationEmail:index }
+
 
 
 maci_order_cart_add:
@@ -20,10 +20,6 @@ maci_order_remove_cart_item:
 maci_order_gocheckout:
     path:  /cart/gocheckout/{option}
     defaults: { _controller: MaciOrderBundle:Default:cartGoCheckout, option: checkout }
-
-maci_order_invoice:
-    path:  /order/invoice/{id}
-    defaults: { _controller: MaciOrderBundle:Default:invoice }
 
 maci_order_checkout_set_checkout:
     path:  /cart/checkout/set-checkout/{checkout}
@@ -50,7 +46,7 @@ maci_order_checkout_set_shipping:
     defaults: { _controller: MaciOrderBundle:Default:cartSetShipping }
 
 maci_order_paypal_complete:
-    path:  /order/paypal/complete
+    path:  /cart/checkout/complete/paypal
     defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
 
 maci_order_checkout_complete:
@@ -69,23 +65,30 @@ maci_order_cart_form:
     path:  /cart/form
     defaults: { _controller: MaciOrderBundle:Default:cartForm }
 
-maci_order_notfound:
-    path:  /order/notfound
-    defaults: { _controller: MaciOrderBundle:Default:notfound }
+maci_order_cart:
+    path:  /cart
+    defaults: { _controller: MaciOrderBundle:Default:cart }
+
+
 
 maci_order_admin_confirmed:
-    path:  /admin/order/confirmed_orders
+    path:  /admin/orders/confirmed
     defaults: { _controller: MaciOrderBundle:Default:confirmed }
 
 maci_order_admin_show_order:
     path:  /admin/order/show/{id}
     defaults: { _controller: MaciOrderBundle:Default:adminShow }
 
+
+
+maci_order_invoice:
+    path:  /orders/invoice/{id}
+    defaults: { _controller: MaciOrderBundle:Default:invoice }
+
+maci_order_notfound:
+    path:  /orders/notfound
+    defaults: { _controller: MaciOrderBundle:Default:notfound }
+
 maci_order:
-    path:  /user/orders
+    path:  /orders/
     defaults: { _controller: MaciOrderBundle:Default:index }
-
-maci_order_cart:
-    path:  /cart
-    defaults: { _controller: MaciOrderBundle:Default:cart }
-

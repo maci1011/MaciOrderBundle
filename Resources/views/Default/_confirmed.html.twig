@@ -1,4 +1,6 @@
 
+{% if list|length %}
+
 <header class="row">
 
 	<div class="col-xs-1">
@@ -66,11 +68,6 @@
 
 </div>
 
-{% else %}
-
-<div class="row">
-	<h3 class="noitems">No Items.</h3>
-</div>
-
 {% endfor %}
 
+{% endif %}
