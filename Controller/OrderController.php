@@ -523,7 +523,7 @@ class OrderController extends Controller
                         'country' => $id,
                         'courier' => $name,
                         'courier_label' => $courier['label'],
-                        'label' => ($this->getCountryName($id) . ' - ' . $courier['label']),
+                        'label' => $courier['label'],
                         'cost' => (array_key_exists('cost', $country) ? $country['cost'] : $courier['default_cost'])
                     );
                 };

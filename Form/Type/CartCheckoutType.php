@@ -6,6 +6,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 class CartCheckoutType extends AbstractType
 {
 	protected $orders;
@@ -27,21 +31,21 @@ class CartCheckoutType extends AbstractType
 	{
 		if ($builder->getData()->checkShipment()) {
 			$builder
-				->add('shipping', 'choice', array(
+				->add('shipping', ChoiceType::class, array(
 	                'choices' => $this->getChoices($this->orders->getShippingsArray()),
 	                'preferred_choices' => (is_string($str = $this->orders->getCartShippingCountry()) ? array($str) : array())
 	            ))
 	        ;
 		}
 		$builder
-			->add('payment', 'choice', array(
+			->add('payment', ChoiceType::class, array(
                 'choices' => $this->getChoices($this->orders->getPaymentsArray()),
                 'expanded' => true
             ))
-			->add('checkout', 'hidden', array(
+			->add('checkout', HiddenType::class, array(
 				'data' => 'checkout'
             ))
-			->add('proceed', 'submit')
+			->add('proceed', SubmitType::class)
 		;
 	}
 
@@ -57,7 +61,10 @@ class CartCheckoutType extends AbstractType
 			if (array_key_exists('country', $value)) {
 				$label = $this->orders->getCountryName($value['country']) . ' - ' . $label;
 			}
-			$result[$key] = ( $label . ( $value['cost'] ? ( ' ( ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' ) : null ) );
+			if ($value['cost']) {
+				$label .= ( ' ( ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' );
+			}
+			$result[$label] = $key;
 		}
 		return $result;
 	}

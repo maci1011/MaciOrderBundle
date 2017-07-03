@@ -11,6 +11,13 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Maci\OrderBundle\Entity\Order;
 use Maci\OrderBundle\Entity\Item;
 
+use Maci\OrderBundle\Form\Type\CartAddProductItemType;
+use Maci\OrderBundle\Form\Type\CartEditItemType;
+use Maci\OrderBundle\Form\Type\CartRemoveItemType;
+use Maci\OrderBundle\Form\Type\CartCheckoutType;
+use Maci\OrderBundle\Form\Type\CartBookingType;
+use Maci\OrderBundle\Form\Type\CartPickupType;
+
 use Maci\MailerBundle\Entity\Mail;
 
 class DefaultController extends Controller
@@ -83,7 +90,7 @@ class DefaultController extends Controller
         $item = new Item;
         $item->setProduct($product);
 
-        $form = $this->createForm('cart_add_product_item', $item);
+        $form = $this->createForm(CartAddProductItemType::class, $item);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -110,7 +117,7 @@ class DefaultController extends Controller
 
     public function editCartItemAction(Request $request, $id, $quantity = 1)
     {
-        $form = $this->createForm('cart_edit_item');
+        $form = $this->createForm(CartEditItemType::class);
         $form['quantity']->setData(intval($quantity));
         $form->handleRequest($request);
 
@@ -130,7 +137,7 @@ class DefaultController extends Controller
 
     public function removeCartItemAction(Request $request, $id)
     {
-        $form = $this->createForm('cart_remove_item');
+        $form = $this->createForm(CartRemoveItemType::class);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -149,7 +156,7 @@ class DefaultController extends Controller
 
     public function cartGoCheckoutAction(Request $request, $option)
     {
-        if (true === $this->get('security.context')->isGranted('ROLE_USER')) {
+        if (true === $this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
             return $this->redirect($this->generateUrl('maci_order_checkout'));
         }
 
@@ -175,13 +182,13 @@ class DefaultController extends Controller
             return $this->redirect($this->generateUrl('maci_order_invoice', array('id'=>$cart->getId())));
         }
 
-        if ( $this->get('service_container')->getParameter('registration_required') && false === $this->get('security.context')->isGranted('ROLE_USER') ) {
+        if ( $this->get('service_container')->getParameter('registration_required') && false === $this->get('security.authorization_checker')->isGranted('ROLE_USER') ) {
             return $this->redirect($this->generateUrl('maci_order_gocheckout'));
         }
 
         $checkout = array();
         $type = $cart->getCheckout();
-        $type_array = array_keys($cart->getCheckoutArray());
+        $type_array = $cart->getCheckoutArray();
 
         if ( !$type || !in_array($type, $type_array) ) {
             return $this->redirect($this->generateUrl('maci_order_cart'));
@@ -265,16 +272,16 @@ class DefaultController extends Controller
     {
         $cart = $this->get('maci.orders')->getCurrentCart();
 
-        if ($checkout === null || !in_array($checkout, array_keys($cart->getCheckoutArray()))) {
+        if ($checkout === null || !in_array($checkout, $cart->getCheckoutArray())) {
             $checkout = 'checkout';
         }
 
         if ($checkout === 'pickup') {
-            $form = 'cart_pickup';
+            $form = CartPickupType::class;
         } else if ($checkout === 'booking') {
-            $form = 'cart_booking';
+            $form = CartBookingType::class;
         } else {
-            $form = 'cart_checkout';
+            $form = CartCheckoutType::class;
         }
 
         $form = $this->createForm($form, $cart);
@@ -515,7 +522,7 @@ class DefaultController extends Controller
 
         if (
             ( $order->getUser() && $order->getUser()->getId() !== $this->getUser()->getId() ) &&
-            false === $this->get('security.context')->isGranted('ROLE_SUPER_ADMIN')
+            false === $this->get('security.authorization_checker')->isGranted('ROLE_SUPER_ADMIN')
         ) {
             return $this->redirect($this->generateUrl('maci_order_homepage', array('error' => 'order.nomap')));
         }

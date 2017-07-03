@@ -6,6 +6,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Maci\ProductBundle\Entity\Variant;
+
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
+
 class CartAddProductItemType extends AbstractType
 {
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
@@ -21,8 +27,8 @@ class CartAddProductItemType extends AbstractType
 		$product = $builder->getData()->getProduct();
 		if (is_object($product)) {
 			if (count($product->getVariants())) {
-				$builder->add('variants', 'entity', array(
-					'class' => 'MaciProductBundle:Variant',
+				$builder->add('variants', null, array(
+					'class' => Variant::class,
 					'choices' => $product->getVariantsChildren(),
 					'multiple' => true,
 					'group_by' => 'variant.parent'
@@ -30,10 +36,10 @@ class CartAddProductItemType extends AbstractType
 			}
 		}
 		$builder
-			->add('quantity', 'integer', array(
+			->add('quantity', IntegerType::class, array(
                 'attr' => array('class' => 'edit-quantity-field')
             ))
-			->add('add_to_cart', 'submit')
+			->add('add_to_cart', SubmitType::class)
 		;
 	}
 

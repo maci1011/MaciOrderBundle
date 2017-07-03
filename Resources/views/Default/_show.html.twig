@@ -35,9 +35,15 @@
 <div class="row cart-row">
 
 	<div class="col-xs-12 col-sm-2">
+	{% if item.product.preview is not null %}
 
 		<img class="img-responsive" src="{{ asset(item.product.preview.webPath | imagine_filter('maci_product_preview_cart')) }}" {% if item.product.description %} title="{{ item.product }}" alt="{{ item.product.description }}" {% else %} alt="{{ item.product }}" {% endif %} />
 
+	{% else %}
+
+		&nbsp;
+
+	{% endif %}
 	</div>
 
 	<div class="col-xs-12 col-sm-5">

@@ -6,6 +6,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 class CartBookingType extends AbstractType
 {
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
@@ -19,16 +22,16 @@ class CartBookingType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('spedition', 'hidden', array(
+			->add('spedition', HiddenType::class, array(
 				'data' => 'none'
             ))
-			->add('payment', 'hidden', array(
+			->add('payment', HiddenType::class, array(
 				'data' => 'none'
             ))
-			->add('checkout', 'hidden', array(
+			->add('checkout', HiddenType::class, array(
 				'data' => 'booking'
             ))
-			->add('cart_booking', 'submit')
+			->add('cart_booking', SubmitType::class)
 		;
 	}
 

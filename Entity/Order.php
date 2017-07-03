@@ -273,19 +273,18 @@ class Order
     public function getTypeArray()
     {
         return array(
-            'cart' => 'Cart',
-            'order' => 'Order',
-            'booking' => 'Booking',
-            'none' => 'None'
+            'Cart' => 'cart',
+            'Order' => 'order',
+            'Booking' => 'booking',
+            'None' => 'none'
         );
     }
 
     public function getTypeLabel()
     {
         $array = $this->getTypeArray();
-        if (array_key_exists($this->type, $array)) {
-            return $array[$this->type];
-        }
+        $key = array_search($this->type, $array);
+        if ($key) return $key;
         $str = str_replace('_', ' ', $this->type);
         return ucwords($str);
     }
@@ -364,14 +363,14 @@ class Order
     public function getStatusArray()
     {
         return array(
-            'new' => 'New',
-            'wishlist' => 'Wish List',
-            'current' => 'Current',
-            'confirm' => 'Confirm',
-            'complete' => 'Complete',
-            'paid' => 'Paid',
-            'refuse' => 'Refuse',
-            'foo' => 'Foo'
+            'New' => 'new',
+            'Wish List' => 'wishlist',
+            'Current' => 'current',
+            'Confirm' => 'confirm',
+            'Complete' => 'complete',
+            'Paid' => 'paid',
+            'Refuse' => 'refuse',
+            'Foo' => 'foo'
         );
     }
 
@@ -390,10 +389,9 @@ class Order
     public function getStatusLabel()
     {
         $array = $this->getStatusArray();
-        if (array_key_exists($this->status, $array)) {
-            return $array[$this->status];
-        }
-        $str = str_replace('_', ' ', $this->status);
+        $key = array_search($this->type, $array);
+        if ($key) return $key;
+        $str = str_replace('_', ' ', $this->type);
         return ucwords($str);
     }
 
@@ -412,22 +410,21 @@ class Order
     public function getCheckoutArray()
     {
         return array(
-            'full_checkout' => 'Full Checkout',
-            'checkout' => 'Checkout',
-            'fast_checkout' => 'Fast Checkout',
-            'pickup' => 'Pickup In Store',
-            'booking' => 'Booking',
-            'foo' => 'Foo'
+            'Full Checkout' => 'full_checkout',
+            'Checkout' => 'checkout',
+            'Fast Checkout' => 'fast_checkout',
+            'Pickup In Store' => 'pickup',
+            'Booking' => 'booking',
+            'Foo' => 'foo'
         );
     }
 
     public function getCheckoutLabel()
     {
         $array = $this->getCheckoutArray();
-        if (array_key_exists($this->checkout, $array)) {
-            return $array[$this->checkout];
-        }
-        $str = str_replace('_', ' ', $this->checkout);
+        $key = array_search($this->type, $array);
+        if ($key) return $key;
+        $str = str_replace('_', ' ', $this->type);
         return ucwords($str);
     }
 
