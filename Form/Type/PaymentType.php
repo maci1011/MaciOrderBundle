@@ -6,6 +6,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\ResetType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 class PaymentType extends AbstractType
 {
 	protected $orders;
@@ -26,12 +30,12 @@ class PaymentType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('payment', 'choice', array(
+			->add('payment', ChoiceType::class, array(
                 'choices' => $this->getChoices($this->orders->getPaymentsArray()),
                 'expanded' => true
             ))
-			->add('cancel', 'reset')
-			->add('send', 'submit')
+			->add('cancel', ResetType::class)
+			->add('send', SubmitType::class)
 		;
 	}
 

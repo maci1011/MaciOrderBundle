@@ -12,11 +12,16 @@ use Maci\OrderBundle\Entity\Order;
 use Maci\OrderBundle\Entity\Item;
 
 use Maci\OrderBundle\Form\Type\CartAddProductItemType;
-use Maci\OrderBundle\Form\Type\CartEditItemType;
-use Maci\OrderBundle\Form\Type\CartRemoveItemType;
-use Maci\OrderBundle\Form\Type\CartCheckoutType;
+use Maci\OrderBundle\Form\Type\CartBillingAddressType;
 use Maci\OrderBundle\Form\Type\CartBookingType;
+use Maci\OrderBundle\Form\Type\CartCheckoutType;
+use Maci\OrderBundle\Form\Type\CartEditItemType;
 use Maci\OrderBundle\Form\Type\CartPickupType;
+use Maci\OrderBundle\Form\Type\CartRemoveItemType;
+use Maci\OrderBundle\Form\Type\CartShippingAddressType;
+use Maci\OrderBundle\Form\Type\MailType;
+use Maci\OrderBundle\Form\Type\PaymentType;
+use Maci\OrderBundle\Form\Type\ShippingType;
 
 use Maci\MailerBundle\Entity\Mail;
 
@@ -307,7 +312,7 @@ class DefaultController extends Controller
     public function cartSetMailAction(Request $request)
     {
         $cart = $this->get('maci.orders')->getCurrentCart();
-        $form = $this->createForm('order_mail', $cart);
+        $form = $this->createForm(MailType::class, $cart);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -323,7 +328,7 @@ class DefaultController extends Controller
     public function cartSetPaymentAction(Request $request)
     {
         $cart = $this->get('maci.orders')->getCurrentCart();
-        $form = $this->createForm('order_payment', $cart);
+        $form = $this->createForm(PaymentType::class, $cart);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -341,7 +346,7 @@ class DefaultController extends Controller
     public function cartSetShippingAction(Request $request)
     {
         $cart = $this->get('maci.orders')->getCurrentCart();
-        $form = $this->createForm('order_shipping', $cart);
+        $form = $this->createForm(ShippingType::class, $cart);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -357,7 +362,7 @@ class DefaultController extends Controller
     public function cartSetBillingAddressAction(Request $request)
     {
         $cart = $this->get('maci.orders')->getCurrentCart();
-        $form = $this->createForm('cart_billing_address', $cart);
+        $form = $this->createForm(CartBillingAddressType::class, $cart);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -374,7 +379,7 @@ class DefaultController extends Controller
     public function cartSetShippingAddressAction(Request $request)
     {
         $cart = $this->get('maci.orders')->getCurrentCart();
-        $form = $this->createForm('cart_shipping_address', $cart);
+        $form = $this->createForm(CartShippingAddressType::class, $cart);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -400,7 +405,7 @@ class DefaultController extends Controller
 
             return $this->paypalForm($cart);
 
-        } else if ( $cart->confirmCart() ) {
+        } else if ( $cart->confirmOrder() ) {
 
             if ($cart->getUser()) {
                 $to = $cart->getUser()->getEmail();
@@ -435,12 +440,12 @@ class DefaultController extends Controller
             $mail->end();
 
             // ---> send message
-            $this->get('mailer')->send($message);
+            if ($this->container->get('kernel')->getEnvironment() == "prod") $this->get('mailer')->send($message);
 
-            $notify->addTo(array($this->get('service_container')->getParameter('order_email')));
+            $notify->addTo($this->get('service_container')->getParameter('order_email'));
 
             // ---> send notify
-            $this->get('mailer')->send($notify);
+            if ($this->container->get('kernel')->getEnvironment() == "prod") $this->get('mailer')->send($notify);
 
             $em->persist($mail);
 

@@ -6,6 +6,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 class MailType extends AbstractType
 {
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
@@ -19,8 +22,8 @@ class MailType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('mail', 'email')
-			->add('use_this_email', 'submit')
+			->add('mail', EmailType::class)
+			->add('use_this_email', SubmitType::class)
 		;
 	}
 

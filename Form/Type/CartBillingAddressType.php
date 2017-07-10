@@ -6,6 +6,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 class CartBillingAddressType extends AbstractType
 {
 	protected $orders;
@@ -29,11 +32,11 @@ class CartBillingAddressType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('billing_address', 'choice', array(
+			->add('billing_address', ChoiceType::class, array(
 				'choices' => $this->addresses->getAddressChoices(),
 				'mapped' => false
 			))
-			->add('proceed', 'submit')
+			->add('proceed', SubmitType::class)
 		;
 	}
 

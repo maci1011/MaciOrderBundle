@@ -6,6 +6,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\ResetType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 class ShippingType extends AbstractType
 {
 	protected $orders;
@@ -26,12 +30,12 @@ class ShippingType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('shipping', 'choice', array(
+			->add('shipping', ChoiceType::class, array(
                 'choices' => $this->getChoices($this->orders->getShippingsArray()),
 	            'preferred_choices' => (is_string($str = $this->orders->getCartShippingCountry()) ? array($str) : array())
             ))
-			->add('cancel', 'reset')
-			->add('send', 'submit')
+			->add('cancel', ResetType::class)
+			->add('send', SubmitType::class)
 		;
 	}
 
