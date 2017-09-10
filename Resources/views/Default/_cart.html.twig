@@ -3,6 +3,11 @@
 <div class="container">
 
 
+<h3>{{ 'menu.user.cart' | matra('My Cart') }}</h3>
+
+<h5>{{ 'order.code' | matra('Order Identifier') }}: {{ cart.code }}</h5>
+
+
 {{ render(controller('MaciOrderBundle:Default:showOrder', {'order': cart, 'edit': true})) }}
 
 

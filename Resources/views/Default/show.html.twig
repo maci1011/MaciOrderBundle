@@ -11,9 +11,12 @@
 
 {% block content %}
 
-{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order, 'edit': edit } %}
+<h3>{{ 'order.show_title' | matra('Order Details') }}</h3>
+
+<h4>{{ 'order.code' | matra('Order Identifier') }}: {{ order.code }}</h4>
 
 {% include "MaciOrderBundle:Default:_show_addresses.html.twig" with { 'order': order } %}
 
+{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order, 'edit': edit } %}
 
 {% endblock %}

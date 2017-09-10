@@ -1,6 +1,9 @@
 
 <div id="order_show_addresses" class="row">
 
+
+{% if order.shippingAddress is not null %}
+
 <div class="col-xs-12 col-sm-6">
 
 	<h4>Shipping Address:</h4>
@@ -9,13 +12,20 @@
 
 </div>
 
+{% endif %}
+
+
+{% if order.billingAddress is not null %}
 
 <div class="col-xs-12 col-sm-6">
 
-	<h4>Payment Address:</h4>
+	<h4>Billing Address:</h4>
 
 	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
 
 </div>
+
+{% endif %}
+
 
 </div>

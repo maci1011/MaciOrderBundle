@@ -33,10 +33,11 @@ class CartBillingAddressType extends AbstractType
 	{
 		$builder
 			->add('billing_address', ChoiceType::class, array(
+				'label_attr' => array('class'=> 'sr-only'), 
 				'choices' => $this->addresses->getAddressChoices(),
 				'mapped' => false
 			))
-			->add('proceed', SubmitType::class)
+			->add('save', SubmitType::class)
 		;
 	}
 
