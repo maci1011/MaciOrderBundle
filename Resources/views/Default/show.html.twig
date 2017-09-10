@@ -17,6 +17,8 @@
 
 {% include "MaciOrderBundle:Default:_show_addresses.html.twig" with { 'order': order } %}
 
+<h4>{{ 'order.items' | matra('Order Items') }}</h4>
+
 {% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order, 'edit': edit } %}
 
 {% endblock %}
