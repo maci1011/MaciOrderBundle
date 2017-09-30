@@ -1,73 +1,93 @@
 
 {% if list|length %}
 
-<header class="row">
+<div class="list-default">
+<table class="table table-striped">
 
-	<div class="col-xs-1">
-		<span>Id</span>
-	</div>
+<thead>
+<tr class="list-header">
 
-	<div class="col-xs-2">
-		<span>Name</span>
-	</div>
+	<th class="list-header id">
+		<span class="list-title">Id</span>
+	</th>
 
-	<div class="col-xs-2">
-		<span>User</span>
-	</div>
+	<th class="list-header">
+		<span class="list-title">Name</span>
+	</th>
 
-	<div class="col-xs-1">
-		<span>Invoice</span>
-	</div>
+	<th class="list-header">
+		<span class="list-title">User</span>
+	</th>
 
-	<div class="col-xs-1">
-		<span>Status</span>
-	</div>
+	<th class="list-header">
+		<span class="list-title">Invoice</span>
+	</th>
 
-	<div class="col-xs-1">
-		<span>Amount</span>
-	</div>
+	<th class="list-header">
+		<span class="list-title">Status</span>
+	</th>
 
-	<div class="col-xs-4">
-		<span>Actions</span>
-	</div>
+	<th class="list-header">
+		<span class="list-title">Amount</span>
+	</th>
 
-</header>
+	<th class="list-header-last list-header-actions">
+		<span class="list-title">Actions</span>
+	</th>
+
+</tr>
+</thead>
+
+<tbody>
 
 {% for item in list %}
 
-<div class="row">
+<tr class="list-item">
 
-	<div class="col-xs-1">
+	<td class="list-item-id">
 		<span>{{ item.id }}</span>
-	</div>
+	</td>
 
-	<div class="col-xs-2">
+	<td>
 		<a href="{{ path('maci_order_admin_show_order', {'id': item.id}) }}">{{ item.name }}</a>
-	</div>
+	</td>
 
-	<div class="col-xs-2">
+	<td>
 		<span>{{ item.user }}</span>
-	</div>
+	</td>
 
-	<div class="col-xs-1">
+	<td>
 		<span>{{ item.invoice|date('d/m/Y') }}</span>
-	</div>
+	</td>
 
-	<div class="col-xs-1">
+	<td>
 		<span>{{ item.status }}</span>
-	</div>
+	</td>
 
-	<div class="col-xs-1">
+	<td>
 		<span>{{ item.amount }} EUR</span>
-	</div>
+	</td>
 
-	<div class="col-xs-4">
-		<a href="{{ path('maci_order_admin_show_order', {'id': item.id}) }}" class="btn btn-default">Show</a>
-		<a href="#" class="btn btn-danger">Remove</a>
-	</div>
+	<td class="list-item-actions">
+		<a class="btn" href="{{ path('maci_order_admin_show_order', {'id': item.id}) }}">
+			<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+			Show
+		</a>
+		{#}
+		<a class="btn" href="#">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+			Remove
+		</a>
+		{#}
+	</td>
 
-</div>
+</tr>
 
 {% endfor %}
+
+</tbody>
+
+</table>
+</div>
 
 {% endif %}

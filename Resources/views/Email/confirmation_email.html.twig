@@ -32,139 +32,140 @@ td > table {
 </style>
 </head>
 <body>
+
+
 <table class="main">
 <tbody>
-
 <tr>
 	<td class="header">
 
-		<table>
-			<tr>
-				<td class="logo">
-					<img src="{{ asset('/images/logo.png', null, true) }}" />
-				</td>
-				<td class="title">
-					<h1>{{ company_title }}</h1>
-				</td>
-			</tr>
-		</table>
+		<div class="title">
+			<h1>{{ company_title }}</h1>
+			<h2>{{ company_subtitle }}</h2>
+		</div>
 
 	</td>
 </tr>
-
-
 <tr>
 	<td class="order-status">
 		<h4>Dear Customer,</h4>
 		<p>you order has been confirmed.</p>
-		<span>Order Code: {{ order.code }}</span><br/>
-		<span>Order Status: {{ order.statusLabel }}</span>
+		<span>Order Type: {{ order.statusLabel }}</span><br/>
+		<span>Order Code: {{ order.code }}</span>
 	</td>
 </tr>
+</tbody>
+</table>
 
 
-{#% if order.billingAddress is not null %}
-
+{% if order.billingAddress is not null or order.shippingAddress is not null %}
+<table class="main">
+<tbody>
 <tr>
-	<td class="address">
+
+	{% if order.billingAddress is not null %}
+	<td class="address" width="50%">
 		<h3>Payment Address:</h3>
 		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
 	</td>
-</tr>
+	{% endif %}
 
-{% endif %#}
-
-
-{% if order.shippingAddress is not null %}
-
-<tr>
-	<td class="address">
+	{% if order.shippingAddress is not null %}
+	<td class="address" width="50%">
 		<h3>Shipping Address:</h3>
 		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
 	</td>
-</tr>
+	{% endif %}
 
+</tr>
+</tbody>
+</table>
 {% endif %}
 
 
+<table class="main">
+<tbody>
 <tr>
-<td class="details">
-
-	<h3>Order Details:</h3>
-
-	<table>
-
-		{# HEADER #}
-		<tr>
-			<td>&nbsp;</td>
-			<th>Product</th>
-			<th>Quantity</th>
-			<th>Price</th>
-		</tr>
-
-		{# ORDER ITEMS #}
-		{% for item in order.items %}
-		{% if item.product %}
-		<tr>
-			<td>
-				{% if item.product.preview %}
-				<img src="{{ asset(item.product.preview.webPreview | imagine_filter('maci_product_preview_list'), null, true) }}" style="width: 100px;">
-				{% else %}
-				<img src="{{ asset('/images/defaults/no-icon.png' | imagine_filter('maci_product_preview_list'), null, true) }}" style="width: 100px;">
-				{% endif %}
-			</td>
-			<td>
-				{{ item.product }}<br/>
-				{% for variant in item.variants %}
-				<span>{{ variant }}</span>
-				{% endfor %}
-			</td>
-			<td>
-				{{ item.quantity }}
-			</td>
-			<td>
-				{{ item.amount | number_format(2, '.', ',') }} &euro;
-			</td>
-		</tr>
-		{% endif %}
-		{% endfor %}
-
-		{# SHIPPING COST #}
-		{% if order.checkShipment and order.shippingCost %}
-		<tr>
-			<td>&nbsp;</td>
-			<td>Shipping Cost:</td>
-			<td>&nbsp;</td>
-			<td>{{ order.shippingCost | number_format(2, '.', ',') }} &euro;</td>
-		</tr>
-		{% endif %}
-
-		{# PAYMENT COST #}
-		{% if order.paymentCost %}
-		<tr>
-			<td>&nbsp;</td>
-			<td>Payment Cost:</td>
-			<td>&nbsp;</td>
-			<td>{{ order.paymentCost | number_format(2, '.', ',') }} &euro;</td>
-		</tr>
-		{% endif %}
-
-
-		<tr>
-			<td>&nbsp;</td>
-			<td>Amount:</td>
-			<td>&nbsp;</td>
-			<td>{{ order.amount | number_format(2, '.', ',') }} &euro;</td>
-		</tr>
-
-	</table>
-
-</td>
+	<td>
+		<h3>Order Details:</h3>
+	</td>
 </tr>
+</tbody>
+</table>
+
+<table class="main">
+<tbody class="details">
+
+	{# HEADER #}
+	<tr>
+		<td>&nbsp;</td>
+		<th>Product</th>
+		<th>Quantity</th>
+		<th>Price</th>
+	</tr>
+
+	{# ORDER ITEMS #}
+	{% for item in order.items %}
+	{% if item.product %}
+	<tr>
+		<td>
+			{% if item.product.preview %}
+			<img src="{{ asset(item.product.preview.webPreview | imagine_filter('maci_product_preview_list'), null, true) }}" style="width: 100px;">
+			{% else %}
+			<img src="{{ asset('/images/defaults/no-icon.png' | imagine_filter('maci_product_preview_list'), null, true) }}" style="width: 100px;">
+			{% endif %}
+		</td>
+		<td>
+			{{ item.product }}<br/>
+			{% for variant in item.variants %}
+			<span>{{ variant }}</span>
+			{% endfor %}
+		</td>
+		<td>
+			{{ item.quantity }}
+		</td>
+		<td>
+			{{ item.amount | number_format(2, '.', ',') }} &euro;
+		</td>
+	</tr>
+	{% endif %}
+	{% endfor %}
+
+	{# SHIPPING COST #}
+	{% if order.checkShipment and order.shippingCost %}
+	<tr>
+		<td>&nbsp;</td>
+		<td>Shipping Cost:</td>
+		<td>&nbsp;</td>
+		<td>{{ order.shippingCost | number_format(2, '.', ',') }} &euro;</td>
+	</tr>
+	{% endif %}
+
+	{# PAYMENT COST #}
+	{% if order.paymentCost %}
+	<tr>
+		<td>&nbsp;</td>
+		<td>Payment Cost:</td>
+		<td>&nbsp;</td>
+		<td>{{ order.paymentCost | number_format(2, '.', ',') }} &euro;</td>
+	</tr>
+	{% endif %}
+
+
+	<tr>
+		<td>&nbsp;</td>
+		<td>Amount:</td>
+		<td>&nbsp;</td>
+		<td>{{ order.amount | number_format(2, '.', ',') }} &euro;</td>
+	</tr>
+
+</tbody>
+</table>
 
 
 {% if order.orderDocuments|length and 3 < order.progression %}
-
+<table class="main">
+<tbody>
 <tr>
 	<td>
 		<h3>E-Books:</h3>
@@ -183,10 +184,13 @@ td > table {
 		{% endif %}
 	</td>
 </tr>
-
+</tbody>
+</table>
 {% endif %}
 
 
+<table class="main">
+<tbody>
 <tr>
 <td>
 
@@ -196,8 +200,9 @@ td > table {
 
 </td>
 </tr>
-
 </tbody>
 </table>
+
+
 </body>
 </html>
