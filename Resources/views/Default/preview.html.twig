@@ -11,15 +11,7 @@
 
 {% block content %}
 
-<h3>Order Preview:</h3>
-
-{% include "MaciOrderBundle:Default:_show.html.twig" with { 'order': order } %}
-
-{% if order and order.items|length %}
-
-{% include "MaciOrderBundle:Default:_form.html.twig" with {'order': order, 'form': form} %}
-
-{% endif %}
+{% include "MaciOrderBundle:Default:_preview.html.twig" with { 'order': order, 'edit': edit } %}
 
 {% endblock %}
 

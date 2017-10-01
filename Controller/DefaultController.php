@@ -61,6 +61,18 @@ class DefaultController extends Controller
         ));
     }
 
+    public function userShowAction($id)
+    {
+        $order = $this->getDoctrine()->getManager()
+            ->getRepository('MaciOrderBundle:Order')
+            ->findOneBy(array('id'=>$id,'user'=>$this->getUser()));
+
+        return $this->render('MaciOrderBundle:Default:preview.html.twig', array(
+            'order' => $order,
+            'edit' => false
+        ));
+    }
+
     public function cartAction()
     {
         return $this->render('MaciOrderBundle:Default:cart.html.twig', array(

@@ -1,29 +1,63 @@
 
+{% if list|length %}
+
+<section class="cart-list">
+<div class="container-fluid">
+
+<div class="list-default">
+<table class="table table-striped">
+
+<thead>
+
+<tr class="list-header">
+
+	<th class="list-header order-header-code">
+		<span class="list-header-title">{{ 'order.code' | matra('Code') }}</span>
+	</th>
+
+	<th class="list-header order-header-amount">
+		<span class="list-header-title">{{ 'order.amount' | matra('Amount') }}</span>
+	</th>
+
+	<th class="list-header order-header-date">
+		<span class="list-header-title">{{ 'order.date' | matra('Date') }}</span>
+	</th>
+
+	<th class="list-header order-header-status">
+		<span class="list-header-title">{{ 'order.status' | matra('Status') }}</span>
+	</th>
+
+	<th class="list-header order-header-action">
+		<span class="list-header-action">{{ 'order.action' | matra('Action') }}</span>
+	</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
 {% for item in list %}
 
-<div class="row">
+<tr class="list-item">
 
-	<div class="col-xs-4">
+	<td>
+		<h5>{{ item.code }}</h5>
+	</td>
 
-	<h5>
-		{{ item.code }}
-	</h5>
+	<td>
+		<span>{{ item.amount | number_format(2, '.', ',') }} &euro;</span>
+	</td>
 
-	</div>
+	<td>
+		<span>{{ item.created | date('d/m/Y') }}</span>
+	</td>
 
-	<div class="col-xs-2">
-		<p>
-			{{ item.created | date('d/m/Y') }}
-		</p>
-	</div>
+	<td>
+		<span>{{ item.status }}</span>
+	</td>
 
-	<div class="col-xs-2">
-		<p>
-			{{ item.status }}
-		</p>
-	</div>
-
-	<div class="col-xs-4">
+	<td>
 
 		{% if item.status == 'complete' %}
 
@@ -33,7 +67,9 @@
 
 		{% elseif item.status == 'confirm' %}
 
-		&nbsp;
+		<a href="{{ path('maci_order_show', {'id': item.id}) }}">
+			Show Order
+		</a>
 
 		{% else %}
 
@@ -43,15 +79,19 @@
 
 		{% endif %}
 
-	</div>
+	</td>
 
-</div>
-
-{% else %}
-
-<div class="row">
-	<h3 class="noitems">No Items.</h3>
-</div>
+</tr>
 
 {% endfor %}
 
+</tbody>
+
+</table>
+</div>
+
+</div>
+</section>
+
+
+{% endif %}

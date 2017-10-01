@@ -1,26 +1,38 @@
 
-<section class="cart-list">
-
-<div class="container-fluid">
-
 {% if order and order.items|length %}
 
-<div class="row cart-header">
 
-	<div class="col-xs-12 col-sm-5 col-sm-offset-2">
-		<h4 class="order-show-title">{{ 'product.cart_title' | matra('Product') }}</h4>
-	</div>
+<section class="cart-list">
+<div class="container-fluid">
 
-	<div class="col-xs-8 col-sm-3">
-		<h4 class="order-show-title">{{ 'product.quantity' | matra('Quantity') }}</h4>
-	</div>
+<div class="list-default">
+<table class="table table-striped">
 
-	<div class="col-xs-4 col-sm-2">
-		<h4 class="order-show-title">{{ 'product.price' | matra('Price') }}</h4>
-	</div>
+<thead>
 
-</div>
+<tr class="list-header">
 
+	<th class="list-header order-header-preview">
+		&nbsp;
+	</th>
+
+	<th class="list-header order-header-product">
+		<span class="list-header-title">{{ 'product.cart_title' | matra('Product') }}</span>
+	</th>
+
+	<th class="list-header order-header-quantity">
+		<span class="list-header-title">{{ 'product.quantity' | matra('Quantity') }}</span>
+	</th>
+
+	<th class="list-header order-header-price">
+		<span class="list-header-title">{{ 'product.price' | matra('Price') }}</span>
+	</th>
+
+</tr>
+
+</thead>
+
+<tbody>
 
 {% for item in order.items %}
 
@@ -30,21 +42,19 @@
 {% set id = loop.index0 %}
 {% endif %}
 
-<div class="row cart-row">
+<tr class="list-item">
 
-	<div class="col-xs-12 col-sm-2">
-	{% if item.product.preview is not null %}
+	<td>
 
+		{% if item.product.preview is not null %}
 		<img class="img-responsive" src="{{ asset(item.product.preview.webPath | imagine_filter('maci_product_preview_cart')) }}" {% if item.product.description %} title="{{ item.product }}" alt="{{ item.product.description }}" {% else %} alt="{{ item.product }}" {% endif %} />
-
-	{% else %}
-
+		{% else %}
 		&nbsp;
+		{% endif %}
 
-	{% endif %}
-	</div>
+	</td>
 
-	<div class="col-xs-12 col-sm-5">
+	<td>
 
 		{% if edit is defined and edit %}
 		<a href="{{ path('maci_product_show', { 'id': item.product.id }) }}">
@@ -62,18 +72,21 @@
 		{% endif %}
 		{% endfor %}
 
-	</div>
+	</td>
 
-	<div class="col-xs-12 col-sm-3">
+	<td>
+
 		{% if edit is defined and edit %}
 		{{ render(controller('MaciOrderBundle:Default:editCartItem', { 'id': id, 'quantity': item.quantity } )) }}
 		{{ render(controller('MaciOrderBundle:Default:removeCartItem', { 'id': id } )) }}
 		{% else %}
 		<span class="order-item-quantity">{{ item.quantity }}</span>
 		{% endif %}
-	</div>
 
-	<div class="col-xs-12 col-sm-2">
+	</td>
+
+	<td>
+
 		{% if item.sale %}
 		<span class="product-sale">
 			{{ item.sale | number_format(2, '.', ',') }} &euro;
@@ -82,51 +95,60 @@
 		<span class="order-item-price">
 			{{ item.amount | number_format(2, '.', ',') }} &euro;
 		</span>
-	</div>
 
-</div>
+	</td>
+
+</tr>
 
 {% endfor %}
 
+</tbody>
+<tfoot>
 
 {# DETAILS #}
 
-<div class="row cart-header">
+<tr>
 
-	<div class="col-xs-12 col-sm-5 col-sm-offset-2">
-		<h4 class="order-show-title">{{ 'product.cart_details' | matra('Details') }}</h4>
-	</div>
+	<th class="list-header">
+		&nbsp;
+	</th>
 
-	<div class="col-xs-8 col-sm-3">
-		<h4 class="order-show-title">{{ 'product.cart_description' | matra('Description') }}</h4>
-	</div>
+	<th class="list-header">
+		<span class="list-header-title">{{ 'product.cart_details' | matra('Details') }}</h4>
+	</th>
 
-	<div class="col-xs-4 col-sm-2">
-		<h4 class="order-show-title">{{ 'product.price' | matra('Price') }}</h4>
-	</div>
+	<th class="list-header">
+		<span class="list-header-title">{{ 'product.cart_description' | matra('Description') }}</h4>
+	</th>
 
-</div>
+	<th class="list-header">
+		<span class="list-header-title">{{ 'product.price' | matra('Price') }}</h4>
+	</th>
+
+</tr>
 
 
 {# SHIPPING COST #}
 
 {% if order.checkShipment and order.shippingCost and not edit %}
 
-<div class="row cart-footer">
+<tr>
 
-	<div class="col-xs-4 col-sm-3 col-sm-offset-2">
+	<td>&nbsp;</td>
+
+	<td>
 		<span class="order-shippingCost-label">{{ 'order.shipping' | matra('Shipping') }}</span>
-	</div>
+	</td>
 
-	<div class="col-xs-4 col-sm-offset-2 col-sm-3">
+	<td>
 		{% if maci_orders.shippingsArray[order.shipping] is defined %}
 		<span class="order-shippingCost-description">{{ ('order.shippings.' ~ order.shipping) | matra(maci_orders.shippingsArray[order.shipping].label) }}</span>
 		{% else %}
 		<span class="order-shippingCost-description">{{ ('order.shippings.' ~ order.shipping) | matra(order.shipping) }}</span>
 		{% endif %}
-	</div>
+	</td>
 
-	<div class="col-xs-4 col-sm-2">
+	<td>
 		<span class="order-shippingCost-value">
 			{% if 0 < order.shippingCost %}
 			{{ order.shippingCost | number_format(2, '.', ',') }} &euro;
@@ -134,81 +156,88 @@
 			&nbsp;
 			{% endif %}
 		</span>
-	</div>
+	</td>
 
-</div>
+</tr>
 
 {% endif %}
-
 
 
 {# PAYMENT COST #}
 
 {% if order.paymentCost and edit is not defined or not edit %}
 
-<div class="row cart-footer">
+<tr>
 
-	<div class="col-xs-4 col-sm-3 col-sm-offset-2">
+	<td>&nbsp;</td>
+
+	<td>
 		<span class="order-paymentCost-label">{{ 'order.payment' | matra('Payment') }}</span>
-	</div>
+	</td>
 
-	<div class="col-xs-4 col-sm-offset-2 col-sm-3">
+	<td>
 		{% if maci_orders.paymentsArray[order.payment] is defined %}
 		<span class="order-paymentCost-description">{{ ('order.payments.' ~ order.payment) | matra(maci_orders.paymentsArray[order.payment].label) }}</span>
 		{% else %}
 		<span class="order-paymentCost-description">{{ ('order.payments.' ~ order.payment) | matra(order.payment) }}</span>
 		{% endif %}
-	</div>
+	</td>
 
-	<div class="col-xs-4 col-sm-2">
+	<td>
 		<span class="order-paymentCost-value">
 			{% if 0 < order.paymentCost %}
-			{{ order.paymentCost | number_format(2, '.', ',') }} &euro;
+			<span>{{ order.paymentCost | number_format(2, '.', ',') }} &euro;</span>
 			{% else %}
 			&nbsp;
 			{% endif %}
 		</span>
-	</div>
+	</td>
 
-</div>
+</tr>
 
 {% endif %}
-
 
 
 {# AMOUNT #}
 
-<div class="row cart-footer">
+<tr>
+
+	<td>&nbsp;</td>
 
 	{% if edit is defined and edit %}
 
-	<div class="col-xs-6 col-sm-3 col-sm-offset-7">
+	<td>
 		<h4 class="order-amount-label">{{ 'order.subtotal' | matra('SubTotal') }} ( {{ order.totalItemsQuantity }} {{ 'order.subtotal-items' | matra('Items') }} ):</h4>
-	</div>
+	</td>
 
-	<div class="col-xs-6 col-sm-2">
+	<td>&nbsp;</td>
+
+	<td>
 		<h4 class="order-amount-value">{{ order.subAmount | number_format(2, '.', ',') }} &euro;</h4>
-	</div>
+	</td>
 
 	{% else %}
 
-	<div class="col-xs-8 col-sm-3 col-sm-offset-7">
+	<td>
 		<h4 class="order-amount-label">{{ 'order.amount' | matra('Amount') }}:</h4>
-	</div>
+	</td>
 
-	<div class="col-xs-4 col-sm-2">
+	<td>&nbsp;</td>
+
+	<td>
 		<h4 class="order-amount-value">{{ order.amount | number_format(2, '.', ',') }} &euro;</h4>
-	</div>
+	</td>
 
 	{% endif %}
 
+</tr>
+
+</tfoot>
+</table>
 </div>
 
+</div>
+</section>
 
 
 {% endif %}
-
-
-</div>
-
-</section>

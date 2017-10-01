@@ -81,6 +81,10 @@ maci_order_admin_show_order:
 
 
 
+maci_order_show:
+    path:  /orders/show/{id}
+    defaults: { _controller: MaciOrderBundle:Default:userShow }
+
 maci_order_invoice:
     path:  /orders/invoice/{id}
     defaults: { _controller: MaciOrderBundle:Default:invoice }
