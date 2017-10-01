@@ -5,6 +5,12 @@ services:
 
 services:
 
+    maci.order.menu_builder:
+        class: Maci\OrderBundle\Menu\OrderMenuBuilder
+        arguments: ["@knp_menu.factory","@maci.translator"]
+        tags:
+            - { name: knp_menu.menu_builder, method: createShopAdminMenu, alias: shop_admin }
+
     maci.orders:
         class: Maci\OrderBundle\Controller\OrderController
         arguments: ["@doctrine.orm.entity_manager","@security.authorization_checker",'@security.token_storage',"@session","@maci.addresses","%maci.order.configs%"]
