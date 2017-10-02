@@ -389,7 +389,7 @@ class Order
     public function getStatusLabel()
     {
         $array = $this->getStatusArray();
-        $key = array_search($this->type, $array);
+        $key = array_search($this->status, $array);
         if ($key) return $key;
         $str = str_replace('_', ' ', $this->type);
         return ucwords($str);

@@ -50,8 +50,9 @@ td > table {
 	<td class="order-status">
 		<h4>Dear Customer,</h4>
 		<p>you order has been confirmed.</p>
-		<span>Order Type: {{ order.statusLabel }}</span><br/>
-		<span>Order Code: {{ order.code }}</span>
+		<span>Order Type: {{ order.typeLabel }}</span><br/>
+		<span>Order Code: {{ order.code }}</span><br/>
+		<span>Order Status: {{ order.statusLabel }}</span>
 	</td>
 </tr>
 </tbody>
@@ -65,14 +66,14 @@ td > table {
 
 	{% if order.billingAddress is not null %}
 	<td class="address" width="50%">
-		<h3>Payment Address:</h3>
+		<h3>{{ 'page.checkout.billing' | matra('Billing Address') }}:</h3>
 		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
 	</td>
 	{% endif %}
 
 	{% if order.shippingAddress is not null %}
 	<td class="address" width="50%">
-		<h3>Shipping Address:</h3>
+		<h3>{{ 'page.checkout.shipping' | matra('Shipping Address') }}:</h3>
 		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
 	</td>
 	{% endif %}
@@ -125,18 +126,35 @@ td > table {
 			{{ item.quantity }}
 		</td>
 		<td>
-			{{ item.amount | number_format(2, '.', ',') }} &euro;
+			{% if item.sale %}
+			<span style="text-decoration: line-through;">{{ item.sale | number_format(2, '.', ',') }} &euro;</span><br/>
+			{% endif %}
+			<span>{{ item.amount | number_format(2, '.', ',') }} &euro;</span>
 		</td>
 	</tr>
 	{% endif %}
 	{% endfor %}
+
+	{# FOOTER #}
+	<tr>
+		<td>&nbsp;</td>
+		<th>{{ 'product.cart_details' | matra('Details') }}</th>
+		<th>{{ 'product.cart_description' | matra('Description') }}</th>
+		<th>{{ 'product.price' | matra('Price') }}</th>
+	</tr>
 
 	{# SHIPPING COST #}
 	{% if order.checkShipment and order.shippingCost %}
 	<tr>
 		<td>&nbsp;</td>
 		<td>Shipping Cost:</td>
-		<td>&nbsp;</td>
+		<td>
+			{% if maci_orders.shippingsArray[order.shipping] is defined %}
+			<span class="order-shippingCost-description">{{ ('order.shippings.' ~ order.shipping) | matra(maci_orders.shippingsArray[order.shipping].label) }}</span>
+			{% else %}
+			<span class="order-shippingCost-description">{{ ('order.shippings.' ~ order.shipping) | matra(order.shipping) }}</span>
+			{% endif %}
+		</td>
 		<td>{{ order.shippingCost | number_format(2, '.', ',') }} &euro;</td>
 	</tr>
 	{% endif %}
@@ -146,7 +164,13 @@ td > table {
 	<tr>
 		<td>&nbsp;</td>
 		<td>Payment Cost:</td>
-		<td>&nbsp;</td>
+		<td>
+			{% if maci_orders.paymentsArray[order.payment] is defined %}
+			<span class="order-paymentCost-description">{{ ('order.payments.' ~ order.payment) | matra(maci_orders.paymentsArray[order.payment].label) }}</span>
+			{% else %}
+			<span class="order-paymentCost-description">{{ ('order.payments.' ~ order.payment) | matra(order.payment) }}</span>
+			{% endif %}
+		</td>
 		<td>{{ order.paymentCost | number_format(2, '.', ',') }} &euro;</td>
 	</tr>
 	{% endif %}
@@ -154,9 +178,9 @@ td > table {
 
 	<tr>
 		<td>&nbsp;</td>
-		<td>Amount:</td>
+		<td><h4>Amount:</h4></td>
 		<td>&nbsp;</td>
-		<td>{{ order.amount | number_format(2, '.', ',') }} &euro;</td>
+		<td><h4>{{ order.amount | number_format(2, '.', ',') }} &euro;</h4></td>
 	</tr>
 
 </tbody>
