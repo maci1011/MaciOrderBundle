@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Maci\ProductBundle\Entity\Variant;
+use Maci\TranslatorBundle\Controller\TranslatorController;
 
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -14,6 +15,13 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class CartAddProductItemType extends AbstractType
 {
+	protected $translator;
+
+	public function __construct(TranslatorController $translator)
+	{
+		$this->translator = $translator;
+	}
+
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{
 		$resolver->setDefaults(array(
@@ -37,6 +45,7 @@ class CartAddProductItemType extends AbstractType
 		}
 		$builder
 			->add('quantity', IntegerType::class, array(
+				'label' => ($this->translator->getLabel('cart_add_product_item.label', 'Select Quantity')),
                 'attr' => array('class' => 'edit-quantity-field')
             ))
 			->add('add_to_cart', SubmitType::class)

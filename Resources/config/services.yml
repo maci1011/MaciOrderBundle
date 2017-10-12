@@ -17,6 +17,7 @@ services:
 
     maci.order.form.type.cart_add_product_item:
         class: Maci\OrderBundle\Form\Type\CartAddProductItemType
+        arguments: ["@maci.translator"]
         tags:
             - { name: form.type, alias: cart_add_product_item }
 
