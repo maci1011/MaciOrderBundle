@@ -49,11 +49,11 @@ class OrderController extends Controller
         $this->cart = false;
     }
 
-    public function addProductToCart($product, $quantity = 1, $variants = array())
+    public function addProductToCart($product, $quantity = 1)
     {
         $cart = $this->getCurrentCart();
 
-        $item = $this->addProduct($cart, $product, $quantity, $variants);
+        $item = $this->addProduct($cart, $product, $quantity);
 
         if (!$item) {
             return false;
@@ -70,22 +70,14 @@ class OrderController extends Controller
         return true;
     }
 
-    public function addProduct($order, $product, $quantity = 1, $variants = array())
+    public function addProduct($order, $product, $quantity = 1)
     {
         $same_item = false;
         foreach ($order->getItems() as $item) {
-            $same = true;
             $item_product = $item->getProduct();
-            if (is_object($item_product) && $item_product->getId() === $product->getId() && count($variants) == count($item->getVariants())) {
-                foreach ($variants as $variant) {
-                    if (!in_array($variant->getId(), $item->getVariantsId())) {
-                        $same = false;
-                    }
-                }
-            } else {
-                $same = false;
-            }
-            if ($same) {
+            if (!is_object($item_product)) {
+                break;
+            } else if ($item_product->getId() === $product->getId()) {
                 $same_item = $item;
                 break;
             }
@@ -99,15 +91,13 @@ class OrderController extends Controller
             $item->setQuantity($quantity);
             $item->setProduct($product);
             $item->setOrder($order);
-            $order->addItem($item);
-            foreach ($variants as $variant) {
-                $item->addVariant($variant);
-            }
         }
 
         if (!$item->checkAvailability()) {
             return false;
         }
+
+        $order->addItem($item);
 
         return $item;
     }
@@ -415,20 +405,12 @@ class OrderController extends Controller
 
         foreach ($order->getItems() as $item) {
             if (is_object($product = $item->getProduct())) {
-                $variants_info = array();
-                foreach ($item->getVariants() as $variant) {
-                    array_push($variants_info, array(
-                        'id' => $variant->getId(),
-                        'name' => $variant->getName()
-                    ));
-                }
                 array_push($items, array(
                     'id' => $product->getId(),
                     'name' => $product->getName(),
                     'sale' => $product->getSale(),
                     'price' => $product->getPrice(),
-                    'quantity' => $item->getQuantity(),
-                    'variants' => $variants_info
+                    'quantity' => $item->getQuantity()
                 ));
             }
         }
@@ -441,30 +423,12 @@ class OrderController extends Controller
         $order_arr = $this->getDefaultSession();
         $items = $this->session->get('order_items', array());
         if (count($items)) {
-            foreach ($items as $info) {
-                $available = true;
-                $quantity = $info['quantity'];
-                $variants = array();
+            foreach ($items as $item) {
+                $quantity = $item['quantity'];
                 $product = $this->om->getRepository('MaciProductBundle:Product')
-                    ->findOneById($info['id']);
+                    ->findOneById($item['id']);
                 if ($product && $product->isAvailable() && $product->checkQuantity($quantity)) {
-                    if (count($info['variants'])) {
-                        foreach ($info['variants'] as $varinfo) {
-                            $vid = $varinfo['id'];
-                            $variant = $this->om->getRepository('MaciProductBundle:Variant')
-                                ->findOneById($vid);
-                            if ($variant && $variant->isAvailable() && $variant->checkQuantity($quantity)) {
-                                array_push($variants, $variant);
-                            } else {
-                                $available = false;
-                            }
-                        }
-                    }
-                } else {
-                    $available = false;
-                }
-                if ($available) {
-                    $this->addProduct($cart, $product, $quantity, $variants);
+                    $this->addProduct($cart, $product, $quantity);
                 }
             }
         }

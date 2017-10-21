@@ -892,11 +892,6 @@ class Order
             if ($product = $item->getProduct()) {
                 $product->subQuantity($item->getQuantity());
             }
-            if (count($item->getVariants())) {
-                foreach ($item->getVariants() as $variant) {
-                    $variant->subQuantity($item->getQuantity());
-                }
-            }
         }
     }
 
@@ -905,11 +900,6 @@ class Order
         foreach ($this->items as $item) {
             if ($product = $item->getProduct()) {
                 $product->addQuantity($item->getQuantity());
-            }
-            if (count($item->getVariants())) {
-                foreach ($item->getVariants() as $variant) {
-                    $variant->addQuantity($item->getQuantity());
-                }
             }
         }
     }

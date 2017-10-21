@@ -55,17 +55,11 @@ class Item
     private $product;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    private $variants;
-
-    /**
      * Constructor
      */
     public function __construct()
     {
         $this->quantity = 1;
-        $this->variants = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
 
@@ -264,49 +258,6 @@ class Item
     }
 
     /**
-     * Add variants
-     *
-     * @param \Maci\ProductBundle\Entity\Variant $variants
-     * @return Item
-     */
-    public function addVariant(\Maci\ProductBundle\Entity\Variant $variants)
-    {
-        $this->variants[] = $variants;
-
-        return $this;
-    }
-
-    /**
-     * Remove variants
-     *
-     * @param \Maci\ProductBundle\Entity\Variant $variants
-     */
-    public function removeVariant(\Maci\ProductBundle\Entity\Variant $variants)
-    {
-        $this->variants->removeElement($variants);
-    }
-
-    /**
-     * Get variants
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getVariants()
-    {
-        return $this->variants;
-    }
-
-    public function getVariantsId()
-    {
-        $list = $this->getVariants();
-        $res = array();
-        foreach ($list as $el) {
-            array_push($res, $el->getId());
-        }
-        return $res;
-    }
-
-    /**
      * __toString()
      */
     public function __toString()
@@ -356,21 +307,10 @@ class Item
         return true;
     }
 
-    public function checkVariants($quantity = false)
-    {
-        $quantity = $quantity ? $quantity : $this->quantity;
-        foreach ($this->variants as $variant) {
-            if ( !$variant->checkQuantity($quantity) && $this->product->isAvalaible() ) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public function checkAvailability($quantity = false)
     {
         if ( $this->product ) {
-            if ( !$this->product->isAvailable() || !$this->checkProduct($quantity) || !$this->checkVariants($quantity) ) {
+            if ( !$this->product->isAvailable() || !$this->checkProduct($quantity) ) {
                 return false;
             }
         }

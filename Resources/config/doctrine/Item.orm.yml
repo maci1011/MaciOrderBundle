@@ -25,17 +25,6 @@ Maci\OrderBundle\Entity\Item:
             type: datetime
         updated:
             type: datetime
-    manyToMany:
-        variants:
-            targetEntity: Maci\ProductBundle\Entity\Variant
-            joinTable:
-                name: maci_order_items_and_variants
-                joinColumns:
-                    item_id:
-                        referencedColumnName: id
-                inverseJoinColumns:
-                    variant_id:
-                        referencedColumnName: id
     manyToOne:
         order:
             targetEntity: Order

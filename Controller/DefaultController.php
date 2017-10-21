@@ -111,17 +111,12 @@ class DefaultController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $variants = array();
-            if ($form->has('variants')) {
-                $variants = $form['variants']->getData();
-            }
-
             $quantity = intval($form['quantity']->getData());
             if (!$product->checkQuantity($quantity)) {
                 return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.noavailable')));
             }
 
-            if ( $this->get('maci.orders')->addProductToCart($product, $quantity, $variants) ) {
+            if ( $this->get('maci.orders')->addProductToCart($product, $quantity) ) {
                 return $this->redirect($this->generateUrl('maci_order_cart'));
             }
         }

@@ -64,14 +64,6 @@
 		<h4 class="order-item-name">{{ item.product }}</h4>
 		{% endif %}
 
-		{% for variant in item.variants %}
-		{% if variant.parent %}
-		<span class="order-item-variant">{{ variant.parent }}: {{ variant }}</span><br/>
-		{% else %}
-		<span class="order-item-variant">- {{ variant }}</span><br/>
-		{% endif %}
-		{% endfor %}
-
 	</td>
 
 	<td>
