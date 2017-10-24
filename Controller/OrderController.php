@@ -409,7 +409,7 @@ class OrderController extends Controller
                     'id' => $product->getId(),
                     'name' => $product->getName(),
                     'sale' => $product->getSale(),
-                    'price' => $product->getPrice(),
+                    'price' => $product->getAmount(),
                     'quantity' => $item->getQuantity()
                 ));
             }

@@ -3,9 +3,11 @@
 
 <form class="maci_order_billing_address" action="{{ path('maci_order_checkout_set_billing_address') }}" method="post">
 
+	{% if not form.vars.valid %}
 	<div class="form-group">
     	{{ form_errors(form) }}
 	</div>
+	{% endif %}
 
     {{ form_row(form.billing_address) }}
 

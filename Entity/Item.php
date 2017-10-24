@@ -319,17 +319,13 @@ class Item
 
     public function refreshAmount()
     {
-        $tot = 0;
-        if ($this->product) {
-            $tot += ( $this->product->getPrice() * $this->quantity );
-        }
-        $this->amount = $tot;
+        $this->amount = ( $this->getProductAmount() * $this->quantity );
     }
 
-    public function getPrice()
+    public function getProductAmount()
     {
         if ($this->product) {
-            return ( $this->product->getPrice() );
+            return ( $this->product->getAmount() );
         }
         return 0;
     }

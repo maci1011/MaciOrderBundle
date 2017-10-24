@@ -6,8 +6,9 @@ maci_paypal_ipn:
 
 
 maci_order_cart_add:
-    path:  /cart/item/add/{product}
+    path:  /cart/item/add
     defaults: { _controller: MaciOrderBundle:Default:addToCart }
+    methods:  [POST]
 
 maci_order_edit_cart_item:
     path:  /cart/item/edit/{id}

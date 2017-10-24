@@ -4,10 +4,11 @@ namespace Maci\OrderBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Maci\TranslatorBundle\Controller\TranslatorController;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
@@ -16,27 +17,42 @@ class CartAddProductItemType extends AbstractType
 {
 	protected $translator;
 
+	protected $product;
+
 	public function __construct(TranslatorController $translator)
 	{
 		$this->translator = $translator;
+		$this->product = false;
 	}
 
-	public function setDefaultOptions(OptionsResolverInterface $resolver)
+	public function configureOptions(OptionsResolver $resolver)
 	{
 		$resolver->setDefaults(array(
-			'data_class' => 'Maci\OrderBundle\Entity\Item',
-			'cascade_validation' => true
+			// 'data_class' => 'Maci\OrderBundle\Entity\Item',
+			'cascade_validation' => true,
+			'product' => false
 		));
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
+		$this->product = $options['product'];
+
 		$builder
+			->add('product', HiddenType::class, array(
+				'data' => ($this->product ? $this->product->getId() : null)
+			))
 			->add('quantity', IntegerType::class, array(
+				'data' => 1,
 				'label' => ($this->translator->getLabel('cart_add_product_item.label', 'Select Quantity')),
-                'attr' => array('class' => 'edit-quantity-field')
+                'attr' => array_merge(array('class' => 'edit-quantity-field', 'min' => 0),(
+                	($this->product and $this->product->getLimited()) ? array('max' => $this->product->getQuantity()) : array()
+                ))
             ))
-			->add('add_to_cart', SubmitType::class)
+			->add('add_to_cart', SubmitType::class, array(
+				'label' => ($this->translator->getLabel('product.add_to_cart', 'Add To Cart')),
+                'attr' => array('class' => 'btn-primary btn')
+            ))
 		;
 	}
 
