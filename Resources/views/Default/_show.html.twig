@@ -46,8 +46,8 @@
 
 	<td>
 
-		{% if item.product.preview is not null %}
-		<img class="img-responsive" src="{{ asset(item.product.preview.webPath | imagine_filter('maci_product_preview_cart')) }}" {% if item.product.description %} title="{{ item.product }}" alt="{{ item.product.description }}" {% else %} alt="{{ item.product }}" {% endif %} />
+		{% if item.product.inhPreview is not null %}
+		<img class="img-responsive" src="{{ asset(item.product.inhPreview.webPath | imagine_filter('maci_product_preview_cart')) }}" alt="{{ item.product.inhName }}" {% if item.product.inhDescription %} title="{{ item.product.inhDescription }}" {% else %} title="{{ item.product.inhName }}" {% endif %} />
 		{% else %}
 		&nbsp;
 		{% endif %}
@@ -58,11 +58,20 @@
 
 		{% if edit is defined and edit %}
 		<a href="{{ path('maci_product_show', { 'id': item.product.id }) }}">
-			<h4 class="order-item-name">{{ item.product }}</h4>
+			<h4 class="order-item-name">{{ item.product.inhName }}</h4>
 		</a>
 		{% else %}
-		<h4 class="order-item-name">{{ item.product }}</h4>
+		<h4 class="order-item-name">{{ item.product.inhName }}</h4>
 		{% endif %}
+
+		<ol>
+			{% for obj in item.product.hierarchy if obj.variantName %}
+			<li>
+				{% if obj.variantLabel %}<span class="product-child-label">{{ obj.variantLabel }}:</span>{% endif %}
+				<span class="product-child-name">{{ obj.variantName }}</span>
+			</li>
+			{% endfor %}
+		</ol>
 
 	</td>
 
