@@ -1,7 +1,7 @@
 
-maci_paypal_ipn:
-    path:  /ipn/ipn-twig-email-notification
-    defaults: { _controller: MaciOrderBundle:TwigNotificationEmail:index }
+# maci_paypal_ipn:
+#     path:  /ipn/ipn-twig-email-notification
+#     defaults: { _controller: MaciOrderBundle:TwigNotificationEmail:index }
 
 
 

@@ -33,7 +33,7 @@ Maci\OrderBundle\Entity\Item:
                 name: order_id
                 referencedColumnName: id
         product:
-            targetEntity: Maci\ProductBundle\Entity\Product
+            targetEntity: Maci\PageBundle\Entity\Shop\Product
             joinColumn:
                 name: product_id
                 referencedColumnName: id

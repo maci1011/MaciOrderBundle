@@ -11,8 +11,8 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Maci\AddressBundle\Controller\AddressController;
-use Maci\AddressBundle\Entity\Address;
+use Maci\UserBundle\Controller\AddressServiceController;
+use Maci\UserBundle\Entity\Address;
 use Maci\OrderBundle\Entity\Order;
 use Maci\OrderBundle\Entity\Item;
 
@@ -38,7 +38,7 @@ class OrderController extends Controller
 
     private $countries;
 
-	public function __construct(ObjectManager $objectManager, AuthorizationCheckerInterface $authorizationChecker, TokenStorageInterface $tokenStorage, Session $session, AddressController $ac, $configs)
+	public function __construct(ObjectManager $objectManager, AuthorizationCheckerInterface $authorizationChecker, TokenStorageInterface $tokenStorage, Session $session, AddressServiceController $ac, $configs)
 	{
     	$this->om = $objectManager;
         $this->authorizationChecker = $authorizationChecker;
