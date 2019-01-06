@@ -50,7 +50,7 @@ class Item
     private $order;
 
     /**
-     * @var \Maci\ProductBundle\Entity\Product
+     * @var \Maci\PageBundle\Entity\Shop\Product
      */
     private $product;
 
@@ -237,10 +237,10 @@ class Item
     /**
      * Set product
      *
-     * @param \Maci\ProductBundle\Entity\Product $product
+     * @param \Maci\PageBundle\Entity\Shop\Product $product
      * @return Item
      */
-    public function setProduct(\Maci\ProductBundle\Entity\Product $product = null)
+    public function setProduct(\Maci\PageBundle\Entity\Shop\Product $product = null)
     {
         $this->product = $product;
 
@@ -250,7 +250,7 @@ class Item
     /**
      * Get product
      *
-     * @return \Maci\ProductBundle\Entity\Product 
+     * @return \Maci\PageBundle\Entity\Shop\Product 
      */
     public function getProduct()
     {

@@ -736,7 +736,7 @@ class Order
      * @param \Maci\UserBundle\Entity\Address $billing_address
      * @return Order
      */
-    public function setBillingAddress(\Maci\AddressBundle\Entity\Address $billing_address = null)
+    public function setBillingAddress(\Maci\UserBundle\Entity\Address $billing_address = null)
     {
         $this->billing_address = $billing_address;
 
@@ -759,7 +759,7 @@ class Order
      * @param \Maci\UserBundle\Entity\Address $shipping_address
      * @return Order
      */
-    public function setShippingAddress(\Maci\AddressBundle\Entity\Address $shipping_address = null)
+    public function setShippingAddress(\Maci\UserBundle\Entity\Address $shipping_address = null)
     {
         $this->shipping_address = $shipping_address;
 
