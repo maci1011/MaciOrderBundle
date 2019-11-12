@@ -49,7 +49,7 @@ class OrderController extends Controller
         $this->cart = false;
     }
 
-    public function addProductToCart($product, $quantity = 1)
+    public function addToCart($product, $quantity = 1)
     {
         $cart = $this->getCurrentCart();
 

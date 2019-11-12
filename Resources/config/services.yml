@@ -1,19 +1,25 @@
-parameters:
-#    maci_order.example.class: Maci\OrderBundle\Example
 
 services:
 
-services:
+    # Controller Service
 
+    Maci\OrderBundle\Controller\OrderController:
+        arguments: ["@doctrine.orm.entity_manager","@security.authorization_checker",'@security.token_storage',"@session","@maci.addresses","%maci.order.configs%"]
+        public: true
+
+    maci.orders:
+        alias: Maci\OrderBundle\Controller\OrderController
+        public: true
+
+    # Knp Menu
+    
     maci.order.menu_builder:
         class: Maci\OrderBundle\Menu\OrderMenuBuilder
         arguments: ["@knp_menu.factory","@maci.translator"]
         tags:
             - { name: knp_menu.menu_builder, method: createShopAdminMenu, alias: shop_admin }
 
-    maci.orders:
-        class: Maci\OrderBundle\Controller\OrderController
-        arguments: ["@doctrine.orm.entity_manager","@security.authorization_checker",'@security.token_storage',"@session","@maci.addresses","%maci.order.configs%"]
+    # Form
 
     maci.order.form.type.cart_add_product_item:
         class: Maci\OrderBundle\Form\Type\CartAddProductItemType
@@ -76,9 +82,10 @@ services:
         tags:
             - { name: form.type, alias: order_shipping }
 
-    maci.order.paypal_im_received:
-        class: Maci\OrderBundle\Event\OrderPayPalListener
-        arguments: ["@doctrine.orm.entity_manager"]
-        tags:
-            - { name: kernel.event_listener, event: paypal.ipn.receive, method: onIPNReceive }
+    # Orderly Bundle
+    # maci.order.paypal_im_received:
+    #     class: Maci\OrderBundle\Event\OrderPayPalListener
+    #     arguments: ["@doctrine.orm.entity_manager"]
+    #     tags:
+    #         - { name: kernel.event_listener, event: paypal.ipn.receive, method: onIPNReceive }
 

@@ -121,7 +121,7 @@ class DefaultController extends Controller
                     return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.notAvailable')));
                 }
 
-                if ( $this->get('maci.orders')->addProductToCart($product, $quantity) ) {
+                if ( $this->get('maci.orders')->addToCart($product, $quantity) ) {
                     return $this->redirect($this->generateUrl('maci_order_cart'));
                 }
 
