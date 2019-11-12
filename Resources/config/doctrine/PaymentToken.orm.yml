@@ -1,0 +1,10 @@
+
+Maci\OrderBundle\Entity\PaymentToken:
+    type:  entity
+    table: maci_order_payment_token
+    #repositoryClass: Maci\OrderBundle\Repository\PaymentTokenRepository
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
