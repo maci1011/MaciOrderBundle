@@ -107,7 +107,7 @@ class DefaultController extends Controller
                 $product = intval($form['product']->getData());
 
                 if (is_numeric($product)) {
-                    $product = $this->getDoctrine()->getManager()->getRepository('MaciProductBundle:Product')
+                    $product = $this->getDoctrine()->getManager()->getRepository('MaciPageBundle:Shop\Product')
                         ->findOneById(intval($product));
                 }
 
@@ -126,7 +126,7 @@ class DefaultController extends Controller
                 }
 
             } else {
-                return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.formNoValid')));
+                return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.formIsNotValid')));
             }
         }
 
@@ -161,7 +161,7 @@ class DefaultController extends Controller
         $form = $this->createForm(CartRemoveItemType::class);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             if ( $this->get('maci.orders')->removeItem(intval($id)) ) {
                 return $this->redirect($this->generateUrl('maci_order_cart', array('removed' => true)));
             } else {
@@ -308,7 +308,7 @@ class DefaultController extends Controller
         $form = $this->createForm($form, $cart);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->get('maci.orders')->setCartCheckout( $checkout );
             $payment = $form['payment']->getData();
             $payments = $this->get('maci.orders')->getPaymentsArray();
@@ -331,7 +331,7 @@ class DefaultController extends Controller
         $form = $this->createForm(MailType::class, $cart);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->get('maci.orders')->setCartMail( $form['mail']->getData() );
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'mail')));
         }
@@ -347,7 +347,7 @@ class DefaultController extends Controller
         $form = $this->createForm(PaymentType::class, $cart);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $payments = $this->get('maci.orders')->getPaymentsArray();
             $payment = $form['payment']->getData();
             $this->get('maci.orders')->setCartPayment( $payment, $payments[$payment]['cost'] );
@@ -365,7 +365,7 @@ class DefaultController extends Controller
         $form = $this->createForm(ShippingType::class, $cart);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->get('maci.orders')->setCartShipping( $form['shipping']->getData() );
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'shipping')));
         }
@@ -381,7 +381,7 @@ class DefaultController extends Controller
         $form = $this->createForm(CartBillingAddressType::class, $cart);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $address = $this->get('maci.addresses')->getAddress($form['billing_address']->getData());
             $this->get('maci.orders')->setCartBillingAddress($address);
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'billing')));
@@ -398,7 +398,7 @@ class DefaultController extends Controller
         $form = $this->createForm(CartShippingAddressType::class, $cart);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $address = $this->get('maci.addresses')->getAddress($form['shipping_address']->getData());
             $this->get('maci.orders')->setCartShippingAddress($address);
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'shipping')));

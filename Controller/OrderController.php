@@ -2,6 +2,7 @@
 
 namespace Maci\OrderBundle\Controller;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,7 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+
 use Maci\UserBundle\Controller\AddressServiceController;
 use Maci\UserBundle\Entity\Address;
 use Maci\OrderBundle\Entity\Order;

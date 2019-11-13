@@ -58,13 +58,17 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.billing' | matra('Billing Address') }}</h4>
 
-	<h5>{{ 'page.checkout.use_existing_address' | matra('Use An Existing Address') }}</h5>
+	{% if maci_addresses.addressList|length %}
 
-	{% if maci_addresses.addressList|length %} {{ render(controller('MaciOrderBundle:Default:cartSetBillingAddress')) }}{% endif %}
+		<h5>{{ 'page.checkout.use_existing_address' | matra('Use An Existing Address') }}</h5>
+
+		{{ render(controller('MaciOrderBundle:Default:cartSetBillingAddress')) }}
+
+	{% endif %}
 
 	<h5>{{ 'page.checkout.add_new_address' | matra('Add A New Address') }}</h5>
 
-	{{ render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': 'billing'} )) }}
+	{{ render(controller('MaciUserBundle:Address:form', {'id': null, 'method': 'billing'} )) }}
 
 </section>
 
@@ -74,7 +78,7 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.billing' | matra('Billing Address') }}</h4>
 
-	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
+	{% include "@MaciUser/Address/_item.html.twig" with { 'address': order.billingAddress } %}
 
 	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'billingAddress'}) }}" class="btn btn-success">{{ 'order.edit_billing_address' | matra('Edit Billing Address') }}</a>
 
@@ -102,13 +106,17 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Address') }}</h4>
 
-	<h5>{{ 'page.checkout.use_existing_address' | matra('Use An Existing Address') }}</h5>
+	{% if maci_addresses.addressList|length %}
 
-	{% if maci_addresses.addressList|length %} {{ render(controller('MaciOrderBundle:Default:cartSetShippingAddress')) }}{% endif %}
+		<h5>{{ 'page.checkout.use_existing_address' | matra('Use An Existing Address') }}</h5>
+
+		{{ render(controller('MaciOrderBundle:Default:cartSetShippingAddress')) }}
+
+	{% endif %}
 
 	<h5>{{ 'page.checkout.add_new_address' | matra('Add A New Address') }}</h5>
 
-	{{ render(controller('MaciAddressBundle:Default:form', {'id': null, 'method': 'shipping'} )) }}
+	{{ render(controller('MaciUserBundle:Address:form', {'id': null, 'method': 'shipping'} )) }}
 
 </section>
 
@@ -118,7 +126,7 @@
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Address') }}</h4>
 
-	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
+	{% include "@MaciUser/Address/_item.html.twig" with { 'address': order.shippingAddress } %}
 
 	<a href="{{ path('maci_order_checkout', {'id': order.id,'checkout':'shippingAddress'}) }}" class="btn btn-success">{{ 'order.edit_shipping_address' | matra('Edit Shipping Address') }}</a>
 
