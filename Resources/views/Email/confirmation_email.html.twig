@@ -67,14 +67,14 @@ td > table {
 	{% if order.billingAddress is not null %}
 	<td class="address" width="50%">
 		<h3>{{ 'page.checkout.billing' | matra('Billing Address') }}:</h3>
-		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
+		{% include "@MaciUser/Address/_item.html.twig" with { 'address': order.billingAddress } %}
 	</td>
 	{% endif %}
 
 	{% if order.shippingAddress is not null %}
 	<td class="address" width="50%">
 		<h3>{{ 'page.checkout.shipping' | matra('Shipping Address') }}:</h3>
-		{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
+		{% include "@MaciUser/Address/_item.html.twig" with { 'address': order.shippingAddress } %}
 	</td>
 	{% endif %}
 
@@ -217,7 +217,11 @@ td > table {
 
 	<h3>Contact us for more informations.</h3>
 
-	{% include "MaciPageBundle:Default:_contacts.html.twig" %}
+	<p>
+		{{ company_title }} | {{ company_address }} {{ company_cccs }} | 
+		<abbr title="Phone">Tel.</abbr> {{ company_phone }} |
+        <a href="mailto:{{ contact_email }}"><span>{{ contact_email }}</span></a>
+    </p>
 
 </td>
 </tr>

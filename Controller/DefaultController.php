@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Payum\Core\Request\GetHumanStatus;
+
 use Maci\OrderBundle\Entity\Order;
 use Maci\OrderBundle\Entity\Item;
 
@@ -417,11 +419,15 @@ class DefaultController extends Controller
 
             return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'error.order_not_valid')));
 
-        } else if ($cart->getPayment() === 'paypal') {
+        }
 
-            return $this->paypalForm($cart);
+        // else if ($cart->getPayment() === 'paypal') {
 
-        } else if ( $cart->confirmOrder() ) {
+        //     return $this->paypalForm($cart);
+
+        // }
+
+        else if ( $cart->confirmOrder() ) {
 
             if ($cart->getUser()) {
                 $to = $cart->getUser()->getEmail();
@@ -430,8 +436,6 @@ class DefaultController extends Controller
                 $to = $cart->getMail();
                 $toint = $cart->getBillingAddress()->getName() .' '. $cart->getBillingAddress()->getSurname();
             }
-
-            $em = $this->getDoctrine()->getManager();
 
             $mail = new Mail();
 
@@ -455,6 +459,12 @@ class DefaultController extends Controller
 
             $mail->end();
 
+            $em = $this->getDoctrine()->getManager();
+
+            $em->persist($mail);
+
+            $em->flush();
+
             // ---> send message
             if ($this->container->get('kernel')->getEnvironment() == "prod") $this->get('mailer')->send($message);
 
@@ -463,18 +473,38 @@ class DefaultController extends Controller
             // ---> send notify
             if ($this->container->get('kernel')->getEnvironment() == "prod") $this->get('mailer')->send($notify);
 
-            $em->persist($mail);
+            // $page = $em->getRepository('MaciPageBundle:Page')
+            //     ->findOneByPath('order-complete');
 
-            $em->flush();
+            // if ($page) {
+            //     return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete')));
+            // }
 
-            $page = $em->getRepository('MaciPageBundle:Page')
-                ->findOneByPath('order-complete');
+            // return $this->redirect($this->generateUrl('maci_order_checkout_complete'));
 
-            if ($page) {
-                return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete')));
-            }
-
-            return $this->redirect($this->generateUrl('maci_order_checkout_complete'));
+            // if ($cart->getPayment() === 'paypal') {}
+            // else vvv
+            $gatewayName = 'offline';
+            
+            $storage = $this->get('payum')->getStorage('Maci\OrderBundle\Entity\Payment');
+            
+            $payment = $storage->create();
+            $payment->setNumber(uniqid());
+            $payment->setCurrencyCode('EUR');
+            $payment->setTotalAmount(intval($cart->getAmount() * 100)); // 1.23 EUR
+            $payment->setDescription($cart->getCode());
+            $payment->setClientId($toint);
+            $payment->setClientEmail($to);
+            
+            $storage->update($payment);
+            
+            $captureToken = $this->get('payum')->getTokenFactory()->createCaptureToken(
+                $gatewayName, 
+                $payment, 
+                'maci_order_checkout_complete' // the route to redirect after capture
+            );
+            
+            return $this->redirect($captureToken->getTargetUrl());
 
         }
 
@@ -483,7 +513,25 @@ class DefaultController extends Controller
 
     public function cartCompleteAction(Request $request)
     {
-        return $this->render('MaciOrderBundle:Default:complete.html.twig');
+        $token = $this->get('payum')->getHttpRequestVerifier()->verify($request);
+        
+        $gateway = $this->get('payum')->getGateway($token->getGatewayName());
+        
+        $gateway->execute($status = new GetHumanStatus($token));
+        $payment = $status->getFirstModel();
+        
+        // Now you have order and payment status
+        
+        return new JsonResponse(array(
+            'status' => $status->getValue(),
+            'payment' => array(
+                'total_amount' => $payment->getTotalAmount(),
+                'currency_code' => $payment->getCurrencyCode(),
+                'details' => $payment->getDetails(),
+            ),
+        ));
+        
+        // return $this->render('MaciOrderBundle:Default:complete.html.twig');
     }
 
     public function paypalCompleteAction()
