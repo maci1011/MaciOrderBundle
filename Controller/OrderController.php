@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -190,17 +190,15 @@ class OrderController extends Controller
     {
         $this->getCurrentCart();
         $this->cart->setShipping($shipping);
-        $shipping = $this->getShippingsItem($shipping);
+        $shipping = $this->getShippingItem($shipping);
         if ( 0 < $this->configs['free_shipping_over'] ) {
             if ( $this->configs['free_shipping_over'] < $this->cart->getAmount() ) {
                 $this->cart->setShippingCost(0);
             } else {
                 $this->cart->setShippingCost($shipping['cost']);
             }
-        }
-        $address = $this->cart->getShippingAddress();
-        if (is_object($address) && $address->getCountry() !== $shipping['country']) {
-            $this->setCartShippingAddress(null);
+        } else {
+            $this->cart->setShippingCost($shipping['cost']);
         }
         $this->saveCart();
     }
@@ -469,6 +467,37 @@ class OrderController extends Controller
         return $this->configs['payments'];
     }
 
+    public function getPaymentChoices()
+    {
+        $choices = array();
+        foreach ($this->getPaymentsArray() as $key => $value) {
+            $choices[$this->getPaymentLabel($value)] = $key;
+        }
+        return $choices;
+    }
+
+    public function getPaymentLabel($payment)
+    {
+        $label = $payment['label'];
+        if ($payment['cost']) {
+            $label .= ' | ' . number_format($payment['cost'], 2, '.', ',') . ' €';
+        }
+        return $label;
+    }
+
+    public function getCartPaymentLabel()
+    {
+        if(!$this->cart->getPayment()) {
+            return null;
+        }
+        return $this->getPaymentLabelById($this->cart->getPayment());
+    }
+
+    public function getPaymentLabelById($id)
+    {
+        return array_key_exists($id, $this->configs['payments']) ? $this->getPaymentLabel($this->configs['payments'][$id]) : null;
+    }
+
     public function getCouriersArray()
     {
         return $this->configs['couriers'];
@@ -484,25 +513,51 @@ class OrderController extends Controller
         foreach ($this->getCouriersArray() as $name => $courier) {
             if (array_key_exists('countries', $courier)) {
                 foreach ($courier['countries'] as $id => $country) {
-                    $shippings[($id . '_' . $name)] = array(
+                    $shippings['shipping_'.count($shippings)] = array(
                         'country' => $id,
                         'courier' => $name,
-                        'courier_label' => $courier['label'],
                         'label' => $courier['label'],
                         'cost' => (array_key_exists('cost', $country) ? $country['cost'] : $courier['default_cost'])
                     );
                 };
             }
         }
+        $this->shippings = $shippings;
 
-        if (!count($shippings)) {
-            $shippings = false;
-        }
-
-        return $this->shippings = $shippings;
+        return $shippings;
     }
 
-    public function getShippingsItem($id)
+    public function getShippingLabel($shipping)
+    {
+        return $shipping['label'] . ' | ' . Countries::getName($shipping['country']) . ' | ' . number_format($shipping['cost'], 2, '.', ',') . ' €';
+    }
+
+    public function getShippingLabelById($id)
+    {
+        $this->getShippingsArray();
+        return array_key_exists($id, $this->shippings) ? $this->getShippingLabel($this->shippings[$id]) : null;
+    }
+
+    public function getShippingChoices()
+    {
+        $choices = array();
+        $country = false;
+        if($this->cart->getShippingAddress()) {
+            $country = $this->cart->getShippingAddress()->getCountry();
+        }
+        foreach ($this->getShippingsArray() as $key => $value) {
+            if ($country) {
+                if($country == $value['country']) {
+                    $choices[$this->getShippingLabel($value)] = $key;
+                }
+            } else {
+                $choices[$this->getShippingLabel($value)] = $key;
+            }
+        }
+        return $choices;
+    }
+
+    public function getShippingItem($id)
     {
         $list = $this->getShippingsArray();
         if (array_key_exists($id, $list)) {
@@ -511,71 +566,53 @@ class OrderController extends Controller
         return false;
     }
 
-    public function getShippingByCountry($country)
-    {
-        $list = $this->getShippingsArray();
-        $item = false;
-        foreach ($list as $key => $value) {
-            if ($value['country'] === $country) {
-                return $key;
-            }
-        }
-        return $item;
-    }
-
     public function getCartShippingItem()
     {
         $this->getCurrentCart();
-        $item = $this->getShippingsItem( $this->cart->getShipping() );
-
-        if ($item) {
-            return $item;
+        if($this->cart->getShipping()) {
+            return $this->getShippingItem($this->cart->getShipping());
         }
-        
         return false;
+    }
+
+    public function getCartShippingLabel()
+    {
+        $this->getCurrentCart();
+        if($this->cart->getShipping()) {
+            return $this->getShippingLabelById($this->cart->getShipping());
+        }
+        return null;
     }
 
     public function getCartShippingCountry()
     {
         $item = $this->getCartShippingItem();
-
         if ($item) {
             return $item['country'];
         }
-        
         return false;
     }
 
     public function getCartShippingCourier()
     {
         $item = $this->getCartShippingItem();
-
         if ($item) {
             return $item['courier'];
         }
-        
         return false;
     }
 
-    public function getCountriesArray()
+    public function getAvailableCountries()
     {
         if ($this->countries) {
             return $this->countries;
         }
-
         $countries  = array();
-
         foreach ($this->getCouriersArray() as $key => $value) {
             if (array_key_exists('countries', $value)) {
-                $countries = array_merge($countries, $value['countries']);
+                $countries = array_merge($countries, array_keys($value['countries']));
             }
         }
-
         return $this->countries = $countries;
-    }
-
-    public function getCountryName($country, $locale = null)
-    {
-        return Intl::getRegionBundle()->getCountryName( $country, $locale );
     }
 }

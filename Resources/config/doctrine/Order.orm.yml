@@ -103,6 +103,6 @@ Maci\OrderBundle\Entity\Order:
             mappedBy: order
             orderBy: { 'created': ASC }
     lifecycleCallbacks:
-        prePersist: [ setUpdatedValue, setCreatedValue ]
+        prePersist: [ setUpdatedValue, setCreatedValue, setInvoiceValue ]
         preUpdate: [ setUpdatedValue ]
 

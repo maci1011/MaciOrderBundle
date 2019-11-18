@@ -257,14 +257,6 @@ class Item
         return $this->product;
     }
 
-    /**
-     * __toString()
-     */
-    public function __toString()
-    {
-        return 'MaciOrderItem_' . $this->getId();
-    }
-
     public function setUpdatedValue()
     {
         $this->updated = new \DateTime();
@@ -336,5 +328,13 @@ class Item
             return ( $this->product->getSale() );
         }
         return 0;
+    }
+
+    /**
+     * __toString()
+     */
+    public function __toString()
+    {
+        return 'Order-Item_'.($this->id ? $this->id : 'New');
     }
 }

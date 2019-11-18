@@ -56,7 +56,7 @@
 
 <section class="page_content checkout_container row active">
 
-	<h4>{{ i }} - {{ 'page.checkout.billing' | matra('Billing Address') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.billing_address' | matra('Billing Address') }}</h4>
 
 	{% if maci_addresses.addressList|length %}
 
@@ -76,7 +76,7 @@
 
 <section class="page_content checkout_container row setted">
 
-	<h4>{{ i }} - {{ 'page.checkout.billing' | matra('Billing Address') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.billing_address' | matra('Billing Address') }}</h4>
 
 	{% include "@MaciUser/Address/_item.html.twig" with { 'address': order.billingAddress } %}
 
@@ -88,7 +88,7 @@
 
 <section class="page_content checkout_container row">
 
-	<h4>{{ i }} - {{ 'page.checkout.billing' | matra('Billing Address') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.billing_address' | matra('Billing Address') }}</h4>
 
 </section>
 
@@ -102,9 +102,9 @@
 
 {% if checkout.shippingAddress == 'set' %}
 
-<section class="page_content checkout_container row">
+<section class="page_content checkout_container row ck-set">
 
-	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Address') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.shipping_address' | matra('Shipping Address') }}</h4>
 
 	{% if maci_addresses.addressList|length %}
 
@@ -122,9 +122,9 @@
 
 {% elseif checkout.shippingAddress == 'setted' %}
 
-<section class="page_content checkout_container row setted">
+<section class="page_content checkout_container row ck-setted">
 
-	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Address') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.shipping_address' | matra('Shipping Address') }}</h4>
 
 	{% include "@MaciUser/Address/_item.html.twig" with { 'address': order.shippingAddress } %}
 
@@ -134,9 +134,9 @@
 
 {% elseif checkout.shippingAddress == 'toset' %}
 
-<section class="page_content checkout_container row">
+<section class="page_content checkout_container row ck-toset">
 
-	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Address') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.shipping_address' | matra('Shipping Address') }}</h4>
 
 </section>
 
@@ -152,7 +152,7 @@
 
 <section class="page_content checkout_container row active">
 
-	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Method') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.shipping_method' | matra('Shipping Method') }}</h4>
 
 	{{ render(controller('MaciOrderBundle:Default:cartSetShipping')) }}
 
@@ -162,9 +162,9 @@
 
 <section class="page_content checkout_container row setted">
 
-	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Method') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.shipping_method' | matra('Shipping Method') }}</h4>
 
-	<span>{{ order.shippingLabel }}</span>
+	<span>{{ maci_orders.cartShippingLabel }}</span>
 
 	<br/><br/>
 
@@ -176,7 +176,7 @@
 
 <section class="page_content checkout_container row">
 
-	<h4>{{ i }} - {{ 'page.checkout.shipping' | matra('Shipping Method') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.shipping_method' | matra('Shipping Method') }}</h4>
 
 </section>
 
@@ -192,7 +192,7 @@
 
 <section class="page_content checkout_container row active">
 
-	<h4>{{ i }} - {{ 'page.checkout.payment' | matra('Payment Method') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.payment_method' | matra('Payment Method') }}</h4>
 
 	{{ render(controller('MaciOrderBundle:Default:cartSetPayment')) }}
 
@@ -202,9 +202,9 @@
 
 <section class="page_content checkout_container row setted">
 
-	<h4>{{ i }} - {{ 'page.checkout.payment' | matra('Payment Method') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.payment_method' | matra('Payment Method') }}</h4>
 
-	<span>{{ order.paymentLabel }}</span>
+	<span>{{ maci_orders.cartPaymentLabel }}</span>
 
 	<br/><br/>
 
@@ -216,13 +216,22 @@
 
 <section class="page_content checkout_container row">
 
-	<h4>{{ i }} - {{ 'page.checkout.payment' | matra('Payment Method') }}</h4>
+	<h4>{{ i }} - {{ 'page.checkout.payment_method' | matra('Payment Method') }}</h4>
 
 </section>
 
 {% endif %}
 
 {% endif %} {# --- End Payment ---  #}
+
+
+
+{#
+	- ? -
+	{{ render(controller('MaciOrderBundle:Default:cartSetCheckout')) }}
+
+#}
+
 
 
 {% if checkout.confirm %} {# --- Confirm ---  #}

@@ -32,14 +32,14 @@ class CartCheckoutType extends AbstractType
 		if ($builder->getData()->checkShipment()) {
 			$builder
 				->add('shipping', ChoiceType::class, array(
-	                'choices' => $this->getChoices($this->orders->getShippingsArray()),
-	                'preferred_choices' => (is_string($str = $this->orders->getCartShippingCountry()) ? array($str) : array())
-	            ))
-	        ;
+					'choices' => $this->orders->getShippingChoices(),
+					'preferred_choices' => (is_string($str = $this->orders->getCartShippingCountry()) ? array($str) : array())
+				))
+			;
 		}
 		$builder
 			->add('payment', ChoiceType::class, array(
-                'choices' => $this->getChoices($this->orders->getPaymentsArray()),
+                'choices' => $this->orders->getPaymentChoices(),
                 'expanded' => true
             ))
 			->add('checkout', HiddenType::class, array(
@@ -47,26 +47,6 @@ class CartCheckoutType extends AbstractType
             ))
 			->add('proceed', SubmitType::class)
 		;
-	}
-
-	public function getChoices($array)
-	{
-		$result = array();
-		foreach ($array as $key => $value) {
-			if (array_key_exists('label', $value)) {
-				$label = $value['label'];
-			} else {
-				$label = ucfirst($key);
-			}
-			if (array_key_exists('country', $value)) {
-				$label = $this->orders->getCountryName($value['country']) . ' - ' . $label;
-			}
-			if ($value['cost']) {
-				$label .= ( ' ( ' . number_format($value['cost'], 2, '.', ',') . ' EUR )' );
-			}
-			$result[$label] = $key;
-		}
-		return $result;
 	}
 
 	public function getName()

@@ -776,14 +776,6 @@ class Order
         return $this->shipping_address;
     }
 
-    /**
-     * __toString()
-     */
-    public function __toString()
-    {
-        return $this->getName();
-    }
-
     public function setUpdatedValue()
     {
         $this->updated = new \DateTime();
@@ -792,6 +784,13 @@ class Order
     public function setCreatedValue()
     {
         $this->created = new \DateTime();
+    }
+
+    public function setInvoiceValue()
+    {
+        if (!$this->invoice) {
+            $this->invoice = new \DateTime();
+        }
     }
 
     public function getTransactionsAmount()
@@ -955,5 +954,13 @@ class Order
         }
 
         return true;
+    }
+
+    /**
+     * __toString()
+     */
+    public function __toString()
+    {
+        return 'Order_'.($this->id ? $this->id : 'New');
     }
 }

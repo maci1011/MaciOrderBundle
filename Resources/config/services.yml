@@ -65,6 +65,18 @@ services:
         tags:
             - { name: form.type, alias: cart_checkout }
 
+    maci.order.form.type.checkout_payment:
+        class: Maci\OrderBundle\Form\Type\CheckoutPaymentType
+        arguments: ["@maci.orders"]
+        tags:
+            - { name: form.type, alias: order_checkout_payment }
+
+    maci.order.form.type.checkout_shipping:
+        class: Maci\OrderBundle\Form\Type\CheckoutShippingType
+        arguments: ["@maci.orders"]
+        tags:
+            - { name: form.type, alias: order_checkout_shipping }
+
     maci.order.form.type.mail:
         class: Maci\OrderBundle\Form\Type\MailType
         tags:
@@ -72,15 +84,8 @@ services:
 
     maci.order.form.type.payment:
         class: Maci\OrderBundle\Form\Type\PaymentType
-        arguments: ["@maci.orders"]
         tags:
             - { name: form.type, alias: order_payment }
-
-    maci.order.form.type.shipping:
-        class: Maci\OrderBundle\Form\Type\ShippingType
-        arguments: ["@maci.orders"]
-        tags:
-            - { name: form.type, alias: order_shipping }
 
     # Orderly Bundle
     # maci.order.paypal_im_received:

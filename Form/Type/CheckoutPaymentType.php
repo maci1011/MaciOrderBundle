@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
-class ShippingType extends AbstractType
+class CheckoutPaymentType extends AbstractType
 {
 	protected $orders;
 
@@ -30,12 +30,14 @@ class ShippingType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('shipping', ChoiceType::class, array(
-                'choices' => $this->getChoices($this->orders->getShippingsArray()),
-	            'preferred_choices' => (is_string($str = $this->orders->getCartShippingCountry()) ? array($str) : array())
+			->add('payment', ChoiceType::class, array(
+                'choices' => $this->orders->getPaymentChoices(),
+                'expanded' => true
             ))
-			->add('cancel', ResetType::class)
-			->add('send', SubmitType::class)
+			->add('set_payment', SubmitType::class, [
+				'label' => 'Set Payment',
+				'attr' => ['class' => 'btn btn-primary']
+			])
 		;
 	}
 
@@ -50,6 +52,6 @@ class ShippingType extends AbstractType
 
 	public function getName()
 	{
-		return 'order_shipping';
+		return 'order_checkout_payment';
 	}
 }

@@ -22,8 +22,8 @@ use Maci\OrderBundle\Form\Type\CartPickupType;
 use Maci\OrderBundle\Form\Type\CartRemoveItemType;
 use Maci\OrderBundle\Form\Type\CartShippingAddressType;
 use Maci\OrderBundle\Form\Type\MailType;
-use Maci\OrderBundle\Form\Type\PaymentType;
-use Maci\OrderBundle\Form\Type\ShippingType;
+use Maci\OrderBundle\Form\Type\CheckoutPaymentType;
+use Maci\OrderBundle\Form\Type\CheckoutShippingType;
 
 use Maci\MailerBundle\Entity\Mail;
 
@@ -210,12 +210,13 @@ class DefaultController extends Controller
         }
 
         $checkout = array();
-        $type = $cart->getCheckout();
-        $type_array = $cart->getCheckoutArray();
 
-        if ( !$type || !in_array($type, $type_array) ) {
-            return $this->redirect($this->generateUrl('maci_order_cart'));
-        }
+        // $type = $cart->getCheckout();
+        // $type_array = $cart->getCheckoutArray();
+
+        // if ( !$type || !in_array($type, $type_array) ) {
+        //     return $this->redirect($this->generateUrl('maci_order_cart'));
+        // }
 
         $edit = $request->get('checkout');
         $set = false;
@@ -231,7 +232,7 @@ class DefaultController extends Controller
             }
         }
 
-        if ($cart->checkShipment() && ( $type === 'full_checkout' || $type === 'checkout' || $type === 'fast_checkout' ) ) {
+        if ($cart->checkShipment()) {
             if ($cart->getShippingAddress() && $edit !== 'shippingAddress') {
                 $checkout['shippingAddress'] = 'setted';
             } else {
@@ -246,7 +247,7 @@ class DefaultController extends Controller
             $checkout['shippingAddress'] = false;
         }
 
-        if ($type === 'full_checkout') {
+        if ($cart->checkShipment()) {
             if ($cart->getShipping() && $edit !== 'shipping') {
                 $checkout['shipping'] = 'setted';
             } else {
@@ -261,19 +262,15 @@ class DefaultController extends Controller
             $checkout['shipping'] = false;
         }
 
-        if ($type === 'full_checkout') {
-            if ($cart->getPayment() && $edit !== 'payment') {
-                $checkout['payment'] = 'setted';
-            } else {
-                if ($set) {
-                    $checkout['payment'] = 'toset';
-                } else {
-                    $checkout['payment'] = 'set';
-                    $set = true;
-                }
-            }
+        if ($cart->getPayment() && $edit !== 'payment') {
+            $checkout['payment'] = 'setted';
         } else {
-            $checkout['payment'] = false;
+            if ($set) {
+                $checkout['payment'] = 'toset';
+            } else {
+                $checkout['payment'] = 'set';
+                $set = true;
+            }
         }
 
         if ($set) {
@@ -346,7 +343,7 @@ class DefaultController extends Controller
     public function cartSetPaymentAction(Request $request)
     {
         $cart = $this->get('maci.orders')->getCurrentCart();
-        $form = $this->createForm(PaymentType::class, $cart);
+        $form = $this->createForm(CheckoutPaymentType::class, $cart);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -356,7 +353,7 @@ class DefaultController extends Controller
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'payment')));
         }
 
-        return $this->render('MaciOrderBundle:Default:_order_payment.html.twig', array(
+        return $this->render('MaciOrderBundle:Default:_order_checkout_payment.html.twig', array(
             'form' => $form->createView()
         ));
     }
@@ -364,7 +361,7 @@ class DefaultController extends Controller
     public function cartSetShippingAction(Request $request)
     {
         $cart = $this->get('maci.orders')->getCurrentCart();
-        $form = $this->createForm(ShippingType::class, $cart);
+        $form = $this->createForm(CheckoutShippingType::class, $cart);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -372,7 +369,7 @@ class DefaultController extends Controller
             return $this->redirect($this->generateUrl('maci_order_gocheckout', array('setted' => 'shipping')));
         }
 
-        return $this->render('MaciOrderBundle:Default:_order_shipping.html.twig', array(
+        return $this->render('MaciOrderBundle:Default:_order_checkout_shipping.html.twig', array(
             'form' => $form->createView()
         ));
     }

@@ -44,7 +44,7 @@ class Configuration implements ConfigurationInterface
                                 ->prototype('array')
                                     ->beforeNormalization()
                                         ->ifString()
-                                        ->then(function($v) { return array('cost' => intval($v)); })
+                                        ->then(function($v) { return array('cost' => floatval($v)); })
                                     ->end()
                                     ->children()
                                         ->integerNode('cost')->min(0)->end()
@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('default_tax')->defaultValue(22)->end()
-                ->scalarNode('free_shipping_over')->defaultValue(150)->end()
+                ->scalarNode('free_shipping_over')->defaultValue(0)->end()
             ->end()
         ;
 

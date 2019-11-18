@@ -1,5 +1,5 @@
 
-<div id="order_show_addresses" class="row">
+<div id="order_show_addresses" class="clearfix">
 
 
 {% if order.shippingAddress is not null %}
@@ -8,7 +8,7 @@
 
 	<h4>Shipping Address</h4>
 
-	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.shippingAddress } %}
+	{% include "MaciUserBundle:Address:_item.html.twig" with { 'address': order.shippingAddress } %}
 
 </div>
 
@@ -21,7 +21,7 @@
 
 	<h4>Billing Address</h4>
 
-	{% include "MaciAddressBundle:Default:_item.html.twig" with { 'address': order.billingAddress } %}
+	{% include "MaciUserBundle:Address:_item.html.twig" with { 'address': order.billingAddress } %}
 
 </div>
 
