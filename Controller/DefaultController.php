@@ -33,7 +33,7 @@ class DefaultController extends Controller
     {
         $list = $this->getDoctrine()->getManager()
             ->getRepository('MaciOrderBundle:Order')
-            ->findBy(array( 'user' => $this->getUser()));
+            ->findBy(['user' => $this->getUser()], ['id' => 'DESC']);
 
         return $this->render('MaciOrderBundle:Default:index.html.twig', array(
             'list' => $list
@@ -426,50 +426,6 @@ class DefaultController extends Controller
 
         else if ( $cart->confirmOrder() ) {
 
-            if ($cart->getUser()) {
-                $to = $cart->getUser()->getEmail();
-                $toint = $cart->getUser()->getUsername();
-            } else {
-                $to = $cart->getMail();
-                $toint = $cart->getBillingAddress()->getName() .' '. $cart->getBillingAddress()->getSurname();
-            }
-
-            $mail = new Mail();
-
-            $mail
-                ->setName('Order Confirmation: ' . $cart->getCode())
-                ->setType('notify')
-                ->setSubject('Order Confirmation')
-                ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
-                ->addTo($to, $toint)
-                ->setLocale($request->getLocale())
-                ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $cart)), 'text/html')
-            ;
-
-            $message = $this->get('maci.mailer')->getSwiftMessage($mail);
-
-            $notify = clone $message;
-
-            if ($cart->getUser()) {
-                $mail->setUser($cart->getUser());
-            }
-
-            $mail->end();
-
-            $em = $this->getDoctrine()->getManager();
-
-            $em->persist($mail);
-
-            $em->flush();
-
-            // ---> send message
-            if ($this->container->get('kernel')->getEnvironment() == "prod") $this->get('mailer')->send($message);
-
-            $notify->addTo($this->get('service_container')->getParameter('order_email'));
-
-            // ---> send notify
-            if ($this->container->get('kernel')->getEnvironment() == "prod") $this->get('mailer')->send($notify);
-
             // $page = $em->getRepository('MaciPageBundle:Page')
             //     ->findOneByPath('order-complete');
 
@@ -518,7 +474,57 @@ class DefaultController extends Controller
         $payment = $status->getFirstModel();
         
         // Now you have order and payment status
-        
+    
+        // Recipient
+
+        if ($cart->getUser()) {
+            $to = $cart->getUser()->getEmail();
+            $toint = $cart->getUser()->getUsername();
+        } else {
+            $to = $cart->getMail();
+            $toint = $cart->getBillingAddress()->getName() .' '. $cart->getBillingAddress()->getSurname();
+        }
+
+        // Create Mail
+
+        $mail = new Mail();
+
+        $mail
+            ->setName('Order Confirmation: ' . $cart->getCode())
+            ->setType('notify')
+            ->setSubject('Order Confirmation')
+            ->setFrom($this->get('service_container')->getParameter('server_email'), $this->get('service_container')->getParameter('server_email_int'))
+            ->addTo([$to => $toint])
+            ->setLocale($request->getLocale())
+            ->setContent($this->renderView('MaciOrderBundle:Email:confirmation_email.html.twig', array('mail' => $mail, 'order' => $cart)), 'text/html')
+        ;
+
+        if ($cart->getUser()) {
+            $mail->setUser($cart->getUser());
+        }
+
+        $mail->end();
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($mail);
+
+        $em->flush();
+
+        // Send Mail
+
+        $message = $this->get('maci.mailer')->getSwiftMessage($mail);
+
+        $notify = clone $message;
+
+        // ---> send message
+        if ($this->container->get('kernel')->getEnvironment() == "prod") $this->get('mailer')->send($message);
+
+        $notify->addTo($this->get('service_container')->getParameter('order_email'));
+
+        // ---> send notify
+        if ($this->container->get('kernel')->getEnvironment() == "prod") $this->get('mailer')->send($notify);
+
         return new JsonResponse(array(
             'status' => $status->getValue(),
             'payment' => array(

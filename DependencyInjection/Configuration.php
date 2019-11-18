@@ -47,7 +47,7 @@ class Configuration implements ConfigurationInterface
                                         ->then(function($v) { return array('cost' => floatval($v)); })
                                     ->end()
                                     ->children()
-                                        ->integerNode('cost')->min(0)->end()
+                                        ->floatNode('cost')->min(0)->end()
                                         ->scalarNode('note')->end()
                                     ->end()
                                 ->end()

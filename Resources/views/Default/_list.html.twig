@@ -71,9 +71,9 @@
 			Show Order
 		</a>
 
-		{% else %}
+		{% elseif item.status == 'current' %}
 
-		<a href="{{ path('maci_order_checkout', {'id': item.id}) }}">
+		<a href="{{ path('maci_order_checkout') }}">
 			Checkout
 		</a>
 

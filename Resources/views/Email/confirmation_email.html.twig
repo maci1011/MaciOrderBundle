@@ -50,7 +50,6 @@ td > table {
 	<td class="order-status">
 		<h4>Dear Customer,</h4>
 		<p>you order has been confirmed.</p>
-		<span>Order Type: {{ order.typeLabel }}</span><br/>
 		<span>Order Code: {{ order.code }}</span><br/>
 		<span>Order Status: {{ order.statusLabel }}</span>
 	</td>
@@ -141,7 +140,7 @@ td > table {
 	</tr>
 
 	{# SHIPPING COST #}
-	{% if order.checkShipment and order.shippingCost %}
+	{% if order.shipping %}
 	<tr>
 		<td>&nbsp;</td>
 		<td>Shipping Cost:</td>
@@ -152,12 +151,18 @@ td > table {
 			<span class="order-shippingCost-description">{{ ('order.shippings.' ~ order.shipping) | matra(order.shipping) }}</span>
 			{% endif %}
 		</td>
-		<td>{{ order.shippingCost | number_format(2, '.', ',') }} &euro;</td>
+		<td>
+			{% if order.shippingCost %}
+			{{ order.shippingCost | number_format(2, '.', ',') }} &euro;
+			{% else %}
+			&nbsp;
+			{% endif %}
+		</td>
 	</tr>
 	{% endif %}
 
 	{# PAYMENT COST #}
-	{% if order.paymentCost %}
+	{% if order.payment %}
 	<tr>
 		<td>&nbsp;</td>
 		<td>Payment Cost:</td>
@@ -168,7 +173,13 @@ td > table {
 			<span class="order-paymentCost-description">{{ ('order.payments.' ~ order.payment) | matra(order.payment) }}</span>
 			{% endif %}
 		</td>
-		<td>{{ order.paymentCost | number_format(2, '.', ',') }} &euro;</td>
+		<td>
+			{% if order.paymentCost %}
+			{{ order.paymentCost | number_format(2, '.', ',') }} &euro;
+			{% else %}
+			&nbsp;
+			{% endif %}
+		</td>
 	</tr>
 	{% endif %}
 
