@@ -1,7 +1,7 @@
 
 {% if list|length %}
 
-<section class="cart-list">
+<section class="orders-list">
 <div class="container-fluid">
 
 <div class="list-default">
@@ -42,7 +42,7 @@
 <tr class="list-item">
 
 	<td>
-		<h5>{{ item.code }}</h5>
+		<span>{{ item.code }}</span>
 	</td>
 
 	<td>
@@ -61,19 +61,19 @@
 
 		{% if item.status == 'complete' %}
 
-		<a href="{{ path('maci_order_invoice', {'id': item.id}) }}">
+		<a class="btn" href="{{ path('maci_order_invoice', {'id': item.id}) }}">
 			Show Invoice
 		</a>
 
 		{% elseif item.status == 'confirm' %}
 
-		<a href="{{ path('maci_order_show', {'id': item.id}) }}">
+		<a class="btn" href="{{ path('maci_order_show', {'id': item.id}) }}">
 			Show Order
 		</a>
 
 		{% elseif item.status == 'current' %}
 
-		<a href="{{ path('maci_order_checkout') }}">
+		<a class="btn" href="{{ path('maci_order_checkout') }}">
 			Checkout
 		</a>
 

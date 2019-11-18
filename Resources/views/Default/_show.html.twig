@@ -12,7 +12,7 @@
 
 <tr class="list-header">
 
-	<th class="list-header order-header-preview">
+	<th class="list-header order-header-preview hidden-xs">
 		&nbsp;
 	</th>
 
@@ -44,7 +44,7 @@
 
 <tr class="order-item">
 
-	<td class="order-item-preview">
+	<td class="order-item-preview hidden-xs">
 
 		{% if item.product.inhPreview is not null %}
 		<img class="img-responsive" src="{{ asset(item.product.inhPreview.webPath | imagine_filter('maci_product_preview_cart')) }}" alt="{{ item.product.inhName }}" {% if item.product.inhDescription %} title="{{ item.product.inhDescription }}" {% else %} title="{{ item.product.inhName }}" {% endif %} />
@@ -118,7 +118,7 @@
 
 <tr>
 
-	<th class="list-header">
+	<th class="list-header hidden-xs">
 		&nbsp;
 	</th>
 
