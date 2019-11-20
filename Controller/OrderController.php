@@ -29,6 +29,8 @@ class OrderController extends Controller
 
     private $session;
 
+    private $kernel;
+
     private $ac;
 
     private $cart;
@@ -39,12 +41,13 @@ class OrderController extends Controller
 
     private $countries;
 
-	public function __construct(ObjectManager $objectManager, AuthorizationCheckerInterface $authorizationChecker, TokenStorageInterface $tokenStorage, Session $session, AddressServiceController $ac, $configs)
+	public function __construct(ObjectManager $objectManager, AuthorizationCheckerInterface $authorizationChecker, TokenStorageInterface $tokenStorage, Session $session, \App\Kernel $kernel, AddressServiceController $ac, $configs)
 	{
     	$this->om = $objectManager;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenStorage = $tokenStorage;
         $this->session = $session;
+        $this->kernel = $kernel;
         $this->ac = $ac;
         $this->configs = $configs;
         $this->cart = false;
@@ -470,8 +473,10 @@ class OrderController extends Controller
     public function getPaymentChoices()
     {
         $choices = array();
-        foreach ($this->getPaymentsArray() as $key => $value) {
-            $choices[$this->getPaymentLabel($value)] = $key;
+        foreach ($this->getCartShippingPayments() as $name => $value) {
+            if(!$value['sandbox'] || ($value['sandbox'] && $this->kernel->getEnvironment() == "dev")) {
+                $choices[$this->getPaymentLabel($value)] = $name;
+            }
         }
         return $choices;
     }
@@ -557,6 +562,33 @@ class OrderController extends Controller
         return $choices;
     }
 
+    public function getPaymentItem($id)
+    {
+        $list = $this->getPaymentsArray();
+        if (array_key_exists($id, $list)) {
+            return $list[$id];
+        }
+        return false;
+    }
+
+    public function getCartPaymentItem()
+    {
+        $this->getCurrentCart();
+        if($this->cart->getPayment()) {
+            return $this->getPaymentItem($this->cart->getPayment());
+        }
+        return false;
+    }
+
+    public function getCartPaymentGateway()
+    {
+        $item = $this->getCartPaymentItem();
+        if ($item) {
+            return $item['gateway'];
+        }
+        return false;
+    }
+
     public function getShippingItem($id)
     {
         $list = $this->getShippingsArray();
@@ -600,6 +632,26 @@ class OrderController extends Controller
             return $item['courier'];
         }
         return false;
+    }
+
+    public function getCartShippingPayments()
+    {
+        $item = $this->getCartShippingItem();
+        $courier = $this->getCouriersArray()[$item['courier']];
+        if(!array_key_exists('payments', $courier)) {
+            return [];
+        }
+        if(in_array('all', $courier['payments'])) {
+            return $this->getPaymentsArray();
+        }
+        $return = [];
+        $paymentNames = array_keys($this->getPaymentsArray());
+        foreach ($courier['payments'] as $key => $value) {
+            if (in_array($value, $paymentNames)) {
+                $return[$value] = $this->getPaymentsArray()[$value];
+            }
+        }
+        return $return;
     }
 
     public function getAvailableCountries()

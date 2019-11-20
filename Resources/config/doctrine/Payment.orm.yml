@@ -8,3 +8,8 @@ Maci\OrderBundle\Entity\Payment:
             type: integer
             generator:
                 strategy: AUTO
+    fields:
+        created:
+            type: datetime
+    lifecycleCallbacks:
+        prePersist: [ setCreatedValue ]

@@ -51,16 +51,20 @@ maci_order_paypal_complete:
     defaults: { _controller: MaciOrderBundle:Default:paypalComplete }
 
 maci_order_checkout_complete:
-    path:  /cart/checkout/complete
-    defaults: { _controller: MaciOrderBundle:Default:cartComplete }
+    path:  /cart/checkout/complete/{token}
+    defaults: { _controller: MaciOrderBundle:Default:checkoutComplete }
 
 maci_order_checkout_confirm:
     path:  /cart/checkout/confirm
-    defaults: { _controller: MaciOrderBundle:Default:cartConfirm }
+    defaults: { _controller: MaciOrderBundle:Default:checkoutConfirm }
 
 maci_order_checkout:
     path:  /cart/checkout
     defaults: { _controller: MaciOrderBundle:Default:cartCheckout }
+
+maci_order_payments_after_capture:
+    path:  /payements/after_capture
+    defaults: { _controller: MaciOrderBundle:Default:afterCapture }
 
 maci_order_cart_form:
     path:  /cart/form

@@ -4,7 +4,7 @@ services:
     # Controller Service
 
     Maci\OrderBundle\Controller\OrderController:
-        arguments: ["@doctrine.orm.entity_manager","@security.authorization_checker",'@security.token_storage',"@session","@maci.addresses","%maci.order.configs%"]
+        arguments: ["@doctrine.orm.entity_manager","@security.authorization_checker",'@security.token_storage',"@session","@kernel","@maci.addresses","%maci.order.configs%"]
         public: true
 
     maci.orders:

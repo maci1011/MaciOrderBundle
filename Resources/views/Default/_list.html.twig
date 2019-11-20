@@ -46,7 +46,11 @@
 	</td>
 
 	<td>
+		{% if item.status == 'current' %}
+		<span>{{ item.subAmount | number_format(2, '.', ',') }} &euro;</span>
+		{% else %}
 		<span>{{ item.amount | number_format(2, '.', ',') }} &euro;</span>
+		{% endif %}
 	</td>
 
 	<td>

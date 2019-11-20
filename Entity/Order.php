@@ -325,6 +325,11 @@ class Order
         return $this->payment_cost;
     }
 
+    public function getpayment_cost()
+    {
+        return $this->getPaymentCost();
+    }
+
     public function setShippingCost($shipping_cost)
     {
         $this->shipping_cost = $shipping_cost;
@@ -335,6 +340,11 @@ class Order
     public function getShippingCost()
     {
         return $this->shipping_cost;
+    }
+
+    public function getshipping_cost()
+    {
+        return $this->getShippingCost();
     }
 
     /**
@@ -378,12 +388,12 @@ class Order
     {
         $i = 0;
         foreach ($this->getStatusArray() as $key => $value) {
-            if ($key === $this->status) {
+            if ($value === $this->status) {
                 return $i;
             }
             $i++;
         }
-        return null;
+        return -1;
     }
 
     public function getStatusLabel()
@@ -511,6 +521,9 @@ class Order
 
     public function getSubAmount()
     {
+        if (!$this->sub_amount) {
+            $this->refreshAmount();
+        }
         return $this->sub_amount;
     }
 
@@ -835,6 +848,10 @@ class Order
 
     public function checkOrder()
     {
+        if(!count($this->items)) {
+            return false;
+        }
+
         foreach ($this->items as $item) {
             if ( !$item->checkAvailability() ) {
                 return false;
@@ -919,7 +936,7 @@ class Order
 
     public function checkConfirmation()
     {
-        if ( 2 < $this->getProgression() || !$this->amount || !$this->checkOrder() ) {
+        if ( 2 < $this->getProgression() || !$this->checkOrder() ) {
             return false;
         }
 
