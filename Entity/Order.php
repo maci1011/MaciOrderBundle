@@ -130,6 +130,11 @@ class Order
     private $transactions;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $payments;
+
+    /**
      * @var \Maci\UserBundle\Entity\User
      */
     private $user;
@@ -151,6 +156,7 @@ class Order
     {
         $this->items = new \Doctrine\Common\Collections\ArrayCollection();
         $this->transactions = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->token = md5(
             'MaciOrderBundle_Entity_Order-' . rand(10000, 99999) . '-' . 
             date('h') . date('i') . date('s') . date('m') . date('d') . date('Y')
@@ -721,6 +727,39 @@ class Order
     }
 
     /**
+     * Add payments
+     *
+     * @param \Maci\OrderBundle\Entity\Payment $payments
+     * @return Order
+     */
+    public function addPayment(\Maci\OrderBundle\Entity\Payment $payments)
+    {
+        $this->payments[] = $payments;
+
+        return $this;
+    }
+
+    /**
+     * Remove payments
+     *
+     * @param \Maci\OrderBundle\Entity\Payment $payments
+     */
+    public function removePayment(\Maci\OrderBundle\Entity\Payment $payments)
+    {
+        $this->payments->removeElement($payments);
+    }
+
+    /**
+     * Get payments
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPayments()
+    {
+        return $this->payments;
+    }
+
+    /**
      * Set user
      *
      * @param \Maci\UserBundle\Entity\User $user
@@ -774,7 +813,15 @@ class Order
      */
     public function setShippingAddress(\Maci\UserBundle\Entity\Address $shipping_address = null)
     {
+        if($this->shipping_address && $this->shipping) {
+            if($this->shipping_address->getCountry() !== $shipping_address->getCountry()) {
+                $this->shipping = null;
+            }
+        }
+
         $this->shipping_address = $shipping_address;
+
+
 
         return $this;
     }

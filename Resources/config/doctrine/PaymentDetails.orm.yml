@@ -1,0 +1,10 @@
+
+Maci\OrderBundle\Entity\PaymentDetails:
+    type:  entity
+    table: maci_order_payment_details
+    #repositoryClass: Maci\OrderBundle\Repository\PaymentDetailsRepository
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO

@@ -191,18 +191,31 @@ class OrderController extends Controller
 
     public function setCartShipping($shipping)
     {
+        $item = $this->getShippingItem($shipping);
+        if(!$item) { return; }
+
         $this->getCurrentCart();
+
         $this->cart->setShipping($shipping);
-        $shipping = $this->getShippingItem($shipping);
+
+        $payment = $this->cart->getPayment();
+        if($payment) {
+            $payments = $this->getCartShippingPayments();
+            if(!in_array($payment, $payments)) {
+                $this->cart->setPayment(null);
+            }
+        }
+
         if ( 0 < $this->configs['free_shipping_over'] ) {
             if ( $this->configs['free_shipping_over'] < $this->cart->getAmount() ) {
                 $this->cart->setShippingCost(0);
             } else {
-                $this->cart->setShippingCost($shipping['cost']);
+                $this->cart->setShippingCost($item['cost']);
             }
         } else {
-            $this->cart->setShippingCost($shipping['cost']);
+            $this->cart->setShippingCost($item['cost']);
         }
+
         $this->saveCart();
     }
 

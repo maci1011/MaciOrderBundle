@@ -102,6 +102,10 @@ Maci\OrderBundle\Entity\Order:
             targetEntity: Transaction
             mappedBy: order
             orderBy: { 'created': ASC }
+        payments:
+            targetEntity: Payment
+            mappedBy: order
+            orderBy: { 'created': ASC }
     lifecycleCallbacks:
         prePersist: [ setUpdatedValue, setCreatedValue, setInvoiceValue ]
         preUpdate: [ setUpdatedValue ]

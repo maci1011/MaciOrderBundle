@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Payum\Core\Request\GetHumanStatus;
+use Payum\Paypal\ExpressCheckout\Nvp\Api;
 
 use Maci\OrderBundle\Entity\Order;
 use Maci\OrderBundle\Entity\Item;
@@ -24,6 +25,9 @@ use Maci\OrderBundle\Form\Type\CartShippingAddressType;
 use Maci\OrderBundle\Form\Type\MailType;
 use Maci\OrderBundle\Form\Type\CheckoutPaymentType;
 use Maci\OrderBundle\Form\Type\CheckoutShippingType;
+use Maci\OrderBundle\Form\Type\CheckoutConfirmType;
+
+use Maci\OrderBundle\Entity\PaymentDetails;
 
 use Maci\MailerBundle\Entity\Mail;
 
@@ -233,6 +237,7 @@ class DefaultController extends Controller
         }
 
         if ($cart->checkShipment()) {
+
             if ($cart->getShippingAddress() && $edit !== 'shippingAddress') {
                 $checkout['shippingAddress'] = 'setted';
             } else {
@@ -243,11 +248,7 @@ class DefaultController extends Controller
                     $set = true;
                 }
             }
-        } else {
-            $checkout['shippingAddress'] = false;
-        }
 
-        if ($cart->checkShipment()) {
             if ($cart->getShipping() && $edit !== 'shipping') {
                 $checkout['shipping'] = 'setted';
             } else {
@@ -258,7 +259,9 @@ class DefaultController extends Controller
                     $set = true;
                 }
             }
+
         } else {
+            $checkout['shippingAddress'] = false;
             $checkout['shipping'] = false;
         }
 
@@ -277,6 +280,8 @@ class DefaultController extends Controller
             $checkout['confirm'] = 'toset';
         } else {
             $checkout['confirm'] = 'set';
+            $form = $this->createForm(CheckoutConfirmType::class, $cart);
+            $checkout['confirm_form'] = $form->createView();
         }
 
         $this->get('maci.orders')->setCartLocale( $request->getLocale() );
@@ -409,8 +414,15 @@ class DefaultController extends Controller
     }
 
     public function checkoutConfirmAction(Request $request)
-{
+    {
         $cart = $this->get('maci.orders')->getCurrentCart();
+
+        $form = $this->createForm(CheckoutConfirmType::class, $cart);
+        $form->handleRequest($request);
+
+        // if ($form->isSubmitted() && $form->isValid()) {
+        //     return $this->redirect($this->generateUrl();
+        // }
 
         $gatewayName = $this->get('maci.orders')->getCartPaymentGateway();
 
@@ -428,20 +440,65 @@ class DefaultController extends Controller
             $toint = $cart->getBillingAddress()->getName() .' '. $cart->getBillingAddress()->getSurname();
         }
 
+        $notifyToken = false;
         $payment = $storage->create();
+
         $payment->setNumber(uniqid());
         $payment->setCurrencyCode('EUR');
         $payment->setTotalAmount(intval($cart->getAmount() * 100)); // 1.23 EUR
-        $payment->setDescription($cart->getToken());
+        $payment->setDescription($cart->getCode());
         $payment->setClientId($toint);
         $payment->setClientEmail($to);
+
+        $payment->setOrder($cart);
         
         $storage->update($payment);
         
+        if(substr($gatewayName, 0, 6) === 'paypal') {
+
+            $storageDetails = $this->get('payum')->getStorage(PaymentDetails::class);
+
+            $paymentDetails = $storageDetails->create();
+
+            $paymentDetails['PAYMENTREQUEST_0_CURRENCYCODE'] = 'EUR';
+            $paymentDetails['PAYMENTREQUEST_0_AMT'] = $cart->getAmount();
+
+            $paymentDetails['NOSHIPPING'] = Api::NOSHIPPING_NOT_DISPLAY_ADDRESS;
+            $paymentDetails['REQCONFIRMSHIPPING'] = Api::REQCONFIRMSHIPPING_NOT_REQUIRED;
+            $paymentDetails['L_PAYMENTREQUEST_0_ITEMCATEGORY0'] = Api::PAYMENTREQUEST_ITERMCATEGORY_DIGITAL;
+
+            $paymentDetails['L_PAYMENTREQUEST_0_AMT0'] = $cart->getAmount();
+            $paymentDetails['L_PAYMENTREQUEST_0_QTY0'] = 1;
+            $paymentDetails['L_PAYMENTREQUEST_0_NAME0'] = $cart->getName();
+            $paymentDetails['L_PAYMENTREQUEST_0_DESC0'] = $cart->getCode();
+
+            $storageDetails->update($paymentDetails);
+
+            $notifyToken = $this->get('payum')->getTokenFactory()->createNotifyToken($gatewayName, $paymentDetails);
+
+            $captureToken = $this->get('payum')->getTokenFactory()->createCaptureToken(
+                $gatewayName, 
+                $paymentDetails, 
+                'maci_order_payments_after_capture'
+            );
+
+            $paymentDetails['PAYMENTREQUEST_0_NOTIFYURL'] = $notifyToken->getTargetUrl();
+            $paymentDetails['INVNUM'] = $paymentDetails->getId();
+
+            $storageDetails->update($paymentDetails);
+
+            $payment->setDetails($paymentDetails->getDetails());
+
+            $storage->update($payment);
+            
+            return $this->redirect($captureToken->getTargetUrl());
+
+        }
+
         $captureToken = $this->get('payum')->getTokenFactory()->createCaptureToken(
             $gatewayName, 
             $payment, 
-            'maci_order_payments_after_capture' // the route to redirect after capture
+            'maci_order_payments_after_capture'
         );
         
         return $this->redirect($captureToken->getTargetUrl());
@@ -451,18 +508,51 @@ class DefaultController extends Controller
     {
         $token = $this->get('payum')->getHttpRequestVerifier()->verify($request);
         
-        $gateway = $this->get('payum')->getGateway($token->getGatewayName());
+        $gatewayName = $token->getGatewayName();
+        $gateway = $this->get('payum')->getGateway($gatewayName);
         
         $gateway->execute($status = new GetHumanStatus($token));
         $payment = $status->getFirstModel();
         
         // Now you have order and payment status
 
+        // if 
+        // ACK!="Success"
+        // then payment error, redirect...
+        // or $status->getValue()=="canceled"
+        // then redirect...
+
+        // CHECKOUTSTATUS   "PaymentActionCompleted"
+        // PAYMENTREQUEST_0_PAYMENTSTATUS   "Pending"
+        // PAYMENTREQUEST_0_TRANSACTIONID   "1XX96663P5687610F"
+
+        $params = array(
+            'status' => $status->getValue(),
+            'payment' => $payment->getDetails()
+        );
+
+        return new JsonResponse($params);
+
         $em = $this->getDoctrine()->getManager();
     
-        $cart = $em->getRepository('MaciOrderBundle:Order')->findOneByToken($payment->getDescription());
+        $cart = $payment->getOrder();
         if (!$cart) {
             return $this->redirect($this->generateUrl('maci_order_cart', array('error' => 'error.order_not_found')));
+        }
+
+        $params = array(
+            'status' => $status->getValue(),
+            'payment' => array(
+                'total_amount' => $payment->getTotalAmount(),
+                'currency_code' => $payment->getCurrencyCode(),
+                'details' => $payment->getDetails(),
+            )
+        );
+
+        return new JsonResponse($params);
+
+        if($status->getValue() === "failed") {
+            return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'error.payment_not_valid')));
         }
 
         $payment_item = $this->get('maci.orders')->getPaymentItem($cart->getPayment());
@@ -470,9 +560,6 @@ class DefaultController extends Controller
 
         if($gateway == 'offline' && $status->getValue() == 'captured') {
             $cart->confirmOrder();
-        }
-        else {
-            return $this->redirect($this->generateUrl('maci_order_checkout', array('error' => 'error.payment_not_valid')));
         }
 
         // Recipient
@@ -518,17 +605,6 @@ class DefaultController extends Controller
         // ---> send notify
         if ($this->container->get('kernel')->getEnvironment() == "prod") $this->get('mailer')->send($notify);
 
-        $params = array(
-            'status' => $status->getValue(),
-            'payment' => array(
-                'total_amount' => $payment->getTotalAmount(),
-                'currency_code' => $payment->getCurrencyCode(),
-                'details' => $payment->getDetails(),
-            )
-        );
-
-        return new JsonResponse($params);
-
         return $this->redirect($this->generateUrl('maci_order_checkout_complete', ['token' => $cart->getToken()]));
 
     }
@@ -539,56 +615,12 @@ class DefaultController extends Controller
 
         $page = $em->getRepository('MaciPageBundle:Page')
             ->findOneByPath('order-complete');
+
         if ($page) {
             return $this->render($page->getTemplate(), $order);
         }
 
         return $this->render('MaciOrderBundle:Default:complete.html.twig', $order);
-    }
-
-    public function paypalCompleteAction()
-    {
-        $om = $this->getDoctrine()->getManager();
-
-        $id = $tx = $this->getRequest()->get('cm');
-
-        $order = $om->getRepository('MaciOrderBundle:Order')
-            ->findOneById($id);
-
-        $tx = $this->getRequest()->get('tx');
-
-        if (!$order || !$tx) {
-            return $this->redirect($this->generateUrl('maci_order_notfound'));
-        }
-
-        $pdt = $this->get('orderly_pay_pal_pdt');
-        $pdtArray = $pdt->getPdt($tx);
-
-        $status = 'unknown';
-
-        if (isset($pdtArray['payment_status'])) {
-            $status = $pdtArray['payment_status'];
-        } else if ($this->getRequest()->get('st')) {
-            $status = $this->getRequest()->get('st');
-        }
-
-        $page = $this->getDoctrine()->getManager()
-            ->getRepository('MaciPageBundle:Page')
-            ->findOneByPath('order-complete-paypal');
-
-        if ($page) {
-            return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete-paypal')));
-        }
-
-        $page = $this->getDoctrine()->getManager()
-            ->getRepository('MaciPageBundle:Page')
-            ->findOneByPath('order-complete');
-
-        if ($page) {
-            return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete')));
-        }
-
-        return $this->redirect($this->generateUrl('maci_order_checkout_complete'));
     }
 
     public function invoiceAction($id)
@@ -612,6 +644,51 @@ class DefaultController extends Controller
             'order' => $order
         ));
     }
+
+    // public function paypalCompleteAction()
+    // {
+    //     $om = $this->getDoctrine()->getManager();
+
+    //     $id = $tx = $this->getRequest()->get('cm');
+
+    //     $order = $om->getRepository('MaciOrderBundle:Order')
+    //         ->findOneById($id);
+
+    //     $tx = $this->getRequest()->get('tx');
+
+    //     if (!$order || !$tx) {
+    //         return $this->redirect($this->generateUrl('maci_order_notfound'));
+    //     }
+
+    //     $pdt = $this->get('orderly_pay_pal_pdt');
+    //     $pdtArray = $pdt->getPdt($tx);
+
+    //     $status = 'unknown';
+
+    //     if (isset($pdtArray['payment_status'])) {
+    //         $status = $pdtArray['payment_status'];
+    //     } else if ($this->getRequest()->get('st')) {
+    //         $status = $this->getRequest()->get('st');
+    //     }
+
+    //     $page = $this->getDoctrine()->getManager()
+    //         ->getRepository('MaciPageBundle:Page')
+    //         ->findOneByPath('order-complete-paypal');
+
+    //     if ($page) {
+    //         return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete-paypal')));
+    //     }
+
+    //     $page = $this->getDoctrine()->getManager()
+    //         ->getRepository('MaciPageBundle:Page')
+    //         ->findOneByPath('order-complete');
+
+    //     if ($page) {
+    //         return $this->redirect($this->generateUrl('maci_page', array('path' => 'order-complete')));
+    //     }
+
+    //     return $this->redirect($this->generateUrl('maci_order_checkout_complete'));
+    // }
 
     // public function paypalForm($order)
     // {

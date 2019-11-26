@@ -18,6 +18,11 @@ class Payment extends BasePayment
      */
     private $created;
 
+    /**
+     * @var \Maci\OrderBundle\Entity\Order
+     */
+    private $order;
+
 
     /**
      * Get id
@@ -60,6 +65,29 @@ class Payment extends BasePayment
     public function setCreatedValue()
     {
         $this->created = new \DateTime();
+    }
+
+    /**
+     * Set order
+     *
+     * @param \Maci\OrderBundle\Entity\Order $order
+     * @return Item
+     */
+    public function setOrder(\Maci\OrderBundle\Entity\Order $order = null)
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
+    /**
+     * Get order
+     *
+     * @return \Maci\OrderBundle\Entity\Order 
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 
     /**

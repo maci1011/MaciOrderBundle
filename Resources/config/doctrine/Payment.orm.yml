@@ -11,5 +11,12 @@ Maci\OrderBundle\Entity\Payment:
     fields:
         created:
             type: datetime
+    manyToOne:
+        order:
+            targetEntity: Order
+            inversedBy: payments
+            joinColumn:
+                name: order_id
+                referencedColumnName: id
     lifecycleCallbacks:
         prePersist: [ setCreatedValue ]
