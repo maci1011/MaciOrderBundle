@@ -4,7 +4,7 @@ services:
     # Ipn Action
 
     Maci\OrderBundle\Controller\StoreNotificationAction:
-        arguments: ["@doctrine.orm.entity_manager","@payum","@httplug.message_factory.default"]
+        arguments: ["@doctrine.orm.entity_manager","@payum","@httplug.message_factory.guzzle"]
 
     maci.payment.payum.action.store_notification:
         alias: Maci\OrderBundle\Controller\StoreNotificationAction
