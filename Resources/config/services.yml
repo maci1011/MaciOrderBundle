@@ -1,11 +1,19 @@
 
 services:
 
+    # Ipn Action
+
+    Maci\OrderBundle\Controller\StoreNotificationAction:
+        arguments: ["@doctrine.orm.entity_manager","@payum","@httplug.message_factory.default"]
+
+    maci.payment.payum.action.store_notification:
+        alias: Maci\OrderBundle\Controller\StoreNotificationAction
+        public: true
+
     # Controller Service
 
     Maci\OrderBundle\Controller\OrderController:
         arguments: ["@doctrine.orm.entity_manager","@security.authorization_checker",'@security.token_storage',"@session","@kernel","@maci.addresses","%maci.order.configs%"]
-        public: true
 
     maci.orders:
         alias: Maci\OrderBundle\Controller\OrderController
