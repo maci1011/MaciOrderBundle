@@ -11,17 +11,7 @@
 
 {% block container %}
 
-
-{% if registration_required %}
-
-{% include "MaciOrderBundle:Default:_gocheckout_signup.html.twig" %}
-
-{% else %}
-
 {% include "MaciOrderBundle:Default:_gocheckout.html.twig" %}
-
-{% endif %}
-
 
 {% endblock %}
 
