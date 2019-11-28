@@ -17,14 +17,20 @@ class StoreNotificationAction extends GatewayAwareAction
 
     protected $client;
 
+    protected $messageFactory;
+
+    protected $sandbox;
+
     public function __construct(
     	ObjectManager $om,
     	\Payum\Core\HttpClientInterface $client,
-    	\Http\Message\MessageFactory $messageFactory
+    	\Http\Message\MessageFactory $messageFactory,
+    	bool $sandbox
     ) {
         $this->om = $om;
         $this->client = $client;
         $this->messageFactory = $messageFactory;
+        $this->sandbox = $sandbox;
     }
 
     public function execute($request)
@@ -35,7 +41,7 @@ class StoreNotificationAction extends GatewayAwareAction
 		}
 
 		// TODO: read sandbox attribute from config
-		$api = new Api(['sandbox' => true], $this->client, $this->messageFactory);
+		$api = new Api(['sandbox' => $this->sandbox], $this->client, $this->messageFactory);
 
 		// Verify the IPN via PayPal
 		if (Api::NOTIFY_VERIFIED !== $api->notifyValidate($request->getNotification())) {
@@ -51,6 +57,14 @@ class StoreNotificationAction extends GatewayAwareAction
 		        'payer_id' => 'PAYERID',
 		        'mc_gross' => 'PAYMENTREQUEST_0_AMT',
 		        // maybe more
+				// 'item_name' => '';
+				// 'item_number' => '';
+				// 'payment_status' => '';
+				// 'payment_amount' => '';
+				// 'payment_currency' => '';
+				// 'txn_id' => '';
+				// 'receiver_email' => '';
+				// 'payer_email' => '';
 		    ),
 		    $notification,
 		    $model
@@ -58,14 +72,6 @@ class StoreNotificationAction extends GatewayAwareAction
 		    throw new NotFoundHttpException('Malformed IPN');
 		}
 
-  // $item_name = $_POST['item_name'];
-  // $item_number = $_POST['item_number'];
-  // $payment_status = $_POST['payment_status'];
-  // $payment_amount = $_POST['mc_gross'];
-  // $payment_currency = $_POST['mc_currency'];
-  // $txn_id = $_POST['txn_id'];
-  // $receiver_email = $_POST['receiver_email'];
-  // $payer_email = $_POST['payer_email'];
 
 		$previousState  = $model['PAYMENTREQUEST_0_PAYMENTSTATUS'];
 		$currentState   = $notification['payment_status'];
@@ -79,10 +85,7 @@ class StoreNotificationAction extends GatewayAwareAction
 		    $this->om->persist($model);
 		    $this->om->flush();
 
-		}
-		// else {
-		//     // no state change. Maybe no need to do something.
-		// }
+		}// else { no state change. Maybe no need to do something. }
     }
 
     protected function checkEquality($array, $notification, $model)
