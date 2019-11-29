@@ -4,11 +4,11 @@ namespace Maci\OrderBundle\Controller;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Intl\Countries;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -669,15 +669,23 @@ class OrderController extends Controller
 
 	public function getAvailableCountries()
 	{
-	    if ($this->countries) {
-	        return $this->countries;
+	    if (!isset($this->available_countries)) {
+		    $this->available_countries  = array();
+		    foreach ($this->getCouriersArray() as $key => $value) {
+		        if (array_key_exists('countries', $value)) {
+		            $this->available_countries = array_merge($this->available_countries, $value['countries']);
+		        }
+		    }
 	    }
-	    $countries  = array();
-	    foreach ($this->getCouriersArray() as $key => $value) {
-	        if (array_key_exists('countries', $value)) {
-	            $countries = array_merge($countries, array_keys($value['countries']));
-	        }
-	    }
-	    return $this->countries = $countries;
+	    return $this->available_countries;
+	}
+
+	public function getCountryChoices()
+	{
+		$choices = [];
+		foreach ($this->getAvailableCountries() as $key => $value) {
+			$choices[Countries::getName($key)] = $key;
+		}
+		return $choices;
 	}
 }
