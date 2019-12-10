@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Payum\Core\Bridge\Guzzle\HttpClientFactory;
 use Maci\OrderBundle\Action\StoreNotificationAction;
 
+use Http\Message\MessageFactory\GuzzleMessageFactory;
+
 class StoreNotificationSandboxAction extends StoreNotificationAction
 {
 
@@ -15,8 +17,7 @@ class StoreNotificationSandboxAction extends StoreNotificationAction
     ) {
         $this->om = $om;
         $this->client = HttpClientFactory::create();
-        $this->messageFactory = $messageFactory;
-
+        $this->messageFactory = new GuzzleMessageFactory();
         $this->sandbox = true;
 
     }

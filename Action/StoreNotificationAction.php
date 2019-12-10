@@ -10,8 +10,9 @@ use Payum\Core\Action\GatewayAwareAction;
 use Payum\Core\Bridge\Guzzle\HttpClientFactory;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Request\Notify;
-
 use Payum\Paypal\Ipn\Api;
+
+use Http\Message\MessageFactory\GuzzleMessageFactory;
 
 use Maci\OrderBundle\Entity\PaymentDetails;
 
@@ -26,12 +27,11 @@ class StoreNotificationAction extends GatewayAwareAction
     protected $sandbox;
 
     public function __construct(
-    	ObjectManager $om,
-    	\Http\Message\MessageFactory $messageFactory
+    	ObjectManager $om
     ) {
         $this->om = $om;
         $this->client = HttpClientFactory::create();
-        $this->messageFactory = $messageFactory;
+        $this->messageFactory = new GuzzleMessageFactory();
         $this->sandbox = false;
     }
 
@@ -52,12 +52,11 @@ class StoreNotificationAction extends GatewayAwareAction
 
 		$notification = $request->getNotification();
 
-
-		$storageDetails = $this->payum->getStorage(PaymentDetails::class);
-		$paymentDetails = $storageDetails->create();
+		$paymentDetails = new PaymentDetails();
 		$paymentDetails->setDetails($notification);
-        $storageDetails->update($paymentDetails);
 
+		$this->om->persist($paymentDetails);
+		$this->om->flush();
 
 		$model = $request->getModel();
 
