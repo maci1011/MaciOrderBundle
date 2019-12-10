@@ -86,10 +86,10 @@ class StoreNotificationAction implements ActionInterface, GatewayAwareInterface
 
 		    // ... do something with that state change
 
-		    $model['PAYMENTREQUEST_0_PAYMENTSTATUS'] = $currentState;
+		    // $model['PAYMENTREQUEST_0_PAYMENTSTATUS'] = $currentState;
 
-		    $this->om->persist($model);
-		    $this->om->flush();
+		    // $this->om->persist($model);
+		    // $this->om->flush();
 
 		}// else { no state change. Maybe no need to do something. }
     }
