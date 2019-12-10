@@ -28,7 +28,6 @@ class PaymentDetails extends ArrayObject
     public function __construct()
     {
         $this->type = 'unset';
-        $this->details = [];
     }
 
     /**
