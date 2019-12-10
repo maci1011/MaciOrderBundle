@@ -13,9 +13,22 @@ class PaymentDetails extends ArrayObject
     private $id;
 
     /**
+     * @var string
+     */
+    private $type;
+
+    /**
      * @var \Maci\OrderBundle\Entity\Payment
      */
     private $payment;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->type = 'unset';
+    }
 
     /**
      * Get id
@@ -35,6 +48,48 @@ class PaymentDetails extends ArrayObject
     public function getDetails()
     {
         return $this->details;
+    }
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     * @return Order
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string 
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function getTypeArray()
+    {
+        return array(
+            'Unset' => 'unset',
+            'Checkout Payment' => 'checkoutPayment',
+            'PayPal Express Checkout' => 'paypalExpress',
+            'PayPal Ipn' => 'paypalIpn'
+        );
+    }
+
+    public function getTypeLabel()
+    {
+        $array = $this->getTypeArray();
+        $key = array_search($this->type, $array);
+        if ($key) return $key;
+        $str = str_replace('_', ' ', $this->type);
+        return ucwords($str);
     }
 
     /**

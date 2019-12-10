@@ -459,6 +459,8 @@ class DefaultController extends Controller
             $storageDetails = $this->get('payum')->getStorage(PaymentDetails::class);
             $paymentDetails = $storageDetails->create();
 
+            $paymentDetails->setType('paypalExpress');
+
             $paymentDetails['PAYMENTREQUEST_0_CURRENCYCODE'] = 'EUR';
             $paymentDetails['PAYMENTREQUEST_0_AMT'] = $cart->getAmount();
 

@@ -50,6 +50,7 @@ class StoreNotificationAction implements ActionInterface, GatewayAwareInterface
 		$notification = $request->getNotification();
 
 		$paymentDetails = new PaymentDetails();
+		$paymentDetails->setType('paypalIpn');
 		$paymentDetails->setDetails($notification);
 
 		$this->om->persist($paymentDetails);
