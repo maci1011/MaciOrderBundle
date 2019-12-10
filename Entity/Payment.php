@@ -19,9 +19,22 @@ class Payment extends BasePayment
     private $created;
 
     /**
+     * @var ArrayCollection
+     */
+    private $paymentDetails;
+
+    /**
      * @var \Maci\OrderBundle\Entity\Order
      */
     private $order;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->paymentDetails = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
 
     /**
@@ -65,6 +78,39 @@ class Payment extends BasePayment
     public function setCreatedValue()
     {
         $this->created = new \DateTime();
+    }
+
+    /**
+     * Add paymentDetails
+     *
+     * @param \Maci\OrderBundle\Entity\PaymentDetails $paymentDetails
+     * @return Order
+     */
+    public function addPaymentDetails(\Maci\OrderBundle\Entity\PaymentDetails $paymentDetails)
+    {
+        $this->paymentDetails[] = $paymentDetails;
+
+        return $this;
+    }
+
+    /**
+     * Remove paymentDetails
+     *
+     * @param \Maci\OrderBundle\Entity\PaymentDetails $paymentDetails
+     */
+    public function removePaymentDetails(\Maci\OrderBundle\Entity\PaymentDetails $paymentDetails)
+    {
+        $this->paymentDetails->removeElement($paymentDetails);
+    }
+
+    /**
+     * Get paymentDetails
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPaymentDetails()
+    {
+        return $this->paymentDetails;
     }
 
     /**

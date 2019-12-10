@@ -139,7 +139,7 @@
 
 {# SHIPPING COST #}
 
-{% if order.shipping and edit is not defined or not edit %}
+{% if order.shipping and (edit is not defined or not edit) %}
 
 <tr>
 
@@ -174,7 +174,7 @@
 
 {# PAYMENT COST #}
 
-{% if order.payment and edit is not defined or not edit %}
+{% if order.payment and (edit is not defined or not edit) %}
 
 <tr>
 

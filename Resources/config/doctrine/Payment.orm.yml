@@ -18,5 +18,10 @@ Maci\OrderBundle\Entity\Payment:
             joinColumn:
                 name: order_id
                 referencedColumnName: id
+    oneToMany:
+        paymentDetails:
+            targetEntity: PaymentDetails
+            mappedBy: payment
+            orderBy: { 'id': DESC }
     lifecycleCallbacks:
         prePersist: [ setCreatedValue ]

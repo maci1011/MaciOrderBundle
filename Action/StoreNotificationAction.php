@@ -1,15 +1,19 @@
 <?php
 
-namespace Maci\OrderBundle\Controller;
+namespace Maci\OrderBundle\Action;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Action\GatewayAwareAction;
+use Payum\Core\Bridge\Guzzle\HttpClientFactory;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Request\Notify;
 
 use Payum\Paypal\Ipn\Api;
+
+use Maci\OrderBundle\Entity\PaymentDetails;
 
 class StoreNotificationAction extends GatewayAwareAction
 {
@@ -23,14 +27,12 @@ class StoreNotificationAction extends GatewayAwareAction
 
     public function __construct(
     	ObjectManager $om,
-    	\Payum\Core\HttpClientInterface $client,
-    	\Http\Message\MessageFactory $messageFactory,
-    	bool $sandbox
+    	\Http\Message\MessageFactory $messageFactory
     ) {
         $this->om = $om;
-        $this->client = $client;
+        $this->client = HttpClientFactory::create();
         $this->messageFactory = $messageFactory;
-        $this->sandbox = $sandbox;
+        $this->sandbox = false;
     }
 
     public function execute($request)
@@ -49,6 +51,12 @@ class StoreNotificationAction extends GatewayAwareAction
 		}
 
 		$notification   = $request->getNotification();
+
+		// $storageDetails = $this->payum->getStorage(PaymentDetails::class);
+		// $paymentDetails = $storageDetails->create();
+		// $paymentDetails->setDetails($notification);
+  //       $storageDetails->update($paymentDetails);
+
 		$model          = $request->getModel();
 
 		// Additional Checks

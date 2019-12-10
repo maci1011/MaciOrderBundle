@@ -10,14 +10,18 @@ services:
         alias: Http\Message\MessageFactory\GuzzleMessageFactory
         public: true
 
+    Maci\OrderBundle\Action\StoreNotificationAction:
+        arguments: ["@doctrine.orm.entity_manager","@httplug.message_factory.guzzle"]
+
     maci.payment.payum.action.store_notification:
-        class: Maci\OrderBundle\Controller\StoreNotificationAction
-        arguments: ["@doctrine.orm.entity_manager","@payum","@httplug.message_factory.guzzle", false]
+        alias: Maci\OrderBundle\Action\StoreNotificationAction
         public: true
 
+    Maci\OrderBundle\Action\StoreNotificationSandboxAction:
+        arguments: ["@doctrine.orm.entity_manager","@httplug.message_factory.guzzle"]
+
     maci.payment.payum.action.store_notification_sandbox:
-        class: Maci\OrderBundle\Controller\StoreNotificationAction
-        arguments: ["@doctrine.orm.entity_manager","@payum","@httplug.message_factory.guzzle", true]
+        alias: Maci\OrderBundle\Action\StoreNotificationSandboxAction
         public: true
 
     # Controller Service

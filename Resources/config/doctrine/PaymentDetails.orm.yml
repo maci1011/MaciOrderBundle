@@ -8,3 +8,10 @@ Maci\OrderBundle\Entity\PaymentDetails:
             type: integer
             generator:
                 strategy: AUTO
+    manyToOne:
+        payment:
+            targetEntity: Payment
+            inversedBy: paymentDetails
+            joinColumn:
+                name: payment_id
+                referencedColumnName: id

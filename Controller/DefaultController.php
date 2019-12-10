@@ -457,7 +457,6 @@ class DefaultController extends Controller
         if(substr($gatewayName, 0, 6) === 'paypal') {
 
             $storageDetails = $this->get('payum')->getStorage(PaymentDetails::class);
-
             $paymentDetails = $storageDetails->create();
 
             $paymentDetails['PAYMENTREQUEST_0_CURRENCYCODE'] = 'EUR';
@@ -486,6 +485,8 @@ class DefaultController extends Controller
             $paymentDetails['INVNUM'] = $paymentDetails->getId();
 
             $storageDetails->update($paymentDetails);
+
+            $paymentDetails->setPayment($payment);
 
             $payment->setDetails($paymentDetails->getDetails());
 
