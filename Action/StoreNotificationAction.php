@@ -50,14 +50,16 @@ class StoreNotificationAction extends GatewayAwareAction
 		    throw new NotFoundHttpException('Invalid IPN');
 		}
 
-		$notification   = $request->getNotification();
+		$notification = $request->getNotification();
 
-		// $storageDetails = $this->payum->getStorage(PaymentDetails::class);
-		// $paymentDetails = $storageDetails->create();
-		// $paymentDetails->setDetails($notification);
-  //       $storageDetails->update($paymentDetails);
 
-		$model          = $request->getModel();
+		$storageDetails = $this->payum->getStorage(PaymentDetails::class);
+		$paymentDetails = $storageDetails->create();
+		$paymentDetails->setDetails($notification);
+        $storageDetails->update($paymentDetails);
+
+
+		$model = $request->getModel();
 
 		// Additional Checks
 		if (!$this->checkEquality(
