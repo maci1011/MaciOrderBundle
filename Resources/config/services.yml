@@ -11,14 +11,14 @@ services:
         public: true
 
     Maci\OrderBundle\Action\StoreNotificationAction:
-        arguments: ["@doctrine.orm.entity_manager","@httplug.message_factory.guzzle"]
+        arguments: ["@doctrine.orm.entity_manager"]
 
     maci.payment.payum.action.store_notification:
         alias: Maci\OrderBundle\Action\StoreNotificationAction
         public: true
 
     Maci\OrderBundle\Action\StoreNotificationSandboxAction:
-        arguments: ["@doctrine.orm.entity_manager","@httplug.message_factory.guzzle"]
+        arguments: ["@doctrine.orm.entity_manager"]
 
     maci.payment.payum.action.store_notification_sandbox:
         alias: Maci\OrderBundle\Action\StoreNotificationSandboxAction

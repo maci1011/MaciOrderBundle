@@ -5,8 +5,9 @@ namespace Maci\OrderBundle\Action;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+use Payum\Core\GatewayAwareInterface;
+use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Action\ActionInterface;
-use Payum\Core\Action\GatewayAwareAction;
 use Payum\Core\Bridge\Guzzle\HttpClientFactory;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Request\Notify;
@@ -16,13 +17,11 @@ use Http\Message\MessageFactory\GuzzleMessageFactory;
 
 use Maci\OrderBundle\Entity\PaymentDetails;
 
-class StoreNotificationAction extends GatewayAwareAction
+class StoreNotificationAction implements ActionInterface, GatewayAwareInterface
 {
+    use GatewayAwareTrait;
+
     protected $om;
-
-    protected $client;
-
-    protected $messageFactory;
 
     protected $sandbox;
 
@@ -30,8 +29,6 @@ class StoreNotificationAction extends GatewayAwareAction
     	ObjectManager $om
     ) {
         $this->om = $om;
-        $this->client = HttpClientFactory::create();
-        $this->messageFactory = new GuzzleMessageFactory();
         $this->sandbox = false;
     }
 
@@ -43,7 +40,7 @@ class StoreNotificationAction extends GatewayAwareAction
 		}
 
 		// TODO: read sandbox attribute from config
-		$api = new Api(['sandbox' => $this->sandbox], $this->client, $this->messageFactory);
+		$api = new Api(['sandbox' => $this->sandbox], HttpClientFactory::create(), new GuzzleMessageFactory());
 
 		// Verify the IPN via PayPal
 		if (Api::NOTIFY_VERIFIED !== $api->notifyValidate($request->getNotification())) {
