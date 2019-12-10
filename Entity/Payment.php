@@ -34,6 +34,7 @@ class Payment extends BasePayment
     public function __construct()
     {
         $this->paymentDetails = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->details = [];
     }
 
 
