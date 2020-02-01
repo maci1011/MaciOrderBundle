@@ -13,6 +13,8 @@ use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Request\Notify;
 use Payum\Paypal\Ipn\Api;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use Http\Message\MessageFactory\GuzzleMessageFactory;
 
 use Maci\OrderBundle\Entity\PaymentDetails;
@@ -26,9 +28,11 @@ class StoreNotificationAction implements ActionInterface, GatewayAwareInterface
     protected $sandbox;
 
     public function __construct(
-    	ObjectManager $om
+    	ObjectManager $om,
+    	Request $request
     ) {
         $this->om = $om;
+        $this->request = $request;
         $this->sandbox = false;
     }
 
@@ -39,14 +43,6 @@ class StoreNotificationAction implements ActionInterface, GatewayAwareInterface
 		    throw RequestNotSupportedException::createActionNotSupported($this, $request);
 		}
 
-		// TODO: read sandbox attribute from config
-		$api = new Api(['sandbox' => $this->sandbox], HttpClientFactory::create(), new GuzzleMessageFactory());
-
-		// Verify the IPN via PayPal
-		if (Api::NOTIFY_VERIFIED !== $api->notifyValidate($request->getNotification())) {
-		    throw new NotFoundHttpException('Invalid IPN');
-		}
-
 		$notification = $request->getNotification();
 
 		$paymentDetails = new PaymentDetails();
@@ -55,6 +51,14 @@ class StoreNotificationAction implements ActionInterface, GatewayAwareInterface
 
 		$this->om->persist($paymentDetails);
 		$this->om->flush();
+
+		// TODO: read sandbox attribute from config
+		$api = new Api(['sandbox' => $this->sandbox], HttpClientFactory::create(), new GuzzleMessageFactory());
+
+		// Verify the IPN via PayPal
+		if (Api::NOTIFY_VERIFIED !== $api->notifyValidate($request->getNotification())) {
+		    throw new NotFoundHttpException('Invalid IPN');
+		}
 
 		$model = $request->getModel();
 
