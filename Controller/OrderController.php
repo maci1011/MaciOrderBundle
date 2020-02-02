@@ -3,7 +3,7 @@
 namespace Maci\OrderBundle\Controller;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,7 +17,7 @@ use Maci\UserBundle\Entity\Address;
 use Maci\OrderBundle\Entity\Order;
 use Maci\OrderBundle\Entity\Item;
 
-class OrderController extends Controller
+class OrderController extends AbstractController
 {
 	private $om;
 

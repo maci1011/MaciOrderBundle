@@ -2,13 +2,13 @@
 
 namespace Maci\OrderBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Payum\Core\Request\GetHumanStatus;
 
-class PaymentController extends Controller
+class PaymentController extends AbstractController
 {
 
     public function prepareAction() 

@@ -4,7 +4,7 @@ namespace Maci\OrderBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Orderly\PayPalIpnBundle\Ipn;
@@ -32,7 +32,7 @@ use Maci\MailerBundle\Entity\Mail;
 /**
  *  Sample listener controller for IPN messages with twig email notification
  */
-class TwigNotificationEmailController extends Controller
+class TwigNotificationEmailController extends AbstractController
 {
     
     public $paypal_ipn;

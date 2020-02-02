@@ -2,7 +2,7 @@
 
 namespace Maci\OrderBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -31,7 +31,7 @@ use Maci\OrderBundle\Entity\PaymentDetails;
 
 use Maci\MailerBundle\Entity\Mail;
 
-class DefaultController extends Controller
+class DefaultController extends AbstractController
 {
     public function indexAction()
     {
