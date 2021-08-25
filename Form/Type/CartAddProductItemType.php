@@ -5,12 +5,10 @@ namespace Maci\OrderBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Maci\TranslatorBundle\Controller\TranslatorController;
-
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Maci\TranslatorBundle\Controller\TranslatorController;
 
 
 class CartAddProductItemType extends AbstractType
@@ -55,7 +53,7 @@ class CartAddProductItemType extends AbstractType
             ));
 		}
 		$builder->add('add_to_cart', SubmitType::class, array(
-			'label' => ($this->translator->getLabel('product.add_to_cart', 'Add To Cart')),
+			'label' => $this->translator->getLabel('product.add_to_cart', 'Add To Cart'),
             'attr' => array('class' => 'btn-primary btn')
         ));
 	}
