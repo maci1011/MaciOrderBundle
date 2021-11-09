@@ -231,7 +231,9 @@
 		<h4 class="order-amount-label">{{ 'order.amount' | matra('Amount') }}:</h4>
 	</td>
 
-	<td><h4 class="order-amount-description">{{ order.totalItemsQuantity }} {{ 'order.subtotal-items' | matra('Items') }}</h4></td>
+	<td>
+		<h4 class="order-amount-description">{{ order.totalItemsQuantity }} {{ 'order.subtotal-items' | matra('Items') }}</h4>
+	</td>
 
 	<td>
 		<h4 class="order-amount-value">{{ order.amount | number_format(2, '.', ',') }} &euro;</h4>
