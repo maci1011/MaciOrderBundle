@@ -11,7 +11,7 @@
 {% if order.items|length %} {# --- Valid Checkout (^^) ---  #}
 
 
-<section class="page_header checkout_container row">
+<section class="page_header container-fluid px-0">
 
 {% if order.checkout == 'pickup' %}
 
@@ -40,7 +40,7 @@
 </section>
 
 
-<section class="page_content checkout_container row">
+<section class="page_content container-fluid px-0">
 
 	{{ render(controller('MaciOrderBundle:Default:showOrder', {'order': order})) }}
 
@@ -54,7 +54,7 @@
 
 {% if checkout.billingAddress == 'set' %}
 
-<section class="page_content checkout_container row active">
+<section class="page_content container-fluid px-0 active">
 
 	<h4>{{ i }} - {{ 'page.checkout.billing_address' | matra('Billing Address') }}</h4>
 
@@ -74,7 +74,7 @@
 
 {% elseif checkout.billingAddress == 'setted' %}
 
-<section class="page_content checkout_container row setted">
+<section class="page_content container-fluid px-0 setted">
 
 	<h4>{{ i }} - {{ 'page.checkout.billing_address' | matra('Billing Address') }}</h4>
 
@@ -86,7 +86,7 @@
 
 {% elseif checkout.billingAddress == 'toset' %}
 
-<section class="page_content checkout_container row">
+<section class="page_content container-fluid px-0">
 
 	<h4>{{ i }} - {{ 'page.checkout.billing_address' | matra('Billing Address') }}</h4>
 
@@ -102,7 +102,7 @@
 
 {% if checkout.shippingAddress == 'set' %}
 
-<section class="page_content checkout_container row ck-set">
+<section class="page_content container-fluid px-0 ck-set">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping_address' | matra('Shipping Address') }}</h4>
 
@@ -122,7 +122,7 @@
 
 {% elseif checkout.shippingAddress == 'setted' %}
 
-<section class="page_content checkout_container row ck-setted">
+<section class="page_content container-fluid px-0 ck-setted">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping_address' | matra('Shipping Address') }}</h4>
 
@@ -134,7 +134,7 @@
 
 {% elseif checkout.shippingAddress == 'toset' %}
 
-<section class="page_content checkout_container row ck-toset">
+<section class="page_content container-fluid px-0 ck-toset">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping_address' | matra('Shipping Address') }}</h4>
 
@@ -150,7 +150,7 @@
 
 {% if checkout.shipping == 'set' %}
 
-<section class="page_content checkout_container row active">
+<section class="page_content container-fluid px-0 active">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping_method' | matra('Shipping Method') }}</h4>
 
@@ -160,7 +160,7 @@
 
 {% elseif checkout.shipping == 'setted' %}
 
-<section class="page_content checkout_container row setted">
+<section class="page_content container-fluid px-0 setted">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping_method' | matra('Shipping Method') }}</h4>
 
@@ -174,7 +174,7 @@
 
 {% elseif checkout.shipping == 'toset' %}
 
-<section class="page_content checkout_container row">
+<section class="page_content container-fluid px-0">
 
 	<h4>{{ i }} - {{ 'page.checkout.shipping_method' | matra('Shipping Method') }}</h4>
 
@@ -190,7 +190,7 @@
 
 {% if checkout.payment == 'set' %}
 
-<section class="page_content checkout_container row active">
+<section class="page_content container-fluid px-0 active">
 
 	<h4>{{ i }} - {{ 'page.checkout.payment_method' | matra('Payment Method') }}</h4>
 
@@ -200,7 +200,7 @@
 
 {% elseif checkout.payment == 'setted' %}
 
-<section class="page_content checkout_container row setted">
+<section class="page_content container-fluid px-0 setted">
 
 	<h4>{{ i }} - {{ 'page.checkout.payment_method' | matra('Payment Method') }}</h4>
 
@@ -214,7 +214,7 @@
 
 {% elseif checkout.payment == 'toset' %}
 
-<section class="page_content checkout_container row">
+<section class="page_content container-fluid px-0">
 
 	<h4>{{ i }} - {{ 'page.checkout.payment_method' | matra('Payment Method') }}</h4>
 
@@ -239,7 +239,7 @@
 
 {% if checkout.confirm == 'set' %}
 
-<section class="page_content checkout_container row active">
+<section class="page_content container-fluid px-0 active">
 
 	<h4>{{ i }} - {{ 'page.checkout.confirm' | matra('Confirm Order') }}</h4>
 
@@ -251,7 +251,7 @@
 
 {% elseif checkout.confirm == 'toset' %}
 
-<section class="page_content checkout_container row">
+<section class="page_content container-fluid px-0">
 
 	<h4>{{ i }} - {{ 'page.checkout.confirm' | matra('Confirm Order') }}</h4>
 
