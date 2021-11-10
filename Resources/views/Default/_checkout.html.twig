@@ -1,41 +1,30 @@
 
-
-{% set i = 0 %}
-
-
 <div class="page page-checkout">
-
 <div class="container">
-
 
 {% if order.items|length %} {# --- Valid Checkout (^^) ---  #}
 
+{% set i = 0 %}
 
 <section class="page_header container-fluid px-0">
 
-{% if order.checkout == 'pickup' %}
+	<h3>{{ 'page.cart.checkout' | matra('Checkout') }}</h3>
 
-<h3>{{ 'page.cart.pickup' | matra('Pickup In Store') }}</h3>
+	<h5>{{ 'order.code' | matra('Order Identifier') }}: {{ order.code }}</h5>
 
-{% else %}
+	{% if is_granted('ROLE_USER') %}
 
-<h3>{{ 'page.cart.checkout' | matra('Checkout') }}</h3>
+	<p class="page-checkout-identity">
+		You are ordering as {{ app.user.username }}
+	</p>
 
-{% endif %}
+	{% else %}
 
+	<p class="page-checkout-identity">
+		You are ordering with this e-mail address: {{ order.mail }} ( <a href="{{ path('maci_order_gocheckout', {'edit': true}) }}">Change Email</a> )
+	</p>
 
-<h5>{{ 'order.code' | matra('Order Identifier') }}: {{ order.code }}</h5>
-
-
-{% if is_granted('ROLE_USER') %}
-
-<span class="page-checkout-identity">You are ordering as {{ app.user.username }}</span>
-
-{% else %}
-
-<span class="page-checkout-identity">You are ordering with this e-mail address: {{ order.mail }} ( <a href="{{ path('maci_order_gocheckout', {'edit': true}) }}">Change Email</a> )</span>
-
-{% endif %}
+	{% endif %}
 
 </section>
 
@@ -97,6 +86,7 @@
 {% endif %} {# --- End Billing Address ---  #}
 
 
+
 {% if checkout.shippingAddress %} {# --- Shipping Address ---  #}
 {% set i = i + 1 %}
 
@@ -145,6 +135,7 @@
 {% endif %} {# --- End Shipping Address ---  #}
 
 
+
 {% if checkout.shipping %} {# --- Shipping Method ---  #}
 {% set i = i + 1 %}
 
@@ -181,6 +172,7 @@
 {% endif %}
 
 {% endif %} {# --- End Shipping Method ---  #}
+
 
 
 {% if checkout.payment %} {# --- Payment ---  #}
@@ -222,14 +214,6 @@
 
 
 
-{#
-	- ? -
-	{{ render(controller('MaciOrderBundle:Default:cartSetCheckout')) }}
-
-#}
-
-
-
 {% if checkout.confirm %} {# --- Confirm ---  #}
 {% set i = i + 1 %}
 
@@ -257,8 +241,8 @@
 
 {% endif %} {# --- End Confirm ---  #}
 
-
 {% endif %} {# --- Checkout Defined ---  #}
+
 
 
 {% else %} {# --- InValid Checkout ---  #}
@@ -267,8 +251,5 @@
 
 {% endif %} {# --- EndIf Checkout ---  #}
 
-
 </div>
-
 </div>
-
